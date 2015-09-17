@@ -4,7 +4,6 @@ from threading import Thread
 from queue import Queue, Empty
 import json
 
-
 ON_POSIX = 'posix' in sys.builtin_module_names
 
 
@@ -15,27 +14,26 @@ def enqueue_output(out, queue):
 
 
 def conf(os):
-    global settings
-
     if os is "win":
-        settings = {"frink": "/Applications/Frink/frink.jar",
-                    "maple": "/Library/Frameworks/Maple.framework/Versions/2015/bin/maple",
-                    "pdflatex": "/usr/texbin/pdflatex"}
+        __settings__ = {"frink": "/Applications/Frink/frink.jar",
+                        "maple": "/Library/Frameworks/Maple.framework/Versions/2015/bin/maple",
+                        "pdflatex": "/usr/texbin/pdflatex"}
     elif os is "osx":
-        settings = {"frink": "/Applications/Frink/frink.jar",
-                    "maple": "/Library/Frameworks/Maple.framework/Versions/2015/bin/maple",
-                    "pdflatex": "/usr/local/texlive/2015/bin/x86_64-darwin/pdftex"}
-
+        __settings__ = {"frink": "/Applications/Frink/frink.jar",
+                        "maple": "/Library/Frameworks/Maple.framework/Versions/2015/bin/maple",
+                        "pdflatex": "/usr/local/texlive/2015/bin/x86_64-darwin/pdftex"}
     with open('mathnotes.conf', 'w') as f:
-        json.dump(settings, f)
+        json.dump(__settings__, f)
 
 
 def run():
+    global __settings__
+
     with open('mathnotes.conf', 'r') as f:
-        settings = json.load(f)
+        __settings__ = json.load(f)
 
     shell_cmd = "java -cp \"{}\" frink.parser.Frink -k "\
-        .format(settings["frink"])
+        .format(__settings__["frink"])
 
     frink_proc = Popen(shell_cmd,
                        stdout=PIPE,
@@ -56,7 +54,7 @@ def run():
     process_input(frink_proc, frink_queue, frink_thread, 20)
 
     shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" "\
-        .format(settings["maple"])
+        .format(__settings__["maple"])
 
     maple_proc = Popen(shell_cmd,
                        stdout=PIPE,
@@ -87,10 +85,7 @@ def run():
             maple_query(prompt, maple_proc, maple_queue, maple_thread)
 
         elif "latex" in prompt:
-            output_string = "\\begin{document}\n{}\n\\end{{document}}".format(prompt)
-            with open("/tmp/mathnotes.tex", "w") as f:
-                f.write(output_string)
-            call(settings["pdflatex"]+" /tmp/mathnotes.tex", shell=True)
+            generate_latex(prompt)
 
         elif "quit" in prompt:
             print("Killing processes...")
@@ -127,3 +122,12 @@ def process_input(proc, queue, thread, wait=0, single=False):
             return line
         else:
             return line + process_input(proc, queue, thread, 0)
+
+
+def generate_latex(output_string):
+    output_string = output_string.strip("latex")
+    with open("preamble.tex", "r") as f:
+        output_string = f.read().replace("%content", output_string)
+    with open("/tmp/mathnotes.tex", "w") as f:
+        f.write(output_string)
+    call(__settings__["pdflatex"]+" -fmt pdflatex /tmp/mathnotes.tex", shell=True)
