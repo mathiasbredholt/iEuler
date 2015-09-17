@@ -43,14 +43,17 @@ def run():
                        stderr=STDOUT,
                        universal_newlines=True,
                        shell=True,
-                       bufsize=1)
-    frink_proc.stdout.readline()
+                       bufsize=1,
+                       close_fds=ON_POSIX)
 
     frink_queue = Queue()
     frink_thread = Thread(target=enqueue_output,
                           args=(frink_proc.stdout, frink_queue))
     frink_thread.daemon = True  # thread dies with the program
     frink_thread.start()
+
+    # Catch initial output
+    process_input(frink_proc, frink_queue, frink_thread, 20)
 
     shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" "\
         .format(settings["maple"])
@@ -71,19 +74,17 @@ def run():
     maple_thread.start()
 
     # Catch initial output
-    process_input(maple_proc, maple_queue, maple_thread, 2)
+    process_input(maple_proc, maple_queue, maple_thread, 20)
 
     print("Welcome to MathNotes v0.1!")
 
     while True:
         prompt = input("math> ")
         if "frink" in prompt:
-            query_string = prompt.strip("frink")+"\n"
-            query(query_string, frink_proc, frink_queue, frink_thread)
+            frink_query(prompt, frink_proc, frink_queue, frink_thread)
 
         elif "maple" in prompt:
-            query_string = prompt.strip("maple")+";\n"
-            query(query_string, maple_proc, maple_queue, maple_thread)
+            maple_query(prompt, maple_proc, maple_queue, maple_thread)
 
         elif "latex" in prompt:
             output_string = "\\begin{{document}} {} \\end{{document}}".format(prompt)
@@ -99,7 +100,16 @@ def run():
             break
 
 
-def query(query_string, proc, queue, thread):
+def frink_query(query_string, proc, queue, thread):
+    query_string = query_string.strip("frink")+"\n"
+    proc.stdin.write(query_string)
+    return_string = process_input(proc, queue, thread, 20)
+    return_string = return_string.strip("\n")
+    print(return_string)
+
+
+def maple_query(query_string, proc, queue, thread):
+    query_string = query_string.strip("maple")+";\n"
     proc.stdin.write(query_string)
     process_input(proc, queue, thread, 0.5, True)
     return_string = process_input(proc, queue, thread, 20)
