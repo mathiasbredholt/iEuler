@@ -15,13 +15,19 @@ def enqueue_output(out, queue):
 
 def conf(os):
     if os is "win":
-        __settings__ = {"frink": "/Applications/Frink/frink.jar",
-                        "maple": "/Library/Frameworks/Maple.framework/Versions/2015/bin/maple",
-                        "pdflatex": "/usr/texbin/pdflatex"}
+        __settings__ = {
+            "frink": "/Applications/Frink/frink.jar",
+            "maple":
+            "/Library/Frameworks/Maple.framework/Versions/2015/bin/maple",
+            "pdflatex": "/usr/texbin/pdflatex"
+        }
     elif os is "osx":
-        __settings__ = {"frink": "/Applications/Frink/frink.jar",
-                        "maple": "/Library/Frameworks/Maple.framework/Versions/2015/bin/maple",
-                        "pdflatex": "/usr/local/texlive/2015/bin/x86_64-darwin/pdftex"}
+        __settings__ = {
+            "frink": "/Applications/Frink/frink.jar",
+            "maple":
+            "/Library/Frameworks/Maple.framework/Versions/2015/bin/maple",
+            "pdflatex": "/usr/local/texlive/2015/bin/x86_64-darwin/pdftex"
+        }
     with open('mathnotes.conf', 'w') as f:
         json.dump(__settings__, f)
 
@@ -86,6 +92,9 @@ def run():
 
         elif "latex" in prompt:
             generate_latex(prompt)
+            call(
+                __settings__["pdflatex"] + " -fmt pdflatex /tmp/mathnotes.tex",
+                shell=True)
 
         elif "quit" in prompt:
             print("Killing processes...")
@@ -96,7 +105,7 @@ def run():
 
 
 def frink_query(query_string, proc, queue, thread):
-    query_string = query_string.strip("frink")+"\n"
+    query_string = query_string.strip("frink") + "\n"
     proc.stdin.write(query_string)
     return_string = process_input(proc, queue, thread, 20)
     return_string = return_string.strip("\n")
@@ -104,7 +113,7 @@ def frink_query(query_string, proc, queue, thread):
 
 
 def maple_query(query_string, proc, queue, thread):
-    query_string = query_string.strip("maple")+";\n"
+    query_string = query_string.strip("maple") + ";\n"
     proc.stdin.write(query_string)
     process_input(proc, queue, thread, 0.5, True)
     return_string = process_input(proc, queue, thread, 20)
@@ -130,4 +139,3 @@ def generate_latex(output_string):
         output_string = f.read().replace("%content", output_string)
     with open("/tmp/mathnotes.tex", "w") as f:
         f.write(output_string)
-    call(__settings__["pdflatex"]+" -fmt pdflatex /tmp/mathnotes.tex", shell=True)
