@@ -87,10 +87,10 @@ def run():
             maple_query(prompt, maple_proc, maple_queue, maple_thread)
 
         elif "latex" in prompt:
-            output_string = "\\begin{{document}} {} \\end{{document}}".format(prompt)
+            output_string = "\\begin{document}\n{}\n\\end{{document}}".format(prompt)
             with open("/tmp/mathnotes.tex", "w") as f:
                 f.write(output_string)
-            call("/usr/local/texlive/2015/bin/x86_64-darwin/pdftex", shell=True)
+            call(settings["pdflatex"]+" /tmp/mathnotes.tex", shell=True)
 
         elif "quit" in prompt:
             print("Killing processes...")
