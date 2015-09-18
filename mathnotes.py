@@ -145,11 +145,15 @@ def generate_latex(output_string):
         f.write(output_string)
 
 
-def print_math(math_tuple):
+def print_math(math_list):
     output_string = ""
-    for item in math_tuple:
+    for item in math_list:
         if type(item) is list:
             output_string += str(item) + " "
         elif type(item) is Complex:
             output_string += "{} {}i ".format(item.r, item.i)
+        elif type(item) is Root:
+            output_string += "sqrt({}, {})".format(item.value, item.n)
+        elif type(item) is Power:
+            output_string + + "{}^({})".format(item.value, item.n)
     print(output_string)
