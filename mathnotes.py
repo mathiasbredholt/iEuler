@@ -16,10 +16,10 @@ def enqueue_output(out, queue):
 def conf(os):
     if os is "win":
         __settings__ = {
-            "frink": "/Applications/Frink/frink.jar",
+            "frink": "C:/Program Files (x86)/Frink/frink.jar",
             "maple":
-            "/Library/Frameworks/Maple.framework/Versions/2015/bin/maple",
-            "pdflatex": "/usr/texbin/pdflatex"
+            "C:/Program Files/Maple 2015/bin.X86_64_WINDOWS/cmaple",
+            "pdflatex": "pdflatex"
         }
     elif os is "osx":
         __settings__ = {
@@ -130,7 +130,7 @@ def process_input(proc, queue, thread, wait=0, single=False):
         if single:
             return line
         else:
-            return line + process_input(proc, queue, thread, 0)
+            return line + process_input(proc, queue, thread, 0.1)
 
 
 def generate_latex(output_string):
