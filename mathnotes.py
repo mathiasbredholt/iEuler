@@ -97,7 +97,7 @@ def run():
         elif "latex" in prompt:
             generate_latex(prompt)
             call(
-                __settings__["pdflatex"] + " -fmt pdflatex /tmp/mathnotes.tex",
+                __settings__["pdflatex"] + " -fmt pdflatex mathnotes.tex",
                 shell=True)
             pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
@@ -122,6 +122,7 @@ def maple_query(query_string, proc, queue, thread):
     proc.stdin.write(query_string)
     process_input(proc, queue, thread, 0.5, True)
     return_string = process_input(proc, queue, thread, 20)
+    print("Return string: " + return_string.strip("\n"))
     print_math(maple.parse(return_string.strip("\n")))
 
 
@@ -141,7 +142,7 @@ def generate_latex(output_string):
     output_string = output_string.strip("latex")
     with open("preamble.tex", "r") as f:
         output_string = f.read().replace("%content", output_string)
-    with open("/tmp/mathnotes.tex", "w") as f:
+    with open("mathnotes.tex", "w") as f:
         f.write(output_string)
 
 
