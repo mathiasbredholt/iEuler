@@ -3,4 +3,4 @@ from mathlib import *
 
 
 def parse(input_string):
-    return [[3, 3], MulOp, Complex(3, 4), AddOp, Root(2, 23)]
+    return [[3, 5], Root(4, 2), Power(3, 6), Complex(3, 4)]

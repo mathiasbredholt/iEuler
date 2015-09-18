@@ -37,15 +37,15 @@ class Fraction:
 
 
 class Root:
-    def _init__(self, nth, val):
-        self.n = nth
-        self.value = val
+    def __init__(self, nth, value):
+        self.nth = nth
+        self.value = value
 
 
 class Power:
-    def __init__(self, nth, val):
-        self.n = nth
-        self.value = val
+    def __init__(self, nth, value):
+        self.nth = nth
+        self.value = value
 
 
 def dummy():

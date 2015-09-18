@@ -21,8 +21,7 @@ def conf(os):
     if os is "win":
         __settings__ = {
             "frink": "C:/Program Files (x86)/Frink/frink.jar",
-            "maple":
-            "C:/Program Files/Maple 2015/bin.X86_64_WINDOWS/cmaple",
+            "maple": "C:/Program Files/Maple 2015/bin.X86_64_WINDOWS/cmaple",
             "pdflatex": "pdflatex"
         }
     elif os is "osx":
@@ -52,7 +51,8 @@ def run():
                        universal_newlines=True,
                        shell=True,
                        bufsize=1,
-                       close_fds=ON_POSIX)
+                       close_fds=ON_POSIX,
+                       preexec_fn=os.setsid)
 
     frink_queue = Queue()
     frink_thread = Thread(target=enqueue_output,
@@ -73,7 +73,8 @@ def run():
                        universal_newlines=True,
                        shell=True,
                        bufsize=1,
-                       close_fds=ON_POSIX)
+                       close_fds=ON_POSIX,
+                       preexec_fn=os.setsid)
 
     maple_queue = Queue()
     maple_thread = Thread(target=enqueue_output,
@@ -85,6 +86,8 @@ def run():
     process_input(maple_proc, maple_queue, maple_thread, 20)
 
     print("Welcome to MathNotes v0.1!")
+
+    print_math(maple.parse(""))
 
     while True:
         prompt = input("math> ")
@@ -103,10 +106,13 @@ def run():
 
         elif "quit" in prompt:
             print("Killing processes...")
-            maple_proc.kill()
-            frink_proc.kill()
+            os.killpg(os.getpgid(maple_proc.pid), 15)
+            os.killpg(os.getpgid(frink_proc.pid), 15)
             print("Quit.")
             break
+
+        else:
+            print("Sorry. I don't understand.")
 
 
 def frink_query(query_string, proc, queue, thread):
@@ -151,9 +157,9 @@ def print_math(math_list):
         if type(item) is list:
             output_string += str(item) + " "
         elif type(item) is Complex:
-            output_string += "{} {}i ".format(item.r, item.i)
+            output_string += "{} + {}i ".format(item.r, item.i)
         elif type(item) is Root:
-            output_string += "sqrt({}, {})".format(item.value, item.n)
+            output_string += "sqrt({}, {}) ".format(item.value, item.nth)
         elif type(item) is Power:
-            output_string + + "{}^({})".format(item.value, item.n)
+            output_string += "{}^({}) ".format(item.value, item.nth)
     print(output_string)
