@@ -21,8 +21,7 @@ def conf(os):
     if os is "win":
         __settings__ = {
             "frink": "C:/Program Files (x86)/Frink/frink.jar",
-            "maple":
-            "C:/Program Files/Maple 2015/bin.X86_64_WINDOWS/cmaple",
+            "maple": "C:/Program Files/Maple 2015/bin.X86_64_WINDOWS/cmaple",
             "pdflatex": "pdflatex"
         }
     elif os is "osx":
@@ -52,7 +51,8 @@ def run():
                        universal_newlines=True,
                        shell=True,
                        bufsize=1,
-                       close_fds=ON_POSIX)
+                       close_fds=ON_POSIX,
+                       preexec_fn=os.setsid)
 
     frink_queue = Queue()
     frink_thread = Thread(target=enqueue_output,
@@ -73,7 +73,8 @@ def run():
                        universal_newlines=True,
                        shell=True,
                        bufsize=1,
-                       close_fds=ON_POSIX)
+                       close_fds=ON_POSIX,
+                       preexec_fn=os.setsid)
 
     maple_queue = Queue()
     maple_thread = Thread(target=enqueue_output,
@@ -84,15 +85,28 @@ def run():
     # Catch initial output
     process_input(maple_proc, maple_queue, maple_thread, 20)
 
+    preview = []
+
     print("Welcome to MathNotes v0.1!")
 
     while True:
+
+        do_save = False
         prompt = input("math> ")
+
+        if ";" in prompt:
+            prompt = prompt.strip(";")
+            do_save = True
+
         if "frink" in prompt:
-            frink_query(prompt, frink_proc, frink_queue, frink_thread)
+            prompt = prompt.strip("frink") + "\n"
+            result_string = frink_query(prompt, frink_proc, frink_queue,
+                                        frink_thread)
 
         elif "maple" in prompt:
-            maple_query(prompt, maple_proc, maple_queue, maple_thread)
+            prompt = prompt.strip("maple") + ";\n"
+            result_string = maple_query(prompt, maple_proc, maple_queue,
+                                        maple_thread)
 
         elif "latex" in prompt:
             generate_latex(prompt)
@@ -103,27 +117,38 @@ def run():
 
         elif "quit" in prompt:
             print("Killing processes...")
-            maple_proc.kill()
-            frink_proc.kill()
+            os.killpg(os.getpgid(maple_proc.pid), 15)
+            os.killpg(os.getpgid(frink_proc.pid), 15)
             print("Quit.")
             break
 
+        elif ":" in prompt:
+            for item in preview:
+                print(item)
+
+        else:
+            result_string = prompt
+            print("Sorry. I don't understand.")
+
+        if do_save:
+            preview.append(result_string)
+
 
 def frink_query(query_string, proc, queue, thread):
-    query_string = query_string.strip("frink") + "\n"
     proc.stdin.write(query_string)
     return_string = process_input(proc, queue, thread, 20)
     return_string = return_string.strip("\n")
     print(return_string)
+    return return_string
 
 
 def maple_query(query_string, proc, queue, thread):
-    query_string = query_string.strip("maple") + ";\n"
     proc.stdin.write(query_string)
     process_input(proc, queue, thread, 0.5, True)
     return_string = process_input(proc, queue, thread, 20)
     print("Return string: " + return_string.strip("\n"))
     print_math(maple.parse(return_string.strip("\n")))
+    return return_string
 
 
 def process_input(proc, queue, thread, wait=0, single=False):
@@ -146,11 +171,15 @@ def generate_latex(output_string):
         f.write(output_string)
 
 
-def print_math(math_tuple):
+def print_math(math_list):
     output_string = ""
-    for item in math_tuple:
+    for item in math_list:
         if type(item) is list:
             output_string += str(item) + " "
         elif type(item) is Complex:
-            output_string += "{} {}i ".format(item.r, item.i)
+            output_string += "{} + {}i ".format(item.r, item.i)
+        elif type(item) is Root:
+            output_string += "sqrt({}, {}) ".format(item.value, item.nth)
+        elif type(item) is Power:
+            output_string += "{}^({}) ".format(item.value, item.nth)
     print(output_string)
