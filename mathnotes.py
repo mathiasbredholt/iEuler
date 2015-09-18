@@ -85,17 +85,28 @@ def run():
     # Catch initial output
     process_input(maple_proc, maple_queue, maple_thread, 20)
 
+    preview = []
+
     print("Welcome to MathNotes v0.1!")
 
-    print_math(maple.parse(""))
-
     while True:
+
+        do_save = False
         prompt = input("math> ")
+
+        if ";" in prompt:
+            prompt = prompt.strip(";")
+            do_save = True
+
         if "frink" in prompt:
-            frink_query(prompt, frink_proc, frink_queue, frink_thread)
+            prompt = prompt.strip("frink") + "\n"
+            result_string = frink_query(prompt, frink_proc, frink_queue,
+                                        frink_thread)
 
         elif "maple" in prompt:
-            maple_query(prompt, maple_proc, maple_queue, maple_thread)
+            prompt = prompt.strip("maple") + ";\n"
+            result_string = maple_query(prompt, maple_proc, maple_queue,
+                                        maple_thread)
 
         elif "latex" in prompt:
             generate_latex(prompt)
@@ -111,24 +122,32 @@ def run():
             print("Quit.")
             break
 
+        elif ":" in prompt:
+            for item in preview:
+                print(item)
+
         else:
+            result_string = prompt
             print("Sorry. I don't understand.")
+
+        if do_save:
+            preview.append(result_string)
 
 
 def frink_query(query_string, proc, queue, thread):
-    query_string = query_string.strip("frink") + "\n"
     proc.stdin.write(query_string)
     return_string = process_input(proc, queue, thread, 20)
     return_string = return_string.strip("\n")
     print(return_string)
+    return return_string
 
 
 def maple_query(query_string, proc, queue, thread):
-    query_string = query_string.strip("maple") + ";\n"
     proc.stdin.write(query_string)
     process_input(proc, queue, thread, 0.5, True)
     return_string = process_input(proc, queue, thread, 20)
     print_math(maple.parse(return_string.strip("\n")))
+    return return_string
 
 
 def process_input(proc, queue, thread, wait=0, single=False):
