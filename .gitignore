@@ -1,6 +1,6 @@
 *.conf
-*.pyc
 *.log
 *.pdf
 *.aux
-*.pyc
+__pycache__/
+*.py[cod]
