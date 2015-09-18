@@ -3,6 +3,10 @@ from subprocess import PIPE, STDOUT, Popen, call
 from threading import Thread
 from queue import Queue, Empty
 import json
+import pyperclip
+import os
+import maple
+from mathlib import *
 
 ON_POSIX = 'posix' in sys.builtin_module_names
 
@@ -95,6 +99,7 @@ def run():
             call(
                 __settings__["pdflatex"] + " -fmt pdflatex /tmp/mathnotes.tex",
                 shell=True)
+            pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
         elif "quit" in prompt:
             print("Killing processes...")
@@ -117,8 +122,7 @@ def maple_query(query_string, proc, queue, thread):
     proc.stdin.write(query_string)
     process_input(proc, queue, thread, 0.5, True)
     return_string = process_input(proc, queue, thread, 20)
-    return_string = return_string.strip("\n")
-    print(return_string)
+    print_math(maple.parse(return_string.strip("\n")))
 
 
 def process_input(proc, queue, thread, wait=0, single=False):
@@ -139,3 +143,13 @@ def generate_latex(output_string):
         output_string = f.read().replace("%content", output_string)
     with open("/tmp/mathnotes.tex", "w") as f:
         f.write(output_string)
+
+
+def print_math(math_tuple):
+    output_string = ""
+    for item in math_tuple:
+        if type(item) is list:
+            output_string += str(item) + " "
+        elif type(item) is Complex:
+            output_string += "{} {}i ".format(item.r, item.i)
+    print(output_string)
