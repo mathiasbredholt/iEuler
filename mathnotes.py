@@ -1,21 +1,12 @@
-import sys
-from subprocess import PIPE, STDOUT, Popen, call
-from threading import Thread
-from queue import Queue, Empty
 import json
 import pyperclip
 import os
 import maple
+import frink
 import latex
-import mathlib
-
-ON_POSIX = 'posix' in sys.builtin_module_names
-
-
-def enqueue_output(out, queue):
-    for line in iter(out.readline, b''):
-        queue.put(line)
-    out.close()
+import mathcmd
+from subprocess import call
+import procio
 
 
 def conf(os):
@@ -42,49 +33,8 @@ def run():
     with open('mathnotes.conf', 'r') as f:
         __settings__ = json.load(f)
 
-    shell_cmd = "java -cp \"{}\" frink.parser.Frink -k "\
-        .format(__settings__["frink"])
-
-    frink_proc = Popen(shell_cmd,
-                       stdout=PIPE,
-                       stdin=PIPE,
-                       stderr=STDOUT,
-                       universal_newlines=True,
-                       shell=True,
-                       bufsize=1,
-                       close_fds=ON_POSIX)
-    # preexec_fn=os.setsid)
-
-    frink_queue = Queue()
-    frink_thread = Thread(target=enqueue_output,
-                          args=(frink_proc.stdout, frink_queue))
-    frink_thread.daemon = True  # thread dies with the program
-    frink_thread.start()
-
-    # Catch initial output
-    process_input(frink_proc, frink_queue, frink_thread, 20)
-
-    shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" ".format(
-        __settings__["maple"])
-
-    maple_proc = Popen(shell_cmd,
-                       stdout=PIPE,
-                       stdin=PIPE,
-                       stderr=STDOUT,
-                       universal_newlines=True,
-                       shell=True,
-                       bufsize=1,
-                       close_fds=ON_POSIX)
-    # preexec_fn=os.setsid)
-
-    maple_queue = Queue()
-    maple_thread = Thread(target=enqueue_output,
-                          args=(maple_proc.stdout, maple_queue))
-    maple_thread.daemon = True  # thread dies with the program
-    maple_thread.start()
-
-    # Catch initial output
-    process_input(maple_proc, maple_queue, maple_thread, 20)
+    frink_proc, frink_queue, frink_thread = frink.init(__settings__["frink"])
+    maple_proc, maple_queue, maple_thread = maple.init(__settings__["maple"])
 
     preview = []
 
@@ -112,8 +62,8 @@ def run():
         elif "maptotex" in prompt:
             generate_latex(
                 latex.generate(maple.parse(prompt.strip("mapletolatex"))))
-            call(__settings__["pdflatex"] +
-                 " -fmt pdflatex mathnotes.tex", shell=True)
+            call(__settings__["pdflatex"] + " -fmt pdflatex mathnotes.tex",
+                 shell=True)
             pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
         elif "latex" in prompt:
@@ -157,7 +107,7 @@ def run():
 
 def frink_query(query_string, proc, queue, thread):
     proc.stdin.write(query_string)
-    return_string = process_input(proc, queue, thread, 20)
+    return_string = procio.process_input(proc, queue, thread, 20)
     return_string = return_string.strip("\n")
     print(return_string)
     return return_string
@@ -165,24 +115,12 @@ def frink_query(query_string, proc, queue, thread):
 
 def maple_query(query_string, proc, queue, thread):
     proc.stdin.write(query_string)
-    process_input(proc, queue, thread, 0.5, True)
-    return_string = process_input(proc, queue, thread, 20)
+    procio.process_input(proc, queue, thread, 0.5, True)
+    return_string = procio.process_input(proc, queue, thread, 20)
     return_string = return_string.strip("\n")
     print("Return string: " + return_string)
-    print_math(maple.parse(return_string))
+    mathcmd.print_math(maple.parse(return_string))
     return return_string
-
-
-def process_input(proc, queue, thread, wait=0, single=False):
-    try:
-        line = queue.get(timeout=wait)  # or q.get(timeout=.1)
-    except Empty:
-        return ""
-    else:  # got line
-        if single:
-            return line
-        else:
-            return line + process_input(proc, queue, thread, 0.1)
 
 
 def generate_latex(output_string):
@@ -191,17 +129,3 @@ def generate_latex(output_string):
         output_string = f.read().replace("%content", output_string)
     with open("mathnotes.tex", "w") as f:
         f.write(output_string)
-
-
-def print_math(math_list):
-    output_string = ""
-    for item in math_list:
-        if type(item) is list:
-            output_string += str(item) + " "
-        elif type(item) is Complex:
-            output_string += "{} + {}i ".format(item.r, item.i)
-        elif type(item) is Root:
-            output_string += "sqrt({}, {}) ".format(item.value, item.nth)
-        elif type(item) is Power:
-            output_string += "{}^({}) ".format(item.value, item.nth)
-    print(output_string)
