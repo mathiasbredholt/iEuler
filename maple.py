@@ -15,7 +15,7 @@ def parse(input_string):
     # y = parse_expression(x)
     # print("-> {}".format(y))
     # return y
-    return parse_expression(parse_nested(input_string))
+    return parse_expression(parse_nested(input_string.strip(' ')))
 
 
 def parse_nested(text, left=r'[(]', right=r'[)]', operators=r'[-+*/^]'):
@@ -74,8 +74,9 @@ def parse_expression(expression):
 
             operator = get_operator(operator, value[0], value[1])
 
-            if len(get_list_value(expression, indices[0:len(indices) - 1])) is 3:
-
+            while len(get_list_value(expression, indices[0:len(indices) - 1])) in [1, 3]:
+                # print("indices={}".format(indices))
+                # print("expression={}".format(expression))
                 if len(indices) is 1:
                     # operator contains complete expression, return
                     return operator
@@ -85,6 +86,8 @@ def parse_expression(expression):
                 # operator, replace it with operator
                 set_list_value(
                     expression, indices[0:len(indices) - 1], operator)
+                # print("expression={}".format(expression))
+                indices.pop()
             else:
                 # expression in innermost parentheses contains more unparsed
                 # operations, just replace the three items, constituting the
@@ -100,7 +103,7 @@ def parse_expression(expression):
 
 
 def get_math_value(value):
-    return Number(value)
+    return Number(value.strip(' '))
 
 
 def get_operator(symbol, value1, value2):
@@ -148,7 +151,7 @@ def recursive_index(input_list, regex, rev=False):
             if re.match(regex, x):
                 return ([index], x)
         elif type(x) is list:
-            indices = recursive_index(x, regex, rev)
+            indices, match = recursive_index(x, regex, rev)
             if not indices is -1:
-                return ([index] + indices[0], indices[1])
+                return ([index] + indices, match)
     return (-1, regex)
