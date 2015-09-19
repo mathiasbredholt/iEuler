@@ -6,6 +6,7 @@ import json
 import pyperclip
 import os
 import maple
+import latex
 from mathlib import *
 
 ON_POSIX = 'posix' in sys.builtin_module_names
@@ -41,49 +42,49 @@ def run():
     with open('mathnotes.conf', 'r') as f:
         __settings__ = json.load(f)
 
-    shell_cmd = "java -cp \"{}\" frink.parser.Frink -k "\
-        .format(__settings__["frink"])
-
-    frink_proc = Popen(shell_cmd,
-                       stdout=PIPE,
-                       stdin=PIPE,
-                       stderr=STDOUT,
-                       universal_newlines=True,
-                       shell=True,
-                       bufsize=1,
-                       close_fds=ON_POSIX,
-                       preexec_fn=os.setsid)
-
-    frink_queue = Queue()
-    frink_thread = Thread(target=enqueue_output,
-                          args=(frink_proc.stdout, frink_queue))
-    frink_thread.daemon = True  # thread dies with the program
-    frink_thread.start()
-
-    # Catch initial output
-    process_input(frink_proc, frink_queue, frink_thread, 20)
-
-    shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" "\
-        .format(__settings__["maple"])
-
-    maple_proc = Popen(shell_cmd,
-                       stdout=PIPE,
-                       stdin=PIPE,
-                       stderr=STDOUT,
-                       universal_newlines=True,
-                       shell=True,
-                       bufsize=1,
-                       close_fds=ON_POSIX,
-                       preexec_fn=os.setsid)
-
-    maple_queue = Queue()
-    maple_thread = Thread(target=enqueue_output,
-                          args=(maple_proc.stdout, maple_queue))
-    maple_thread.daemon = True  # thread dies with the program
-    maple_thread.start()
-
-    # Catch initial output
-    process_input(maple_proc, maple_queue, maple_thread, 20)
+    # shell_cmd = "java -cp \"{}\" frink.parser.Frink -k "\
+    #     .format(__settings__["frink"])
+    #
+    # frink_proc = Popen(shell_cmd,
+    #                    stdout=PIPE,
+    #                    stdin=PIPE,
+    #                    stderr=STDOUT,
+    #                    universal_newlines=True,
+    #                    shell=True,
+    #                    bufsize=1,
+    #                    close_fds=ON_POSIX,
+    #                    preexec_fn=os.setsid)
+    #
+    # frink_queue = Queue()
+    # frink_thread = Thread(target=enqueue_output,
+    #                       args=(frink_proc.stdout, frink_queue))
+    # frink_thread.daemon = True  # thread dies with the program
+    # frink_thread.start()
+    #
+    # # Catch initial output
+    # process_input(frink_proc, frink_queue, frink_thread, 20)
+    #
+    # shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" "\
+    #     .format(__settings__["maple"])
+    #
+    # maple_proc = Popen(shell_cmd,
+    #                    stdout=PIPE,
+    #                    stdin=PIPE,
+    #                    stderr=STDOUT,
+    #                    universal_newlines=True,
+    #                    shell=True,
+    #                    bufsize=1,
+    #                    close_fds=ON_POSIX,
+    #                    preexec_fn=os.setsid)
+    #
+    # maple_queue = Queue()
+    # maple_thread = Thread(target=enqueue_output,
+    #                       args=(maple_proc.stdout, maple_queue))
+    # maple_thread.daemon = True  # thread dies with the program
+    # maple_thread.start()
+    #
+    # # Catch initial output
+    # process_input(maple_proc, maple_queue, maple_thread, 20)
 
     preview = []
 
@@ -109,7 +110,14 @@ def run():
                                         maple_thread)
 
         elif "latex" in prompt:
-            generate_latex(prompt)
+            output_string = ""
+            for item in preview:
+                output_string += item + "\n"
+
+            # todo
+            generate_latex(latex.generate([Integral(3, "x", 0, 1), Root(3, 2)
+                                           ]))
+
             call(
                 __settings__["pdflatex"] + " -fmt pdflatex mathnotes.tex",
                 shell=True)
@@ -146,8 +154,9 @@ def maple_query(query_string, proc, queue, thread):
     proc.stdin.write(query_string)
     process_input(proc, queue, thread, 0.5, True)
     return_string = process_input(proc, queue, thread, 20)
-    print("Return string: " + return_string.strip("\n"))
-    print_math(maple.parse(return_string.strip("\n")))
+    return_string = return_string.strip("\n")
+    print("Return string: " + return_string)
+    print_math(maple.parse(return_string))
     return return_string
 
 
