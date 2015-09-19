@@ -42,49 +42,49 @@ def run():
     with open('mathnotes.conf', 'r') as f:
         __settings__ = json.load(f)
 
-    # shell_cmd = "java -cp \"{}\" frink.parser.Frink -k "\
-    #     .format(__settings__["frink"])
-    #
-    # frink_proc = Popen(shell_cmd,
-    #                    stdout=PIPE,
-    #                    stdin=PIPE,
-    #                    stderr=STDOUT,
-    #                    universal_newlines=True,
-    #                    shell=True,
-    #                    bufsize=1,
-    #                    close_fds=ON_POSIX,
-    #                    preexec_fn=os.setsid)
-    #
-    # frink_queue = Queue()
-    # frink_thread = Thread(target=enqueue_output,
-    #                       args=(frink_proc.stdout, frink_queue))
-    # frink_thread.daemon = True  # thread dies with the program
-    # frink_thread.start()
-    #
-    # # Catch initial output
-    # process_input(frink_proc, frink_queue, frink_thread, 20)
-    #
-    # shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" "\
-    #     .format(__settings__["maple"])
-    #
-    # maple_proc = Popen(shell_cmd,
-    #                    stdout=PIPE,
-    #                    stdin=PIPE,
-    #                    stderr=STDOUT,
-    #                    universal_newlines=True,
-    #                    shell=True,
-    #                    bufsize=1,
-    #                    close_fds=ON_POSIX,
-    #                    preexec_fn=os.setsid)
-    #
-    # maple_queue = Queue()
-    # maple_thread = Thread(target=enqueue_output,
-    #                       args=(maple_proc.stdout, maple_queue))
-    # maple_thread.daemon = True  # thread dies with the program
-    # maple_thread.start()
-    #
-    # # Catch initial output
-    # process_input(maple_proc, maple_queue, maple_thread, 20)
+    shell_cmd = "java -cp \"{}\" frink.parser.Frink -k "\
+        .format(__settings__["frink"])
+
+    frink_proc = Popen(shell_cmd,
+                       stdout=PIPE,
+                       stdin=PIPE,
+                       stderr=STDOUT,
+                       universal_newlines=True,
+                       shell=True,
+                       bufsize=1,
+                       close_fds=ON_POSIX,
+                       preexec_fn=os.setsid)
+
+    frink_queue = Queue()
+    frink_thread = Thread(target=enqueue_output,
+                          args=(frink_proc.stdout, frink_queue))
+    frink_thread.daemon = True  # thread dies with the program
+    frink_thread.start()
+
+    # Catch initial output
+    process_input(frink_proc, frink_queue, frink_thread, 20)
+
+    shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" "\
+        .format(__settings__["maple"])
+
+    maple_proc = Popen(shell_cmd,
+                       stdout=PIPE,
+                       stdin=PIPE,
+                       stderr=STDOUT,
+                       universal_newlines=True,
+                       shell=True,
+                       bufsize=1,
+                       close_fds=ON_POSIX,
+                       preexec_fn=os.setsid)
+
+    maple_queue = Queue()
+    maple_thread = Thread(target=enqueue_output,
+                          args=(maple_proc.stdout, maple_queue))
+    maple_thread.daemon = True  # thread dies with the program
+    maple_thread.start()
+
+    # Catch initial output
+    process_input(maple_proc, maple_queue, maple_thread, 20)
 
     preview = []
 
@@ -115,8 +115,11 @@ def run():
                 output_string += item + "\n"
 
             # todo
-            generate_latex(latex.generate([Integral(3, "x", 0, 1), Root(3, 2)
-                                           ]))
+            generate_latex(latex.generate([Integral(Number("3"), Variable(
+                "x"), Number("-1"), Number("1")), Root(
+                    2, Number("4")), Fraction(MulOp(Number("2"), Variable(
+                        "x")), Variable("y")), Derivative(Variable(
+                            "x"), Variable("y"), 2)]))
 
             call(
                 __settings__["pdflatex"] + " -fmt pdflatex mathnotes.tex",
