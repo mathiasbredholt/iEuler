@@ -45,13 +45,41 @@ def parse_nested(text, left=r'[(]', right=r'[)]', operators=r'[-+*/^]'):
 
 
 def parse_expression(expression):
-    indices = recursive_index(expression, "^", True)
-    while not indices is -1:
-        index1, index2 = indices
-        index1[len(index1) - 1] -= 1
-        index2[len(index2) - 1] += 1
-        set_list_value(a, indices[0:len(indices) - 1], )
-        indices = recursive_index(expression, "^", True)
+    operators = ['^', '*', '/', '+', '-']
+    for op in operators:
+        indices = recursive_index(expression, op, op is '^')
+        while not indices is -1:
+            print("op=" + op)
+            index1 = indices.copy()
+            index2 = indices.copy()
+            index1[len(index1) - 1] -= 1
+            index2[len(index2) - 1] += 1
+            print("index1=" + str(index1))
+            print("index2=" + str(index2))
+            operator = get_operator(
+                op, get_list_value(expression, index1), get_list_value(expression, index2))
+            if len(indices) is 1:
+                expression[0] = operator
+                expression.pop()
+                expression.pop()
+                return expression
+            else:
+                set_list_value(
+                    expression, indices[0:len(indices) - 1], operator)
+            indices = recursive_index(expression, op, op is '^')
+
+
+def get_operator(symbol, value1, value2):
+    if symbol is '^':
+        return Power(value1, value2)
+    elif symbol is '*':
+        return MulOp(value1, value2)
+    elif symbol is '/':
+        return Fraction(value1, value2)
+    elif symbol is '+':
+        return AddOp(value1, value2)
+    elif symbol is '-':
+        return SubOp(value1, value2)
 
 
 def get_list_value(input_list, indices):
