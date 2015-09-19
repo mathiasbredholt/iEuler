@@ -2,69 +2,66 @@
 # contains all datatypes
 
 
-class Number:
-    def __init__(self, value):
-        self.value = value
-
-    def __str__(self):
+class MathValue:
+    def get_value(self):
         return self.value
 
 
-class Variable:
-    def __init__(self, name):
-        self.name = name
-
-    def __str__(self):
-        return self.name
+class Number(MathValue):
+    def __init__(self, value):
+        self.value = value
 
 
-class Matrix:
+class Matrix(MathValue):
     def __init__(self, values, width, height):
         self.value = values
         self.width = width
         self.height = height
 
 
-class Complex:
+class Complex(MathValue):
     def __init__(self, realpart, imagpart):
         self.r = realpart
         self.i = imagpart
+        self.value = (self.r, self.i)
 
 
-class AddOp:
-    def __init__(self, value1, value2):
-        self.value1 = value1
-        self.value2 = value2
-
-
-class SubOp:
-    def __init__(self, value1, value2):
-        self.value1 = value1
-        self.value2 = value2
-
-
-class MulOp:
-    def __init__(self, value1, value2):
-        self.value1 = value1
-        self.value2 = value2
-
-
-class Fraction:
-    def __init__(self, enum, denom):
-        self.enum = enum
-        self.denom = denom
-
-
-class Root:
-    def __init__(self, nth, value):
-        self.nth = nth
+class Variable(MathValue):
+    def __init__(self, value):
         self.value = value
 
 
-class Power:
-    def __init__(self, nth, value):
-        self.nth = nth
-        self.value = value
+class MathOperator:
+    def __init__(self, value1, value2):
+        self.value1 = value1
+        self.value2 = value2
+
+    def get_value(self):
+        return False
+
+
+class AddOp(MathOperator):
+    pass
+
+
+class SubOp(MathOperator):
+    pass
+
+
+class MulOp(MathOperator):
+    pass
+
+
+class Fraction(MathOperator):
+    pass
+
+
+class Root(MathOperator):
+    pass
+
+
+class Power(MathOperator):
+    pass
 
 
 # Calculus
@@ -75,9 +72,15 @@ class Integral:
         self.range_from = range_from
         self.range_to = range_to
 
+    def get_value(self):
+        return False
+
 
 class Derivative:
     def __init__(self, dx, dy, nth):
         self.dx = dx
         self.dy = dy
         self.nth = nth
+
+    def get_value(self):
+        return False

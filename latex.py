@@ -2,53 +2,62 @@
 from mathlib import *
 
 
-def generate(math_expression):
-    output_string = ""
-    for item in math_expression:
-        if type(item) is Number:
-            output_string += item.value
-
-        elif type(item) is Variable:
-            output_string += item.name
-
-        elif type(item) is AddOp:
-            output_string += "+"
-
-        elif type(item) is SubOp:
-            output_string += "-"
-
-        elif type(item) is MulOp:
-            if type(item.value1) is Number and type(item.value2) is Number:
-                output_string += "{} \\cdot {}".format(item.value1,
-                                                       item.value2)
+def convert_expr(input_expr):
+    if input_expr.get_value():
+        return input_expr.get_value()
+    else:
+        output_string = ""
+        if type(input_expr) is AddOp:
+            return "{} + {}".format(convert_expr(input_expr.value1),
+                                    convert_expr(input_expr.value2))
+        elif type(input_expr) is SubOp:
+            return "{} - {}".format(convert_expr(input_expr.value1),
+                                    convert_expr(input_expr.value2))
+        elif type(input_expr) is MulOp:
+            if type(input_expr.value1) is Number and type(
+                    input_expr.value2) is Number:
+                return "{} \\cdot {}".format(convert_expr(input_expr.value1),
+                                             convert_expr(input_expr.value2))
             else:
-                output_string += "{} {}".format(item.value1, item.value2)
-
-        elif type(item) is Fraction:
-            output_string += "\\dfrac{{{}}}{{{}}} ".format(item.enum,
-                                                           item.denom)
-
-        elif type(item) is Root:
-            if item.nth is 2:
-                output_string += "\\sqrt{{{}}} ".format(item.value)
+                return "{} {}".format(convert_expr(input_expr.value1),
+                                      convert_expr(input_expr.value2))
+        elif type(input_expr) is Fraction:
+            return "\\dfrac{{{}}}{{{}}} ".format(
+                convert_expr(input_expr.value1),
+                convert_expr(input_expr.value2))
+        elif type(input_expr) is Power:
+            return "{}^{{{}}}".format(convert_expr(input_expr.value1),
+                                      convert_expr(input_expr.value2))
+        elif type(input_expr) is Root:
+            if input_expr.value2.get_value is "2":
+                return "\\sqrt{{{}}} ".format(convert_expr(input_expr.value1))
             else:
-                output_string += "\\sqrt[{}]{{{}}} ".format(item.nth,
-                                                            item.value)
+                return "\\sqrt[{}]{{{}}} ".format(
+                    convert_expr(input_expr.value2),
+                    convert_expr(input_expr.value1))
+        elif type(input_expr) is Integral:
+            return convert_integral(input_expr)
 
-        elif type(item) is Integral:
-            if item.range_from is None:
-                output_string += "\\displaystyle \\int {}\\;\partial {} ".format(
-                    item.value, item.dx)
-            else:
-                output_string += "\\displaystyle \\int_{{{}}}^{{{}}} {}\\;\partial {} ".format(
-                    item.range_from, item.range_to, item.value, item.dx)
+        elif type(input_expr) is Derivative:
+            return convert_derivative(input_expr)
 
-        elif type(item) is Derivative:
-            if item.nth is 1:
-                output_string += "\\frac{{\\partial {}}}{{\\partial {}}} ".format(
-                    item.dx, item.dy)
-            else:
-                output_string += "\\frac{{\\partial^{{{}}}}}{{\\partial {}^{{{}}}}}{} ".format(
-                    item.nth, item.dy, item.nth, item.dx)
 
-    return output_string
+def convert_integral(input_expr):
+    if input_expr.range_from is None:
+        return "\\displaystyle \\int {}\\;\partial {} ".format(
+            convert_expr(input_expr.value), convert_expr(input_expr.dx))
+    else:
+        return "\\displaystyle \\int_{{{}}}^{{{}}} {}\\;\partial {} ".format(
+            convert_expr(input_expr.range_from),
+            convert_expr(input_expr.range_to), convert_expr(input_expr.value),
+            convert_expr(input_expr.dx))
+
+
+def convert_derivative(input_expr):
+    if input_expr.nth.get_value is "1":
+        return "\\frac{{\\partial {}}}{{\\partial {}}} ".format(
+            convert_expr(input_expr.dx), convert_expr(input_expr.dy))
+    else:
+        return "\\frac{{\\partial^{{{}}}}}{{\\partial {}^{{{}}}}}{} ".format(
+            convert_expr(input_expr.nth), convert_expr(input_expr.dy),
+            convert_expr(input_expr.nth), convert_expr(input_expr.dx))

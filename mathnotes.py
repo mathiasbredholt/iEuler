@@ -115,7 +115,7 @@ def run():
                 output_string += item + "\n"
 
             # todo
-            generate_latex(latex.generate([Integral(Number("3"), Variable(
+            generate_latex(latex.convert_expr([Integral(Number("3"), Variable(
                 "x"), Number("-1"), Number("1")), Root(
                     2, Number("4")), Fraction(MulOp(Number("2"), Variable(
                         "x")), Variable("y")), Derivative(Variable(
