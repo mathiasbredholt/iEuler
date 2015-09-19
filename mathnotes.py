@@ -52,8 +52,8 @@ def run():
                        universal_newlines=True,
                        shell=True,
                        bufsize=1,
-                       close_fds=ON_POSIX,
-                       preexec_fn=os.setsid)
+                       close_fds=ON_POSIX)
+    # preexec_fn=os.setsid)
 
     frink_queue = Queue()
     frink_thread = Thread(target=enqueue_output,
@@ -64,8 +64,8 @@ def run():
     # Catch initial output
     process_input(frink_proc, frink_queue, frink_thread, 20)
 
-    shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" "\
-        .format(__settings__["maple"])
+    shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" ".format(
+        __settings__["maple"])
 
     maple_proc = Popen(shell_cmd,
                        stdout=PIPE,
@@ -74,8 +74,8 @@ def run():
                        universal_newlines=True,
                        shell=True,
                        bufsize=1,
-                       close_fds=ON_POSIX,
-                       preexec_fn=os.setsid)
+                       close_fds=ON_POSIX)
+    # preexec_fn=os.setsid)
 
     maple_queue = Queue()
     maple_thread = Thread(target=enqueue_output,
@@ -109,18 +109,27 @@ def run():
             result_string = maple_query(prompt, maple_proc, maple_queue,
                                         maple_thread)
 
+        elif "maptotex" in prompt:
+            generate_latex(
+                latex.generate(maple.parse(prompt.strip("mapletolatex"))))
+            call(__settings__["pdflatex"] +
+                 " -fmt pdflatex mathnotes.tex", shell=True)
+            pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
+
         elif "latex" in prompt:
-            output_string = ""
-            for item in preview:
-                output_string += item + "\n"
+            # output_string = ""
+            # for item in preview:
+            #     output_string += item + "\n"
 
             # todo
-            generate_latex(latex.generate([Integral(Number("3"), Variable(
-                "x"), Number("-1"), Number("1")), Root(
-                    Number("2"), Number("4")), Fraction(MulOp(Number(
-                        "2"), Variable(
-                            "x")), Variable("y")), Derivative(Variable(
-                                "x"), Variable("y"), Number("2"))]))
+            # generate_latex(latex.generate([Integral(Number("3"), Variable(
+            #     "x"), Number("-1"), Number("1")), Root(
+            #         Number("2"), Number("4")), Fraction(MulOp(Number(
+            #             "2"), Variable(
+            #                 "x")), Variable("y")), Derivative(Variable(
+            #                     "x"), Variable("y"), Number("2"))]))
+
+            # generate_latex(latex.generate(prompt.strip()))
 
             call(
                 __settings__["pdflatex"] + " -fmt pdflatex mathnotes.tex",

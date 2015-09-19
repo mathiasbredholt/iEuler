@@ -4,3 +4,4 @@
 *.aux
 __pycache__/
 *.py[cod]
+mathnotes.tex

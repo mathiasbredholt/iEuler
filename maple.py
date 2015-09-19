@@ -56,8 +56,16 @@ def parse_expression(expression):
             index2[len(index2) - 1] += 1
             print("index1=" + str(index1))
             print("index2=" + str(index2))
-            operator = get_operator(
-                op, get_list_value(expression, index1), get_list_value(expression, index2))
+            value = []
+            value.append(get_list_value(expression, index1))
+            value.append(get_list_value(expression, index2))
+            for i in range(0, 2):
+                if type(value[i]) is str:
+                    value[i] = get_math_value(value[i])
+                elif type(value[i]) is list:
+                    value[i] = parse_expression(value[i])
+                # else: is operator
+            operator = get_operator(op, value[0], value[1])
             if len(indices) is 1:
                 expression[0] = operator
                 expression.pop()
@@ -67,6 +75,10 @@ def parse_expression(expression):
                 set_list_value(
                     expression, indices[0:len(indices) - 1], operator)
             indices = recursive_index(expression, op, op is '^')
+
+
+def get_math_value(value):
+    return Number(value)
 
 
 def get_operator(symbol, value1, value2):
