@@ -7,7 +7,7 @@ import pyperclip
 import os
 import maple
 import latex
-from mathlib import *
+import mathlib
 
 ON_POSIX = 'posix' in sys.builtin_module_names
 
