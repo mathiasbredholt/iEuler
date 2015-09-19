@@ -1,5 +1,5 @@
 # latex generator for mathnotes
-from mathlib import *
+import mathlib
 
 
 def generate(input_expr):
@@ -13,40 +13,64 @@ def convert_expr(input_expr):
     if input_expr.get_value():
         return input_expr.get_value()
     else:
-        output_string = ""
-        if type(input_expr) is AddOp:
-            return "{} + {}".format(convert_expr(input_expr.value1),
-                                    convert_expr(input_expr.value2))
-        elif type(input_expr) is SubOp:
-            return "{} - {}".format(convert_expr(input_expr.value1),
-                                    convert_expr(input_expr.value2))
-        elif type(input_expr) is MulOp:
-            if type(input_expr.value1) is Number and type(
-                    input_expr.value2) is Number:
-                return "{} \\cdot {}".format(convert_expr(input_expr.value1),
-                                             convert_expr(input_expr.value2))
-            else:
-                return "{} {}".format(convert_expr(input_expr.value1),
-                                      convert_expr(input_expr.value2))
-        elif type(input_expr) is Fraction:
-            return "\\dfrac{{{}}}{{{}}} ".format(
-                convert_expr(input_expr.value1),
-                convert_expr(input_expr.value2))
-        elif type(input_expr) is Power:
-            return "{}^{{{}}}".format(convert_expr(input_expr.value1),
-                                      convert_expr(input_expr.value2))
-        elif type(input_expr) is Root:
-            if input_expr.value2.get_value is "2":
-                return "\\sqrt{{{}}} ".format(convert_expr(input_expr.value1))
-            else:
-                return "\\sqrt[{}]{{{}}} ".format(
-                    convert_expr(input_expr.value2),
-                    convert_expr(input_expr.value1))
-        elif type(input_expr) is Integral:
+        if type(input_expr) is mathlib.AddOp:
+            return convert_addop(input_expr)
+
+        elif type(input_expr) is mathlib.SubOp:
+            return convert_subop(input_expr)
+
+        elif type(input_expr) is mathlib.MulOp:
+            return convert_mulop(input_expr)
+
+        elif type(input_expr) is mathlib.Fraction:
+            return convert_fraction(input_expr)
+
+        elif type(input_expr) is mathlib.Root:
+            return convert_root(input_expr)
+
+        elif type(input_expr) is mathlib.Integral:
             return convert_integral(input_expr)
 
-        elif type(input_expr) is Derivative:
+        elif type(input_expr) is mathlib.Derivative:
             return convert_derivative(input_expr)
+
+
+def convert_addop(input_expr):
+    return "{} + {}".format(convert_expr(input_expr.value1),
+                            convert_expr(input_expr.value2))
+
+
+def convert_subop(input_expr):
+    return "{} - {}".format(convert_expr(input_expr.value1),
+                            convert_expr(input_expr.value2))
+
+
+def convert_mulop(input_expr):
+    if type(input_expr.value1) is mathlib.Number and type(
+            input_expr.value2) is mathlib.Number:
+        return "{} \\cdot {}".format(convert_expr(input_expr.value1),
+                                     convert_expr(input_expr.value2))
+    else:
+        return "{} {}".format(convert_expr(input_expr.value1),
+                              convert_expr(input_expr.value2))
+
+
+def convert_fraction(input_expr):
+    return "\\dfrac{{{}}}{{{}}} ".format(
+        convert_expr(input_expr.value1), convert_expr(input_expr.value2))
+
+
+def convert_power(input_expr):
+    return "{}^{{{}}}".format(convert_expr(input_expr.value1),
+                              convert_expr(input_expr.value2))
+
+
+def convert_root(input_expr):
+    if input_expr.value2.get_value is "2":
+        return "\\sqrt{{{}}} ".format(convert_expr(input_expr.value1))
+    else:
+        return "\\sqrt[{}]{{{}}} ".format(
+            convert_expr(input_expr.value2), convert_expr(input_expr.value1))
 
 
 def convert_integral(input_expr):
