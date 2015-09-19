@@ -2,6 +2,13 @@
 from mathlib import *
 
 
+def generate(input_expr):
+    output_string = ""
+    for expr in input_expr:
+        output_string += convert_expr(expr)
+    return output_string
+
+
 def convert_expr(input_expr):
     if input_expr.get_value():
         return input_expr.get_value()
