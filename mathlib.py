@@ -3,8 +3,7 @@
 
 
 class MathValue:
-    def get_value(self):
-        return self.value
+    pass
 
 
 class Number(MathValue):

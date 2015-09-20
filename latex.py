@@ -2,7 +2,7 @@
 import mathlib
 
 
-# generates LaTeX string from list of mathlib operators
+# generates LaTeX string from mathlib operators
 def generate(input_expr):
     # output_string = ""
     # for expr in input_expr:
@@ -12,11 +12,16 @@ def generate(input_expr):
 
 
 def convert_expr(input_expr):
+    return input_expr.to_latex()
     # print(input_expr)
-    if input_expr.get_value():
-        return input_expr.get_value()
-    else:
-        return input_expr.to_latex()
+    # if input_expr.get_value():
+    #     return input_expr.get_value()
+    # else:
+    #     return input_expr.to_latex()
+
+
+def convert_value(self):
+    return self.value
 
 
 def convert_addop(self):
@@ -77,6 +82,7 @@ def convert_derivative(self):
             convert_expr(self.nth), convert_expr(self.dx))
 
 # Extending mathlib classes with to_latex method for duck typing
+mathlib.MathValue.to_latex = convert_value
 mathlib.AddOp.to_latex = convert_addop
 mathlib.SubOp.to_latex = convert_subop
 mathlib.MulOp.to_latex = convert_mulop
