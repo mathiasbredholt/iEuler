@@ -63,7 +63,7 @@ def run():
 
         elif "maptotex" in prompt:
             generate_latex(
-                latex.generate(maple.parse(prompt.strip("mapletolatex"))))
+                latex.generate(maple.parse(prompt.strip("maptotex"))))
             call(__settings__["pdflatex"] + " -fmt pdflatex mathnotes.tex",
                  shell=True)
             pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
