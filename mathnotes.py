@@ -33,8 +33,10 @@ def run():
     with open('mathnotes.conf', 'r') as f:
         __settings__ = json.load(f)
 
-    frink_proc, frink_queue, frink_thread = frink.init(__settings__["frink"])
-    maple_proc, maple_queue, maple_thread = maple.init(__settings__["maple"])
+    # Spawn Maple and Frink subprocesses.
+    # Returns instance of process, queue and thread for asynchronous I/O
+    # frink_proc, frink_queue, frink_thread = frink.init(__settings__["frink"])
+    # maple_proc, maple_queue, maple_thread = maple.init(__settings__["maple"])
 
     preview = []
 
@@ -49,15 +51,15 @@ def run():
             prompt = prompt.strip(";")
             do_save = True
 
-        if "frink" in prompt:
-            prompt = prompt.strip("frink") + "\n"
-            result_string = frink_query(prompt, frink_proc, frink_queue,
-                                        frink_thread)
-
-        elif "maple" in prompt:
-            prompt = prompt.strip("maple") + ";\n"
-            result_string = maple_query(prompt, maple_proc, maple_queue,
-                                        maple_thread)
+        # if "frink" in prompt:
+        #     prompt = prompt.strip("frink") + "\n"
+        #     result_string = frink_query(prompt, frink_proc, frink_queue,
+        #                                 frink_thread)
+        #
+        # elif "maple" in prompt:
+        #     prompt = prompt.strip("maple") + ";\n"
+        #     result_string = maple_query(prompt, maple_proc, maple_queue,
+        #                                 maple_thread)
 
         elif "maptotex" in prompt:
             generate_latex(

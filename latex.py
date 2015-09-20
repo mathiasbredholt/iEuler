@@ -2,6 +2,7 @@
 import mathlib
 
 
+# generates LaTeX string from list of mathlib operators
 def generate(input_expr):
     output_string = ""
     for expr in input_expr:
