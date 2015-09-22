@@ -5,7 +5,7 @@ import maple
 import frink
 import latex
 import mathcmd
-from subprocess import call
+from subprocess import call, PIPE
 import procio
 
 
@@ -85,6 +85,7 @@ def run():
 
             call(
                 __settings__["pdflatex"] + " -fmt pdflatex mathnotes.tex",
+                stdout=PIPE,
                 shell=True)
             pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
