@@ -4,65 +4,72 @@ import mathlib
 
 # generates LaTeX string from mathlib operators
 def generate(input_expr):
-    # output_string = ""
-    # for expr in input_expr:
-    #     output_string += convert_expr(expr)
-    # return output_string
-    return convert_expr(input_expr)
+    settings = {"parentheses": False}
+    return convert_expr(input_expr, settings)
 
 
-def convert_expr(input_expr):
-    return input_expr.to_latex()
-    # print(input_expr)
-    # if input_expr.get_value():
-    #     return input_expr.get_value()
-    # else:
-    #     return input_expr.to_latex()
+def convert_expr(input_expr, settings):
+    return input_expr.to_latex(settings)
 
 
-def convert_value(self):
+def convert_value(self, settings):
     return self.value
 
 
-def convert_addop(self):
-    return "{} + {}".format(convert_expr(self.value1),
-                            convert_expr(self.value2))
+def convert_addop(self, settings):
+    if settings["parentheses"]:
+        return "\\left({} + {}\\right)".format(
+            convert_expr(self.value1, settings),
+            convert_expr(self.value2, settings))
+    else:
+        return "{} + {}".format(convert_expr(self.value1, settings),
+                                convert_expr(self.value2, settings))
 
 
-def convert_subop(self):
-    return "{} - {}".format(convert_expr(self.value1),
-                            convert_expr(self.value2))
+def convert_subop(self, settings):
+    if settings["parentheses"]:
+        return "\\left({} - {}\\right)".format(
+            convert_expr(self.value1, settings),
+            convert_expr(self.value2, settings))
+    else:
+        return "{} - {}".format(convert_expr(self.value1, settings),
+                                convert_expr(self.value2, settings))
 
 
-def convert_mulop(self):
+def convert_mulop(self, settings):
+    settings["parentheses"] = True
     if type(self.value1) is mathlib.Number and type(
             self.value2) is mathlib.Number:
-        return "{} \\cdot {}".format(convert_expr(self.value1),
-                                     convert_expr(self.value2))
+        output = "{} \\cdot {}".format(convert_expr(self.value1, settings),
+                                       convert_expr(self.value2, settings))
     else:
-        return "{} {}".format(convert_expr(self.value1),
-                              convert_expr(self.value2))
+        output = "{} {}".format(convert_expr(self.value1, settings),
+                                convert_expr(self.value2, settings))
+    settings["parentheses"] = False
+    return output
 
 
-def convert_fraction(self):
+def convert_fraction(self, settings):
     return "\\dfrac{{{}}}{{{}}} ".format(
-        convert_expr(self.value1), convert_expr(self.value2))
+        convert_expr(self.value1, settings),
+        convert_expr(self.value2, settings))
 
 
-def convert_power(self):
-    return "{}^{{{}}}".format(convert_expr(self.value1),
-                              convert_expr(self.value2))
+def convert_power(self, settings):
+    return "{}^{{{}}}".format(convert_expr(self.value1, settings),
+                              convert_expr(self.value2, settings))
 
 
-def convert_root(self):
+def convert_root(self, settings):
     if self.value2.get_value is "2":
-        return "\\sqrt{{{}}} ".format(convert_expr(self.value1))
+        return "\\sqrt{{{}}} ".format(convert_expr(self.value1, settings))
     else:
         return "\\sqrt[{}]{{{}}} ".format(
-            convert_expr(self.value2), convert_expr(self.value1))
+            convert_expr(self.value2, settings),
+            convert_expr(self.value1, settings))
 
 
-def convert_integral(self):
+def convert_integral(self, settings):
     if self.range_from is None:
         return "\\displaystyle \\int {}\\;\partial {} ".format(
             convert_expr(self.value), convert_expr(self.dx))
@@ -72,7 +79,7 @@ def convert_integral(self):
             convert_expr(self.value), convert_expr(self.dx))
 
 
-def convert_derivative(self):
+def convert_derivative(self, settings):
     if self.nth.get_value is "1":
         return "\\frac{{\\partial {}}}{{\\partial {}}} ".format(
             convert_expr(self.dx), convert_expr(self.dy))
