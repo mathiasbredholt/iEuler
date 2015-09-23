@@ -30,11 +30,12 @@ def convert_subop(self):
 
 
 def convert_mulop(self):
-    if type(self.value1) is mathlib.Number and\
-       type(self.value2) is mathlib.Number:
+    output = "{} {}"
+    if type(self.value1) is mathlib.Number and (
+       type(self.value2) is mathlib.Number or
+       type(self.value2) is mathlib.MulOp and type(self.value2.get_first()) is mathlib.Number) or\
+            type(self.value2) is mathlib.Number:
         output = "{} * {}"
-    else:
-        output = "{} {}"
     if type(self.value1) is mathlib.AddOp or\
        type(self.value1) is mathlib.SubOp:
         output_1 = parentheses(self.value1)
