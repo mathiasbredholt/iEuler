@@ -66,7 +66,7 @@ def convert_power(self):
 
 
 def convert_root(self):
-    if self.value2.get_value is "2":
+    if self.value2.get_value() == "2":
         return "sqrt({}) ".format(convert_expr(self.value1))
     else:
         return "root({}, {}) ".format(
@@ -84,7 +84,7 @@ def convert_integral(self):
 
 
 def convert_derivative(self):
-    if self.nth.get_value is "1":
+    if self.nth.get_value == "1":
         return "d{}/d{} ".format(convert_expr(self.dx), convert_expr(self.dy))
     else:
         return "D({})({})({})".format(
@@ -98,7 +98,7 @@ mathlib.SubOp.to_cmd = convert_subop
 mathlib.MulOp.to_cmd = convert_mulop
 mathlib.Fraction.to_cmd = convert_fraction
 mathlib.Power.to_cmd = convert_power
-mathlib.Root.to_cmd = convert_power
+mathlib.Root.to_cmd = convert_root
 mathlib.Integral.to_cmd = convert_integral
 mathlib.Derivative.to_cmd = convert_derivative
 

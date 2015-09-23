@@ -68,7 +68,7 @@ def convert_power(self):
 
 
 def convert_root(self):
-    if self.value2.get_value is "2":
+    if self.value2.get_value() == "2":
         return "\\sqrt{{{}}} ".format(convert_expr(self.value1))
     else:
         return "\\sqrt[{}]{{{}}} ".format(
@@ -101,6 +101,6 @@ mathlib.SubOp.to_latex = convert_subop
 mathlib.MulOp.to_latex = convert_mulop
 mathlib.Fraction.to_latex = convert_fraction
 mathlib.Power.to_latex = convert_power
-mathlib.Root.to_latex = convert_power
+mathlib.Root.to_latex = convert_root
 mathlib.Integral.to_latex = convert_integral
 mathlib.Derivative.to_latex = convert_derivative
