@@ -74,7 +74,8 @@ def parse_expression(expression):
 
             operator = get_operator(operator, value[0], value[1])
 
-            while len(get_list_value(expression, indices[0:len(indices) - 1])) in [1, 3]:
+            while len(get_list_value(expression, indices[0:len(indices) - 1
+                                                         ])) in [1, 3]:
                 # print("indices={}".format(indices))
                 # print("expression={}".format(expression))
                 if len(indices) is 1:
@@ -103,7 +104,11 @@ def parse_expression(expression):
 
 
 def get_math_value(value):
-    return Number(value.strip(' '))
+    value = value.strip("")
+    if not re.match(r"[^0-9.]+", value):
+        return Number(value)
+    else:
+        return Variable(value)
 
 
 def get_operator(symbol, value1, value2):

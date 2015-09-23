@@ -4,7 +4,7 @@ import mathlib
 
 # generates string from mathlib operators
 def generate(input_expr):
-    return convert_expr(input_expr)
+    return convert_expr(input_expr).replace("  ", " ")
 
 
 def convert_expr(input_expr):
