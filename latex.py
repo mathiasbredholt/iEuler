@@ -30,11 +30,12 @@ def convert_subop(self):
 
 
 def convert_mulop(self):
-    if type(self.value1) is mathlib.Number and\
-       type(self.value2) is mathlib.Number:
+    output = "{} {}"
+    if type(self.value1) is mathlib.Number and (
+       type(self.value2) is mathlib.Number or
+       type(self.value2) is mathlib.MulOp and type(self.value2.get_first()) is mathlib.Number) or\
+            type(self.value2) is mathlib.Number:
         output = "{} \\cdot {}"
-    else:
-        output = "{} {}"
     if type(self.value1) is mathlib.AddOp or\
        type(self.value1) is mathlib.SubOp:
         output_1 = parentheses(self.value1)
@@ -55,8 +56,8 @@ def convert_fraction(self):
 
 def convert_power(self):
     if type(self.value1) is mathlib.Number or type(
-            self.value1) is mathlib.Variable or type(
-                    self.value1) is mathlib.Root:
+        self.value1) is mathlib.Variable or type(
+            self.value1) is mathlib.Root:
         return "{}^{{{}}}".format(convert_expr(self.value1),
                                   convert_expr(self.value2))
     else:

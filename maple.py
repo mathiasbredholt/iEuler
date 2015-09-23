@@ -10,15 +10,17 @@ def init(path):
 
 
 def parse(input_string):
-    # x = parse_nested(input_string).copy()
+    # print("parse({})".format(input_string))
+    x = parse_nested(input_string.strip(' '))
     # print("{} -> {}".format(input_string, x))
-    # y = parse_expression(x)
+    y = parse_expression(x)
     # print("-> {}".format(y))
-    # return y
-    return parse_expression(parse_nested(input_string.strip(' ')))
+    return y
+    # return parse_expression(parse_nested(input_string.strip(' ')))
 
 
 def parse_nested(text, left=r'[(]', right=r'[)]', operators=r'[-+*/^]'):
+    # print("parse_nested({})".format(text))
     """ Based on http://stackoverflow.com/a/17141899/190597 (falsetru) """
     pat = r'({}|{}|{})'.format(left, right, operators)
     tokens = re.split(pat, text)
@@ -37,12 +39,13 @@ def parse_nested(text, left=r'[(]', right=r'[)]', operators=r'[-+*/^]'):
         else:
             stack[-1].append(x)
     if len(stack) > 1:
-        print(stack)
+        # print(stack)
         raise ValueError('error: closing bracket is missing')
     return stack.pop()
 
 
 def parse_expression(expression):
+    # print("parse_expression({})".format(expression))
     operators = [r'[\^]', r'[*/]', r'[+-]']
     for op in operators:
         # find indices of first operator of given type
@@ -73,10 +76,22 @@ def parse_expression(expression):
                 # else: value is an already processed operator
 
             operator = get_operator(operator, value[0], value[1])
+            # print("expression={}".format(expression))
+            inner_exp = get_list_value(
+                expression, indices[0:len(indices) - 1])
+            # print("inner={}".format(inner_exp))
+            inner_exp[indices[-1] - 1:indices[-1] + 2] = [operator]
+            # print("inner={}".format(inner_exp))
+            set_list_value(
+                expression, indices[0:len(indices) - 1], inner_exp)
+            # print("expression={}".format(expression))
+            indices[-1] -= 1
 
-            while len(get_list_value(expression, indices[0:len(indices) - 1])) in [1, 3]:
+            # print("len={}".format(len(get_list_value(expression, indices[0:len(indices) - 1]))))
+            while len(get_list_value(expression, indices[0:len(indices) - 1])) is 1:
                 # print("indices={}".format(indices))
                 # print("expression={}".format(expression))
+
                 if len(indices) is 1:
                     # operator contains complete expression, return
                     return operator
@@ -88,25 +103,27 @@ def parse_expression(expression):
                     expression, indices[0:len(indices) - 1], operator)
                 # print("expression={}".format(expression))
                 indices.pop()
-            else:
-                # expression in innermost parentheses contains more unparsed
-                # operations, just replace the three items, constituting the
-                # parsed operator, with operator
-                inner_exp = get_list_value(
-                    expression, indices[0:len(indices) - 1])
-                inner_exp[indices[-1] - 1:indices[-1] + 2] = [operator]
-                set_list_value(
-                    expression, indices[0:len(indices) - 1], inner_exp)
+            # else:
+            # expression in innermost parentheses contains more unparsed
+            # operations, just replace the three items, constituting the
+            # parsed operator, with operator
+            #     inner_exp = get_list_value(
+            #         expression, indices[0:len(indices) - 1])
+            #     inner_exp[indices[-1] - 1:indices[-1] + 2] = [operator]
+            #     set_list_value(
+            #         expression, indices[0:len(indices) - 1], inner_exp)
 
             # find next operator
             indices, operator = recursive_index(expression, op, op is r'[\^]')
 
 
 def get_math_value(value):
+    # print("get_math_value({})".format(value))
     return Number(value.strip(' '))
 
 
 def get_operator(symbol, value1, value2):
+    # print("get_operator({},{},{})".format(symbol, value1, value2))
     if symbol is '^':
         return Power(value1, value2)
     elif symbol is '*':
@@ -120,6 +137,7 @@ def get_operator(symbol, value1, value2):
 
 
 def get_list_value(input_list, indices):
+    # print("get_list_value({},{})".format(input_list, indices))
     if len(indices) > 1:
         return get_list_value(input_list[indices[0]], indices[1:len(indices)])
     else:
@@ -130,6 +148,7 @@ def get_list_value(input_list, indices):
 
 
 def set_list_value(input_list, indices, value):
+    # print("set_list_value({},{},{})".format(input_list, indices, value))
     if len(indices) > 1:
         set_list_value(input_list[indices[0]], indices[1:len(indices)], value)
     else:
@@ -141,6 +160,7 @@ def set_list_value(input_list, indices, value):
 
 
 def recursive_index(input_list, regex, rev=False):
+    # print("recursive_index({},{},{})".format(input_list, regex, rev))
     l = input_list.copy()
     if rev:
         l.reverse()
