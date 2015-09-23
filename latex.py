@@ -16,6 +16,8 @@ def parentheses(input_expr):
 
 
 def convert_value(self):
+    if self.value is "pi":
+        return "\\pi"
     return self.value
 
 
@@ -54,9 +56,9 @@ def convert_fraction(self):
 
 
 def convert_power(self):
-    if type(self.value1) is mathlib.Number or type(
-            self.value1) is mathlib.Variable or type(
-                    self.value1) is mathlib.Root:
+    if type(self.value1) is mathlib.Number or\
+       type(self.value1) is mathlib.Variable or\
+       type(self.value1) is mathlib.Root:
         return "{}^{{{}}}".format(convert_expr(self.value1),
                                   convert_expr(self.value2))
     else:

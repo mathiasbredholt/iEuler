@@ -105,7 +105,7 @@ def parse_expression(expression):
 
 def get_math_value(value):
     value = value.strip("")
-    if not re.match(r"[^0-9.]+", value):
+    if not re.match(r"[^0-9.]+", value) or value is "pi":
         return Number(value)
     else:
         return Variable(value)
