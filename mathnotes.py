@@ -1,10 +1,10 @@
 import json
-import pyperclip
+# import pyperclip
 import os
 import maple
 import frink
 import latex
-import mathcmd
+import cmdmath
 from subprocess import call, PIPE
 import procio
 
@@ -48,7 +48,7 @@ def run():
         prompt = input("math> ")
 
         if "print" in prompt:
-            print(mathcmd.generate(maple.parse(prompt.strip("print"))))
+            print(cmdmath.generate(maple.parse(prompt.strip("print"))))
 
         elif ";" in prompt:
             prompt = prompt.strip(";")
@@ -69,7 +69,7 @@ def run():
                 latex.generate(maple.parse(prompt.strip("maptotex"))))
             call(__settings__["pdflatex"] + " -fmt pdflatex mathnotes.tex",
                  shell=True)
-            pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
+            # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
         elif "latex" in prompt:
             # output_string = ""
@@ -90,7 +90,7 @@ def run():
                 __settings__["pdflatex"] + " -fmt pdflatex mathnotes.tex",
                 stdout=PIPE,
                 shell=True)
-            pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
+            # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
         elif "quit" in prompt:
             print("Killing processes...")
@@ -125,7 +125,7 @@ def maple_query(query_string, proc, queue, thread):
     return_string = procio.process_input(proc, queue, thread, 20)
     return_string = return_string.strip("\n")
     print("Return string: " + return_string)
-    mathcmd.print_math(maple.parse(return_string))
+    cmdmath.print_math(maple.parse(return_string))
     return return_string
 
 

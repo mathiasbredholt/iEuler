@@ -2,6 +2,7 @@
 import procio
 from mathlib import *
 import re
+from mathparser import *
 
 
 def init(path):
@@ -19,32 +20,14 @@ def parse(input_string):
     # return parse_expression(parse_nested(input_string.strip(' ')))
 
 
-def parse_nested(text, left=r'[(]', right=r'[)]', operators=r'[-+*/^]'):
-    # print("parse_nested({})".format(text))
-    """ Based on http://stackoverflow.com/a/17141899/190597 (falsetru) """
-    pat = r'({}|{}|{})'.format(left, right, operators)
-    tokens = re.split(pat, text)
-    stack = [[]]
-    for x in tokens:
-        # if not x or re.match(sep, x): continue
-        if not x:
-            continue
-        if re.match(left, x):
-            stack[-1].append([])
-            stack.append(stack[-1][-1])
-        elif re.match(right, x):
-            stack.pop()
-            if not stack:
-                raise ValueError('error: opening bracket is missing')
-        else:
-            stack[-1].append(x)
-    if len(stack) > 1:
-        # print(stack)
-        raise ValueError('error: closing bracket is missing')
-    return stack.pop()
-
-
 def parse_expression(expression):
+    if len(expression) is 1:
+        if type(expression[0]) is MathOperator:
+            return expression
+        elif type(expression[0]) is list:
+            return parse_expression(expression[0])
+        else:
+            return get_math_value(expression[0])
     # print("parse_expression({})".format(expression))
     operators = [r'[\^]', r'[*/]', r'[+-]']
     for op in operators:
@@ -67,12 +50,12 @@ def parse_expression(expression):
             value.append(get_list_value(expression, index1))
             value.append(get_list_value(expression, index2))
             for i in range(0, 2):
-                if type(value[i]) is str:
-                    # operand is an unprocessed string, convert to Mathvalue
-                    value[i] = get_math_value(value[i])
-                elif type(value[i]) is list:
+                if type(value[i]) is list:
                     # operand is an uprocessed list, parse recursively
                     value[i] = parse_expression(value[i])
+                elif type(value[i]) is str:
+                    # operand is an unprocessed string, convert to Mathvalue
+                    value[i] = get_math_value(value[i])
                 # else: value is an already processed operator
 
             operator = get_operator(operator, value[0], value[1])
@@ -87,7 +70,8 @@ def parse_expression(expression):
             # print("expression={}".format(expression))
             indices[-1] -= 1
 
-            # print("len={}".format(len(get_list_value(expression, indices[0:len(indices) - 1]))))
+            # print(
+            # "len={}".format(len(get_list_value(expression, indices[0:len(indices) - 1]))))
             while len(get_list_value(expression, indices[0:len(indices) - 1])) is 1:
                 # print("indices={}".format(indices))
                 # print("expression={}".format(expression))
@@ -103,15 +87,6 @@ def parse_expression(expression):
                     expression, indices[0:len(indices) - 1], operator)
                 # print("expression={}".format(expression))
                 indices.pop()
-            # else:
-            # expression in innermost parentheses contains more unparsed
-            # operations, just replace the three items, constituting the
-            # parsed operator, with operator
-            #     inner_exp = get_list_value(
-            #         expression, indices[0:len(indices) - 1])
-            #     inner_exp[indices[-1] - 1:indices[-1] + 2] = [operator]
-            #     set_list_value(
-            #         expression, indices[0:len(indices) - 1], inner_exp)
 
             # find next operator
             indices, operator = recursive_index(expression, op, op is r'[\^]')
