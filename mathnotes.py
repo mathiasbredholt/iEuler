@@ -47,7 +47,10 @@ def run():
         do_save = False
         prompt = input("math> ")
 
-        if ";" in prompt:
+        if "print" in prompt:
+            print(mathcmd.generate(maple.parse(prompt.strip("print"))))
+
+        elif ";" in prompt:
             prompt = prompt.strip(";")
             do_save = True
 
