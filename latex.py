@@ -16,7 +16,7 @@ def parentheses(input_expr):
 
 
 def convert_value(self):
-    if self.value is "pi":
+    if self.value == "pi":
         return "\\pi"
     return self.value
 

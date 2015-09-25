@@ -27,7 +27,7 @@ def conf(os):
         json.dump(__settings__, f)
 
 
-def run():
+def run(input_string=None):
     global __settings__
 
     with open('mathnotes.conf', 'r') as f:
@@ -38,77 +38,84 @@ def run():
     # frink_proc, frink_queue, frink_thread = frink.init(__settings__["frink"])
     # maple_proc, maple_queue, maple_thread = maple.init(__settings__["maple"])
 
-    preview = []
+    if input_string:
+        generate_latex(latex.generate(maple.parse(input_string)))
+        call(__settings__["pdflatex"] +
+             " -fmt pdflatex -shell-escape mathnotes.tex",
+             shell=True)
+    else:
+        preview = []
+        print("Welcome to MathNotes v0.1!")
 
-    print("Welcome to MathNotes v0.1!")
+        while True:
 
-    while True:
+            do_save = False
+            prompt = input("math> ")
 
-        do_save = False
-        prompt = input("math> ")
+            if "print" in prompt:
+                print(cmdmath.generate(maple.parse(prompt.strip("print"))))
 
-        if "print" in prompt:
-            print(cmdmath.generate(maple.parse(prompt.strip("print"))))
+            elif ";" in prompt:
+                prompt = prompt.strip(";")
+                do_save = True
 
-        elif ";" in prompt:
-            prompt = prompt.strip(";")
-            do_save = True
+            # if "frink" in prompt:
+            #     prompt = prompt.strip("frink") + "\n"
+            #     result_string = frink_query(prompt, frink_proc, frink_queue,
+            #                                 frink_thread)
+            #
+            # elif "maple" in prompt:
+            #     prompt = prompt.strip("maple") + ";\n"
+            #     result_string = maple_query(prompt, maple_proc, maple_queue,
+            #                                 maple_thread)
 
-        # if "frink" in prompt:
-        #     prompt = prompt.strip("frink") + "\n"
-        #     result_string = frink_query(prompt, frink_proc, frink_queue,
-        #                                 frink_thread)
-        #
-        # elif "maple" in prompt:
-        #     prompt = prompt.strip("maple") + ";\n"
-        #     result_string = maple_query(prompt, maple_proc, maple_queue,
-        #                                 maple_thread)
+            elif "maptotex" in prompt:
+                generate_latex(
+                    latex.generate(maple.parse(prompt.strip("maptotex"))))
+                call(__settings__["pdflatex"] +
+                     " -fmt pdflatex -shell-escape mathnotes.tex",
+                     shell=True)
+                # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
-        elif "maptotex" in prompt:
-            generate_latex(
-                latex.generate(maple.parse(prompt.strip("maptotex"))))
-            call(__settings__["pdflatex"] + " -fmt pdflatex mathnotes.tex",
-                 shell=True)
-            # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
+            elif "latex" in prompt:
+                # output_string = ""
+                # for item in preview:
+                #     output_string += item + "\n"
 
-        elif "latex" in prompt:
-            # output_string = ""
-            # for item in preview:
-            #     output_string += item + "\n"
+                # todo
+                # generate_latex(latex.generate([Integral(Number("3"), Variable(
+                #     "x"), Number("-1"), Number("1")), Root(
+                #         Number("2"), Number("4")), Fraction(MulOp(Number(
+                #             "2"), Variable(
+                #                 "x")), Variable("y")), Derivative(Variable(
+                #                     "x"), Variable("y"), Number("2"))]))
 
-            # todo
-            # generate_latex(latex.generate([Integral(Number("3"), Variable(
-            #     "x"), Number("-1"), Number("1")), Root(
-            #         Number("2"), Number("4")), Fraction(MulOp(Number(
-            #             "2"), Variable(
-            #                 "x")), Variable("y")), Derivative(Variable(
-            #                     "x"), Variable("y"), Number("2"))]))
+                # generate_latex(latex.generate(prompt.strip()))
 
-            # generate_latex(latex.generate(prompt.strip()))
+                call(
+                    __settings__["pdflatex"] +
+                    " -fmt pdflatex -shell-escape mathnotes.tex",
+                    stdout=PIPE,
+                    shell=True)
+                # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
-            call(
-                __settings__["pdflatex"] + " -fmt pdflatex mathnotes.tex",
-                stdout=PIPE,
-                shell=True)
-            # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
+            elif "quit" in prompt:
+                print("Killing processes...")
+                os.killpg(os.getpgid(maple_proc.pid), 15)
+                os.killpg(os.getpgid(frink_proc.pid), 15)
+                print("Quit.")
+                break
 
-        elif "quit" in prompt:
-            print("Killing processes...")
-            os.killpg(os.getpgid(maple_proc.pid), 15)
-            os.killpg(os.getpgid(frink_proc.pid), 15)
-            print("Quit.")
-            break
+            elif ":" in prompt:
+                for item in preview:
+                    print(item)
 
-        elif ":" in prompt:
-            for item in preview:
-                print(item)
+            else:
+                result_string = prompt
+                print("Sorry. I don't understand.")
 
-        else:
-            result_string = prompt
-            print("Sorry. I don't understand.")
-
-        if do_save:
-            preview.append(result_string)
+            if do_save:
+                preview.append(result_string)
 
 
 def frink_query(query_string, proc, queue, thread):
@@ -130,7 +137,6 @@ def maple_query(query_string, proc, queue, thread):
 
 
 def generate_latex(output_string):
-    output_string = output_string.strip("latex")
     with open("preamble.tex", "r") as f:
         output_string = f.read().replace("%content", output_string)
     with open("mathnotes.tex", "w") as f:
