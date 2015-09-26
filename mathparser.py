@@ -47,6 +47,7 @@ def parse_functions(expression):
 
             # parse arguments in parentheses
             args = [[]]
+            # print("item = {}".format(item))
             for k, x in enumerate(item):
                 # print("k={}".format(k))
                 # go through items in the parentheses (item)
@@ -58,11 +59,11 @@ def parse_functions(expression):
                 else:
                     # append item to last argument
                     args[-1].append(x)
+                # print("last arg = {}".format(args[-1]))
             # print("args[-1]={}".format(args[-1]))
             # parse the last argument
-            args[-1] = parse_expression(args[-1])
+            args[-1] = parse_expression(parse_functions(args[-1]))
             # print("args[-1]={}".format(args[-1]))
-            # print("args={}".format(args[-1]))
 
             # print("expression[j: i + 1] = {}".format(expression[j: i + 1]))
             # insert function in expression
@@ -78,6 +79,7 @@ def parse_functions(expression):
 
 
 def get_math_function(name, args):
+    # print("name={}, args={}".format(name, args))
     if name == "sqrt":
         return Root(args[0], Number("2"))
     else:

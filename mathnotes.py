@@ -33,10 +33,8 @@ def run(input_string=None):
     with open('mathnotes.conf', 'r') as f:
         __settings__ = json.load(f)
 
-    # Spawn Maple and Frink subprocesses.
-    # Returns instance of process, queue and thread for asynchronous I/O
-    # frink_proc, frink_queue, frink_thread = frink.init(__settings__["frink"])
-    # maple_proc, maple_queue, maple_thread = maple.init(__settings__["maple"])
+    maple_proc = None
+    frink_proc = None
 
     if input_string:
         generate_latex(latex.generate(maple.parse(input_string)))
@@ -59,43 +57,39 @@ def run(input_string=None):
                 prompt = prompt.strip(";")
                 do_save = True
 
-            # if "frink" in prompt:
-            #     prompt = prompt.strip("frink") + "\n"
-            #     result_string = frink_query(prompt, frink_proc, frink_queue,
-            #                                 frink_thread)
-            #
-            # elif "maple" in prompt:
-            #     prompt = prompt.strip("maple") + ";\n"
-            #     result_string = maple_query(prompt, maple_proc, maple_queue,
-            #                                 maple_thread)
+            elif "frink" in prompt:
+                if frink_proc is None:
+                    print("Starting Frink...")
+                    # Spawn Frink subprocess.
+                    # Returns instance of process, queue and thread for
+                    # asynchronous I/O
+                    frink_proc, frink_queue, frink_thread = frink.init(
+                        __settings__["frink"])
+                prompt = prompt.strip("frink") + "\n"
+                result_string = frink_query(prompt, frink_proc, frink_queue,
+                                            frink_thread)
 
-            elif "maptotex" in prompt:
-                generate_latex(
-                    latex.generate(maple.parse(prompt.strip("maptotex"))))
-                call(__settings__["pdflatex"] +
-                     " -fmt pdflatex -shell-escape mathnotes.tex",
-                     shell=True)
-                # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
+            elif "maple" in prompt:
+                if maple_proc is None:
+                    print("Starting Maple...")
+                    # Spawn Maple subprocess.
+                    # Returns instance of process, queue and thread for
+                    # asynchronous I/O
+                    maple_proc, maple_queue, maple_thread = maple.init(
+                        __settings__["maple"])
+                prompt = prompt.strip("maple") + ";\n"
+                result_string = maple_query(prompt, maple_proc, maple_queue,
+                                            maple_thread)
+                print(result_string)
+                # print(cmdmath.generate(maple.parse(result_string)))
 
             elif "latex" in prompt:
-                # output_string = ""
-                # for item in preview:
-                #     output_string += item + "\n"
-
-                # todo
-                # generate_latex(latex.generate([Integral(Number("3"), Variable(
-                #     "x"), Number("-1"), Number("1")), Root(
-                #         Number("2"), Number("4")), Fraction(MulOp(Number(
-                #             "2"), Variable(
-                #                 "x")), Variable("y")), Derivative(Variable(
-                #                     "x"), Variable("y"), Number("2"))]))
-
-                # generate_latex(latex.generate(prompt.strip()))
-
+                generate_latex(
+                    latex.generate(maple.parse(prompt.strip("latex"))))
                 call(
                     __settings__["pdflatex"] +
                     " -fmt pdflatex -shell-escape mathnotes.tex",
-                    stdout=PIPE,
+                    # stdout=PIPE,
                     shell=True)
                 # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
@@ -112,7 +106,7 @@ def run(input_string=None):
 
             else:
                 result_string = prompt
-                print("Sorry. I don't understand.")
+                print("Sorry. I don't understand: \"{}\"".format(prompt))
 
             if do_save:
                 preview.append(result_string)
@@ -131,8 +125,8 @@ def maple_query(query_string, proc, queue, thread):
     procio.process_input(proc, queue, thread, 0.5, True)
     return_string = procio.process_input(proc, queue, thread, 20)
     return_string = return_string.strip("\n")
-    print("Return string: " + return_string)
-    cmdmath.print_math(maple.parse(return_string))
+    print("    Return string: " + return_string)
+    cmdmath.convert_expr(maple.parse(return_string))
     return return_string
 
 
