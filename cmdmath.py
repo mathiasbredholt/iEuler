@@ -76,20 +76,20 @@ def convert_root(self):
 def convert_integral(self):
     if self.range_from is None:
         return "int {} d{} ".format(
-            convert_expr(self.value), convert_expr(self.dx))
+            convert_expr(self.value), convert_expr(self.variable))
     else:
         return "int from {} to {} d{} ".format(
             convert_expr(self.range_from), convert_expr(self.range_to),
-            convert_expr(self.value), convert_expr(self.dx))
+            convert_expr(self.value), convert_expr(self.variable))
 
 
 def convert_derivative(self):
     if self.nth.get_value == "1":
-        return "d{}/d{} ".format(convert_expr(self.dx), convert_expr(self.dy))
+        return "d{}/d{} ".format(convert_expr(self.value), convert_expr(self.variable))
     else:
         return "D({})({})({})".format(
-            convert_expr(self.nth), convert_expr(self.dx),
-            convert_expr(self.dy))
+            convert_expr(self.nth), convert_expr(self.value),
+            convert_expr(self.variable))
 
 # Extending mathlib classes with to_cmd method for duck typing
 mathlib.MathValue.to_cmd = convert_value

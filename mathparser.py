@@ -82,6 +82,10 @@ def get_math_function(name, args):
     # print("name={}, args={}".format(name, args))
     if name == "sqrt":
         return Root(args[0], Number("2"))
+    elif name == "int":
+        return Integral(args[0], args[1])
+    elif name == "diff":
+        return Derivative(args[0], args[1])
     else:
         return Function(name, args)
 

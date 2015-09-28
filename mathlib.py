@@ -156,22 +156,32 @@ class Power(MathOperator):
 
 class Integral:
 
-    def __init__(self, value, dx, range_from=None, range_to=None):
+    def __init__(self, value, variable, range_from=None, range_to=None):
         self.value = value
-        self.dx = dx
+        self.variable = variable
         self.range_from = range_from
         self.range_to = range_to
 
     def get_value(self):
         return False
 
+    def __str__(self):
+        return "Integral({},{})".format(self.value, self.variable)
+
+    __repr__ = __str__
+
 
 class Derivative:
 
-    def __init__(self, dx, dy, nth):
-        self.dx = dx
-        self.dy = dy
+    def __init__(self, value, variable, nth=Number("1")):
+        self.value = value
+        self.variable = variable
         self.nth = nth
 
     def get_value(self):
         return False
+
+    def __str__(self):
+        return "Derivative({},{})".format(self.value, self.variable)
+
+    __repr__ = __str__
