@@ -23,7 +23,7 @@ void MainWindow::evaluateCode(QString inputString)
 //    p.setWorkingDirectory("../../");
 
     params << "start.py" << inputString;
-    p.start("/Library/Frameworks/Python.framework/Versions/3.4/bin/python3.4", params);
+    p.start("py3", params);
     p.waitForFinished(-1);
 
     p.start("convert -density 300 mathnotes.pdf mathnotes.png");
