@@ -85,22 +85,22 @@ def convert_root(self):
 
 def convert_integral(self):
     if self.range_from is None:
-        return "\\displaystyle \\int {}\\;\partial {} ".format(
-            convert_expr(self.value), convert_expr(self.dx))
+        return "\\displaystyle \\int {}\\;d {} ".format(
+            convert_expr(self.value), convert_expr(self.variable))
     else:
-        return "\\displaystyle \\int_{{{}}}^{{{}}} {}\\;\partial {} ".format(
+        return "\\displaystyle \\int_{{{}}}^{{{}}} {}\\;d {} ".format(
             convert_expr(self.range_from), convert_expr(self.range_to),
-            convert_expr(self.value), convert_expr(self.dx))
+            convert_expr(self.value), convert_expr(self.variable))
 
 
 def convert_derivative(self):
-    if self.nth.get_value == "1":
-        return "\\frac{{\\partial {}}}{{\\partial {}}} ".format(
-            convert_expr(self.dx), convert_expr(self.dy))
+    if self.nth.get_value() == "1":
+        return "\\frac{{d}}{{d {}}}{} ".format(
+            convert_expr(self.value), convert_expr(self.variable))
     else:
-        return "\\frac{{\\partial^{{{}}}}}{{\\partial {}^{{{}}}}}{} ".format(
-            convert_expr(self.nth), convert_expr(self.dy),
-            convert_expr(self.nth), convert_expr(self.dx))
+        return "\\frac{{d^{{{}}}}}{{d {}^{{{}}}}}{} ".format(
+            convert_expr(self.nth), convert_expr(self.variable),
+            convert_expr(self.nth), convert_expr(self.value))
 
 
 # Extending mathlib classes with to_latex method for duck typing

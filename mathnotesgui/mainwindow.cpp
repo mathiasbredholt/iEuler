@@ -25,10 +25,12 @@ void MainWindow::evaluateCode(CodeInput* target, QString inputString)
     QStringList params;
 
     params << "start.py" << inputString;
+
     p.start("python3", params);
     p.waitForFinished(-1);
 
-    p.start("convert -density 300 mathnotes.pdf mathnotes.png");
+//    p.start("convert -density 300 mathnotes.pdf mathnotes.png");
+    p.start("\"C:\\Program Files\\ImageMagick-6.9.2-Q16\\convert.exe\" -density 300 mathnotes.pdf mathnotes.png");
     p.waitForFinished(-1);
 
     emit outputReady();
