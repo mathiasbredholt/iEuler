@@ -15,11 +15,15 @@ TEMPLATE = app
 SOURCES += \
     codeinput.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    group.cpp \
+    cmdpanel.cpp
 
 HEADERS  += \
     codeinput.h \
-    mainwindow.h
+    mainwindow.h \
+    group.h \
+    cmdpanel.h
 
 FORMS    += \
     mainwindow.ui
