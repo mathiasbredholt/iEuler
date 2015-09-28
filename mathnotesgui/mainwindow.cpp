@@ -14,29 +14,26 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::evaluateCode(QString inputString)
+void MainWindow::evaluateCode(CodeInput* target, QString inputString)
 {
-//    qDebug("cd ../.. && python3 start.py " + inputString.toLatin1());
     QProcess p;
     QStringList params;
 
-//    p.setWorkingDirectory("../../");
-
     params << "start.py" << inputString;
-    p.start("py3", params);
+
+    p.start("python3", params);
     p.waitForFinished(-1);
 
 //    p.start("convert -density 300 mathnotes.pdf mathnotes.png");
     p.start("\"C:\\Program Files\\ImageMagick-6.9.2-Q16\\convert.exe\" -density 300 mathnotes.pdf mathnotes.png");
     p.waitForFinished(-1);
 
-    QLabel* img = new QLabel("<img src='mathnotes.png' />");
-    img->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    ui->content->layout()->addWidget(img);
-    this->createNewCodeLine();
+    emit outputReady();
+
+    createNewCodeLine();
 }
 
-void MainWindow::deleteCode(CodeInput* target)
+void MainWindow::deleteGroup(Group* target)
 {
     ui->content->setFocus();
     ui->content->layout()->removeWidget(target);
@@ -46,9 +43,10 @@ void MainWindow::deleteCode(CodeInput* target)
 
 void MainWindow::createNewCodeLine()
 {
-    CodeInput* ci = new CodeInput();
-    ui->content->layout()->addWidget(ci);
-    ci->setFocus();
-    QObject::connect(ci, SIGNAL(evaluateCode(QString)), this, SLOT(evaluateCode(QString)));
-    QObject::connect(ci, SIGNAL(deleteCode(CodeInput*)), this, SLOT(deleteCode(CodeInput*)));
+    Group* gp = new Group();
+    ui->content->layout()->addWidget(gp);
+    gp->input->setFocus();
+    QObject::connect(gp->input, SIGNAL(evaluateCode(CodeInput*, QString)), this, SLOT(evaluateCode(CodeInput*, QString)));
+    QObject::connect(gp, SIGNAL(deleteGroup(Group*)), this, SLOT(deleteGroup(Group*)));
+    QObject::connect(this, SIGNAL(outputReady()), gp, SLOT(outputReady()));
 }
