@@ -21,6 +21,13 @@ def convert_value(self):
     return self.value
 
 
+def convert_function(self):
+    result = self.name + "\\left( " + convert_expr(self.value[0])
+    for arg in self.value[1:]:
+        result += ", " + convert_expr(arg)
+    return result + " \\right)"
+
+
 def convert_addop(self):
     return "{} + {}".format(convert_expr(self.value1),
                             convert_expr(self.value2))
@@ -59,6 +66,7 @@ def convert_fraction(self):
 def convert_power(self):
     if type(self.value1) is mathlib.Number or\
        type(self.value1) is mathlib.Variable or\
+       type(self.value1) is mathlib.Function or\
        type(self.value1) is mathlib.Root:
         return "{}^{{{}}}".format(convert_expr(self.value1),
                                   convert_expr(self.value2))
@@ -86,7 +94,7 @@ def convert_integral(self):
 
 
 def convert_derivative(self):
-    if self.nth.get_value is "1":
+    if self.nth.get_value == "1":
         return "\\frac{{\\partial {}}}{{\\partial {}}} ".format(
             convert_expr(self.dx), convert_expr(self.dy))
     else:
@@ -94,8 +102,10 @@ def convert_derivative(self):
             convert_expr(self.nth), convert_expr(self.dy),
             convert_expr(self.nth), convert_expr(self.dx))
 
+
 # Extending mathlib classes with to_latex method for duck typing
 mathlib.MathValue.to_latex = convert_value
+mathlib.Function.to_latex = convert_function
 mathlib.AddOp.to_latex = convert_addop
 mathlib.SubOp.to_latex = convert_subop
 mathlib.MulOp.to_latex = convert_mulop
