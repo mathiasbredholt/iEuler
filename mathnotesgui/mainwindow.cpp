@@ -5,7 +5,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    cmdpanel = new CmdPanel(this);
+    ui->container->layout()->addWidget(cmdpanel);
+
     ui->content->layout()->setAlignment(Qt::AlignTop);
+
     this->createNewCodeLine();
 }
 
@@ -47,4 +52,13 @@ void MainWindow::createNewCodeLine()
     QObject::connect(gp->input, SIGNAL(evaluateCode(CodeInput*, QString)), this, SLOT(evaluateCode(CodeInput*, QString)));
     QObject::connect(gp, SIGNAL(deleteGroup(Group*)), this, SLOT(deleteGroup(Group*)));
     QObject::connect(this, SIGNAL(outputReady()), gp, SLOT(outputReady()));
+}
+
+void MainWindow::on_actionShow_command_panel_triggered()
+{
+    if (cmdpanel->isVisible()) {
+        cmdpanel->hide();
+    } else {
+        cmdpanel->show();
+    }
 }
