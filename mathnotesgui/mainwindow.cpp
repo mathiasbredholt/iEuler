@@ -26,7 +26,8 @@ void MainWindow::evaluateCode(QString inputString)
     p.start("py3", params);
     p.waitForFinished(-1);
 
-    p.start("convert -density 300 mathnotes.pdf mathnotes.png");
+//    p.start("convert -density 300 mathnotes.pdf mathnotes.png");
+    p.start("\"C:\\Program Files\\ImageMagick-6.9.2-Q16\\convert.exe\" -density 300 mathnotes.pdf mathnotes.png");
     p.waitForFinished(-1);
 
     QLabel* img = new QLabel("<img src='mathnotes.png' />");
