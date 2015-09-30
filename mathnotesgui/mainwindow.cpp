@@ -26,7 +26,8 @@ void MainWindow::readStandardOutput()
 {
     qDebug("output");
     qDebug(proc->readAllStandardOutput());
-//    emit outputReady();
+    emit outputReady();
+    createNewCodeLine();
 }
 
 
@@ -40,10 +41,6 @@ void MainWindow::evaluateCode(CodeInput* target, QString inputString)
     proc->write(inputString.toLatin1()+"\n");
 //    conv_proc->startDetached("convert -density 300 mathnotes.pdf mathnotes.png");
 //    p.start("\"C:\\Program Files\\ImageMagick-6.9.2-Q16\\convert.exe\" -density 300 mathnotes.pdf mathnotes.png");
-
-
-
-    createNewCodeLine();
 }
 
 void MainWindow::deleteGroup(Group* target)
