@@ -2,6 +2,7 @@ from subprocess import PIPE, STDOUT, Popen, call
 from threading import Thread
 from queue import Queue, Empty
 import sys
+import re
 
 ON_POSIX = 'posix' in sys.builtin_module_names
 
@@ -36,6 +37,18 @@ def process_input(proc, queue, thread, wait=0, single=False):
             return line
         else:
             return line + process_input(proc, queue, thread, 0.1)
+
+
+def wait_for_input(proc, queue, thread, regex, timeout=5):
+    try:
+        line = queue.get(timeout=timeout)  # or q.get(timeout=.1)
+    except Empty:
+        return False
+    else:  # got line
+        if re.match(regex, line):
+            return True
+        else:
+            return wait_for_input(proc, queue, thread, regex, timeout)
 
 
 def enqueue_output(out, queue):

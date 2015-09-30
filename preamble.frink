@@ -1,0 +1,34 @@
+electric_potential :-> "V"
+power :-> "W"
+charge :-> "C"
+energy :-> "J"
+pressure :-> "Pa"
+capacitance :-> "F"
+electric_resistance :-> "\u2126"
+electric_conductance :-> "S"
+magnetic_flux :-> "Wb"
+magnetic_flux_density :-> "T"
+inductance :-> "H"
+
+j := \u2149
+\u00B50 := mu0
+\u00B5_0 := mu0
+Am := A m
+
+setEngineering[true]
+setPrecision[10]
+
+phasor[z, arg = m] := 
+{
+	if arg conforms m
+		return [abs[z], (argument[z] -> deg) + "\u00b0"]
+	else
+		return z*(cos[arg]+j*sin[arg])
+}
+
+argument[z] := arctan[Im[z],Re[z]]
+
+conjugate[z] := Re[z] - j Im[z]
+
+parallel[a, b] := 1/(1/a + 1/b)
+par[a, b] := parallel[a, b]

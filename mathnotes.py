@@ -39,7 +39,7 @@ def run(input_string=None):
     if input_string:
         generate_latex(latex.generate(maple.parse(input_string)))
         call(__settings__["pdflatex"] +
-             " -fmt pdflatex -shell-escape mathnotes.tex",
+             " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex",
              shell=True)
     else:
         preview = []
@@ -68,10 +68,14 @@ def run(input_string=None):
                 prompt = prompt.strip("frink") + "\n"
                 result_string = frink_query(prompt, frink_proc, frink_queue,
                                             frink_thread)
+                # generate_latex(latex.generate(frink.parse(result_string)))
+                # call(__settings__[
+                #      "pdflatex"] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", shell=True)
 
             elif "maple" in prompt:
                 if maple_proc is None:
-                    print("Starting Maple...")
+                    if not gui_mode:
+                        print("Starting Maple...")
                     # Spawn Maple subprocess.
                     # Returns instance of process, queue and thread for
                     # asynchronous I/O
@@ -80,17 +84,14 @@ def run(input_string=None):
                 prompt = prompt.strip("maple") + ";\n"
                 result_string = maple_query(prompt, maple_proc, maple_queue,
                                             maple_thread)
+                latex.generate(maple.parse(result_string))
                 print(result_string)
+
                 # print(cmdmath.generate(maple.parse(result_string)))
 
             elif "latex" in prompt:
-                generate_latex(
-                    latex.generate(maple.parse(prompt.strip("latex"))))
-                call(
-                    __settings__["pdflatex"] +
-                    " -fmt pdflatex -shell-escape mathnotes.tex",
-                    # stdout=PIPE,
-                    shell=True)
+                latex.generate(maple.parse(prompt.strip("latex")))
+                print(result_string)
                 # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
             elif "quit" in prompt:
@@ -130,8 +131,8 @@ def maple_query(query_string, proc, queue, thread):
     return return_string
 
 
-def generate_latex(output_string):
-    with open("preamble.tex", "r") as f:
-        output_string = f.read().replace("%content", output_string)
-    with open("mathnotes.tex", "w") as f:
-        f.write(output_string)
+# def generate_latex(output_string):
+#     with open("preamble.tex", "r") as f:
+#         output_string = f.read().replace("%content", output_string)
+#     with open("mathnotes.tex", "w") as f:
+#         f.write(output_string)

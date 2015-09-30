@@ -1,10 +1,20 @@
 # latex generator for mathnotes
 import mathlib
+import procio
 
 
 # generates LaTeX string from mathlib operators
 def generate(input_expr):
-    return convert_expr(input_expr)
+    output_string = convert_expr(input_expr)
+    with open("preamble.tex", "r") as f:
+        output_string = f.read().replace("%content", output_string)
+    with open("mathnotes.tex", "w") as f:
+        f.write(output_string)
+
+    proc, queue, thread = procio.run(__settings__[
+        "pdflatex"] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", shell=True)
+    procio.wait_for_input(proc, queue, thread, r'.*Output written')
+    return output_string
 
 
 def convert_expr(input_expr):
