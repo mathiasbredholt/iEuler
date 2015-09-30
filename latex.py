@@ -4,7 +4,7 @@ import procio
 
 
 # generates LaTeX string from mathlib operators
-def generate(input_expr):
+def generate(input_expr, __settings__):
     output_string = convert_expr(input_expr)
     with open("preamble.tex", "r") as f:
         output_string = f.read().replace("%content", output_string)
@@ -12,8 +12,8 @@ def generate(input_expr):
         f.write(output_string)
 
     proc, queue, thread = procio.run(__settings__[
-        "pdflatex"] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", shell=True)
-    procio.wait_for_input(proc, queue, thread, r'.*Output written')
+        "pdflatex"] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", False)
+    proc.wait()
     return output_string
 
 

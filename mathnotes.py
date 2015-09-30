@@ -28,7 +28,7 @@ def conf(os):
 
 def run(argv=None):
     gui_mode = False
-    if "-gui" in argv:
+    if argv and "-gui" in argv:
         gui_mode = True
 
     global __settings__
@@ -86,13 +86,13 @@ def run(argv=None):
             prompt = prompt.strip("maple") + ";\n"
             result_string = maple_query(prompt, maple_proc, maple_queue,
                                         maple_thread)
-            latex.generate(maple.parse(result_string))
+            latex.generate(maple.parse(result_string), __settings__)
             print(result_string)
 
             # print(cmdmath.generate(maple.parse(result_string)))
 
         elif "latex" in prompt:
-            latex.generate(maple.parse(prompt.strip("latex")))
+            latex.generate(maple.parse(prompt.strip("latex")), __settings__)
             print(result_string)
             # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 

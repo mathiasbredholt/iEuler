@@ -7,7 +7,7 @@ import re
 ON_POSIX = 'posix' in sys.builtin_module_names
 
 
-def run(cmd):
+def run(cmd, catch=True):
     proc = Popen(cmd,
                  stdout=PIPE,
                  stdin=PIPE,
@@ -23,7 +23,8 @@ def run(cmd):
     thread.start()
 
     # Catch initial output
-    process_input(proc, queue, thread, 20)
+    if catch:
+        process_input(proc, queue, thread, 20)
     return (proc, queue, thread)
 
 
@@ -41,11 +42,12 @@ def process_input(proc, queue, thread, wait=0, single=False):
 
 def wait_for_input(proc, queue, thread, regex, timeout=5):
     try:
-        line = queue.get(timeout=timeout)  # or q.get(timeout=.1)
+        line = queue.get(timeout=5)
     except Empty:
         return False
     else:  # got line
-        if re.match(regex, line):
+        print("line={}".format(line))
+        if re.match(regex, line, re.DOTALL):
             return True
         else:
             return wait_for_input(proc, queue, thread, regex, timeout)
