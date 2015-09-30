@@ -12,7 +12,22 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->content->layout()->setAlignment(Qt::AlignTop);
 
     this->createNewCodeLine();
+    initSubprocess();
 }
+
+void MainWindow::initSubprocess()
+{
+    proc = new QProcess(this);
+    proc->start("python3 start.py -gui");
+    connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
+}
+
+void MainWindow::readStandardOutput()
+{
+    if (proc->readAllStandardOutput())
+//    emit outputReady();
+}
+
 
 MainWindow::~MainWindow()
 {
@@ -21,19 +36,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::evaluateCode(CodeInput* target, QString inputString)
 {
-    QProcess p;
-    QStringList params;
+    proc->write(inputString.toLatin1()+"\n");
+//    conv_proc->startDetached("convert -density 300 mathnotes.pdf mathnotes.png");
+//    p.start("\"C:\\Program Files\\ImageMagick-6.9.2-Q16\\convert.exe\" -density 300 mathnotes.pdf mathnotes.png");
 
-    params << "start.py" << inputString;
 
-    p.start("python3", params);
-    p.waitForFinished(-1);
-
-//    p.start("convert -density 300 mathnotes.pdf mathnotes.png");
-    p.start("\"C:\\Program Files\\ImageMagick-6.9.2-Q16\\convert.exe\" -density 300 mathnotes.pdf mathnotes.png");
-    p.waitForFinished(-1);
-
-    emit outputReady();
 
     createNewCodeLine();
 }
