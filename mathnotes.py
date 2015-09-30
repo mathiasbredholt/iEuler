@@ -5,7 +5,6 @@ import maple
 import frink
 import latex
 import cmdmath
-from subprocess import call, PIPE
 import procio
 
 
@@ -27,7 +26,7 @@ def conf(os):
         json.dump(__settings__, f)
 
 
-def run(argv):
+def run(argv=None):
     gui_mode = False
     if "-gui" in argv:
         gui_mode = True
@@ -132,7 +131,6 @@ def maple_query(query_string, proc, queue, thread):
     print("    Return string: " + return_string)
     cmdmath.convert_expr(maple.parse(return_string))
     return return_string
-
 
 # def generate_latex(output_string):
 #     with open("preamble.tex", "r") as f:

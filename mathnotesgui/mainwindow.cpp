@@ -24,7 +24,8 @@ void MainWindow::initSubprocess()
 
 void MainWindow::readStandardOutput()
 {
-    if (proc->readAllStandardOutput())
+    qDebug("output");
+    qDebug(proc->readAllStandardOutput());
 //    emit outputReady();
 }
 
