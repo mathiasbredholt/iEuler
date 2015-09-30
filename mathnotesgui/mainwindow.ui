@@ -17,7 +17,7 @@
    <bool>false</bool>
   </property>
   <widget class="QWidget" name="container">
-   <layout class="QVBoxLayout" name="verticalLayout">
+   <layout class="QHBoxLayout" name="horizontalLayout">
     <property name="spacing">
      <number>0</number>
     </property>
@@ -72,7 +72,7 @@
              <x>0</x>
              <y>0</y>
              <width>798</width>
-             <height>532</height>
+             <height>553</height>
             </rect>
            </property>
            <layout class="QVBoxLayout" name="verticalLayout_2"/>
@@ -90,7 +90,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QMenuBar" name="menubar">
+  <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
@@ -103,10 +103,21 @@
     <property name="title">
      <string>Tools</string>
     </property>
+    <addaction name="actionShow_command_panel"/>
    </widget>
    <addaction name="menuTools"/>
   </widget>
-  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionShow_command_panel">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Show command panel</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+P</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>
