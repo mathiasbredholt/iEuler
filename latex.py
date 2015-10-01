@@ -14,6 +14,9 @@ def generate(input_expr, __settings__):
     proc, queue, thread = procio.run(__settings__[
         "pdflatex"] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", False)
     proc.wait()
+    proc, queue, thread = procio.run(
+        "convert -density 300 mathnotes.pdf mathnotes.png", False)
+    proc.wait()
     return output_string
 
 

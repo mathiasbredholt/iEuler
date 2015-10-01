@@ -128,7 +128,7 @@ def maple_query(query_string, proc, queue, thread):
     procio.process_input(proc, queue, thread, 0.5, True)
     return_string = procio.process_input(proc, queue, thread, 20)
     return_string = return_string.strip("\n")
-    print("    Return string: " + return_string)
+    # print("    Return string: " + return_string)
     cmdmath.convert_expr(maple.parse(return_string))
     return return_string
 
