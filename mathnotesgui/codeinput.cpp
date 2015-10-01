@@ -4,7 +4,7 @@ CodeInput::CodeInput(QWidget *parent) : QPlainTextEdit(parent)
 {
     setStyleSheet("QPlainTextEdit { border: none; }");
     installEventFilter(this);
-    setTabChangesFocus(true);
+    setTabChangesFocus(false);
     setMaximumHeight(24);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 }
@@ -18,7 +18,15 @@ bool CodeInput::eventFilter(QObject *object, QEvent *e)
             return true;
         }
         else if (keyEvent->key() == Qt::Key_Backspace && keyEvent->modifiers() == Qt::ShiftModifier) {
-            emit deleteCode();
+            emit deleteGroup(this->parentWidget());
+            return true;
+        }
+        else if (keyEvent->key() == Qt::Key_Up) {
+            emit arrowsPressed(true);
+            return true;
+        }
+        else if (keyEvent->key() == Qt::Key_Down) {
+            emit arrowsPressed(false);
             return true;
         }
     }

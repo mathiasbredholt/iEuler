@@ -4,25 +4,23 @@
 #include <QWidget>
 #include <QLabel>
 #include <QVBoxLayout>
-
+#include <QPixmap>
 #include "codeinput.h"
 
 class Group : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Group(QWidget *parent = 0);
-
+    explicit Group(QWidget *parent = 0, int index = 0);
+    int index;
     CodeInput* input;
     QLabel* output;
 
 
 signals:
-    void deleteGroup(Group* target);
 
 public slots:
-    void deleteCode();
-    void outputReady();
+    void outputReady(int lineIndex);
 };
 
 #endif // GROUP_H

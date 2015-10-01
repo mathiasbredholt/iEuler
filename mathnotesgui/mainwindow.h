@@ -12,6 +12,7 @@
 #include <QProcess>
 #include <QThread>
 #include <QLabel>
+#include <QObject>
 #include "cmdpanel.h"
 
 namespace Ui {
@@ -31,17 +32,23 @@ private:
     CmdPanel *cmdpanel;
     QProcess *proc;
 
+    int numberOfLines;
+
     void createNewCodeLine();
     void initSubprocess();
 
+protected:
+    void keyPressEvent(QKeyEvent *);
+
 signals:
-    void outputReady();
+    void outputReady(int lineIndex);
 
 private slots:
     void readStandardOutput();
     void evaluateCode(CodeInput *target, QString inputString);
-    void deleteGroup(Group* target);
+    void deleteGroup(QWidget* target);
     void on_actionShow_command_panel_triggered();
+    void arrowsPressed(bool upArrowPressed);
 };
 
 #endif // MAINWINDOW_H

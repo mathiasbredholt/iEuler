@@ -3,6 +3,7 @@
 
 #include <QPlainTextEdit>
 #include <QTextBlock>
+#include <QWidget>
 
 
 class CodeInput : public QPlainTextEdit
@@ -13,7 +14,8 @@ public:
 
 signals:
      void evaluateCode(CodeInput* target,QString inputString);
-     void deleteCode();
+     void deleteGroup(QWidget *target);
+     void arrowsPressed(bool upArrowPressed);
 
 private:
      bool eventFilter(QObject *object, QEvent *event);

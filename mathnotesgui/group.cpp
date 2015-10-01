@@ -1,24 +1,21 @@
 #include "group.h"
 
-Group::Group(QWidget *parent) : QWidget(parent)
+Group::Group(QWidget *parent, int index) : QWidget(parent)
 {
+    this->index = index;
+
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     QVBoxLayout *vlayout = new QVBoxLayout();
-    input = new CodeInput();
-    output = new QLabel();
+    input = new CodeInput(this);
+    output = new QLabel(this);
     output->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     vlayout->addWidget(input);
+    vlayout->addWidget(output);
     setLayout(vlayout);
-    QObject::connect(input, SIGNAL(deleteCode()), this, SLOT(deleteCode()));
 }
 
-void Group::deleteCode()
+void Group::outputReady(int lineIndex)
 {
-    emit deleteGroup(this);
-}
-
-void Group::outputReady()
-{
-    output->setText("<img src='mathnotes.png' />");
-    layout()->addWidget(output);
+    if (lineIndex == index)
+    output->setPixmap(QPixmap("mathnotes.png"));
 }
