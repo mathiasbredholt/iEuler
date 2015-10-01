@@ -15,6 +15,6 @@ def parse(input_string):
     y = parse_functions(x)
     # print("y={}".format(y))
     z = parse_expression(y)
-    print("    Result: {}".format(z))
+    # print("    Result: {}".format(z))
     return z
     # return parse_expression(parse_nested(input_string.strip(' ')))
