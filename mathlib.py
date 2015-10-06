@@ -73,6 +73,47 @@ class Function(MathValue):
     __repr__ = __str__
 
 
+class MathUnaryOperator:
+
+    def __init__(self, value):
+        self.value = value
+
+    def get_value(self):
+        return False
+
+    def get_first(self):
+        if not self.value.get_value():
+            # value is an operator
+            return self.value.get_first()
+        else:
+            # value is a value
+            return self.value
+
+    def get_last(self):
+        return get_first(self)
+
+    def __str__(self):
+        return "MathUnaryOperator({},{})".format(self.value1, self.value2)
+
+    __repr__ = __str__
+
+
+class Minus(MathUnaryOperator):
+
+    def __str__(self):
+        return "Minus({})".format(self.value)
+
+    __repr__ = __str__
+
+
+class Factorial(MathUnaryOperator):
+
+    def __str__(self):
+        return "Factorial({})".format(self.value)
+
+    __repr__ = __str__
+
+
 class MathOperator:
 
     def __init__(self, value1, value2):
@@ -92,10 +133,10 @@ class MathOperator:
 
     def get_last(self):
         if not self.value2.get_value():
-            # value1 is an operator
+            # value2 is an operator
             return self.value2.get_last()
         else:
-            # value1 is a value
+            # value2 is a value
             return self.value2
 
     def __str__(self):

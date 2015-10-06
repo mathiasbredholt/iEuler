@@ -9,12 +9,5 @@ def init(path):
 
 
 def parse(input_string):
-    # print("parse({})".format(input_string))
-    x = parse_nested(input_string.strip(' '))
-    # print("x={}".format(x))
-    y = parse_functions(x)
-    # print("y={}".format(y))
-    z = parse_expression(y)
-    # print("    Result: {}".format(z))
-    return z
-    # return parse_expression(parse_nested(input_string.strip(' ')))
+    x = parse_expression(input_string.strip(' '))
+    return x
