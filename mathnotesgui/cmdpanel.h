@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QLineEdit>
 #include <QVBoxLayout>
+#include <QLabel>
 
 class CmdPanel : public QFrame
 {

@@ -50,7 +50,7 @@ def run(argv=None):
         if not gui_mode:
             prompt = input("math> ")
         else:
-            prompt = input("")
+            prompt = input("").strip("\n")
 
         if "print" in prompt:
             print(cmdmath.generate(maple.parse(prompt.strip("print"))))
@@ -93,7 +93,7 @@ def run(argv=None):
 
         elif "latex" in prompt:
             latex.generate(maple.parse(prompt.strip("latex")), __settings__)
-            print(result_string)
+            print("Done.")
             # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
         elif "quit" in prompt:

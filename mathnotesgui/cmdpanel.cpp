@@ -9,6 +9,12 @@ layout->setAlignment(Qt::AlignTop);
 
 cmdline = new QLineEdit(this);
 layout->addWidget(cmdline);
+
+QLabel *item1 = new QLabel("Evaluate");
+layout->addWidget(item1);
+
+QLabel *item2 = new QLabel("Quit");
+layout->addWidget(item2);
 }
 
 void CmdPanel::showEvent(QShowEvent *e)

@@ -2,7 +2,7 @@
 
 CodeInput::CodeInput(QWidget *parent) : QPlainTextEdit(parent)
 {
-    setStyleSheet("QPlainTextEdit { border: none; }");
+    setStyleSheet("QPlainTextEdit { border: none; background: #DDD; }");
     installEventFilter(this);
     setTabChangesFocus(false);
     setMaximumHeight(24);
