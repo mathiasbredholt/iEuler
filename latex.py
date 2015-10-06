@@ -1,5 +1,5 @@
 # latex generator for mathnotes
-import mathlib
+import mathlib as ml
 import procio
 
 
@@ -24,14 +24,26 @@ def convert_expr(input_expr):
     return input_expr.to_latex()
 
 
-def parentheses(input_expr):
-    return "\\left( {} \\right)".format(input_expr.to_latex())
+def parentheses(input_expr, do=True):
+    if not type(input_expr) is str:
+        input_expr = convert_expr(input_expr)
+    if do:
+        return "\\left( {} \\right)".format(input_expr)
+    return input_expr
 
 
 def convert_value(self):
     if self.value == "pi":
         return "\\pi"
     return self.value
+
+
+def convert_minus(self):
+    return "-{}".format(parentheses(self.value, not type(self.value) in [ml.Number, ml.Variable]))
+
+
+def convert_factorial(self):
+    return "{}!".format(parentheses(self.value, not type(self.value) in [ml.Number, ml.Variable]))
 
 
 def convert_function(self):
@@ -53,18 +65,15 @@ def convert_subop(self):
 
 def convert_mulop(self):
     output = "{} {}"
-    if type(self.value1) is mathlib.Number and (
-       type(self.value2) is mathlib.Number or
-       type(self.value2) is mathlib.MulOp and type(self.value2.get_first()) is mathlib.Number) or\
-            type(self.value2) is mathlib.Number:
+    num_after = type(self.value2) is ml.Number or type(self.value2) in [
+        ml.MulOp, ml.Power] and type(self.value2.get_first()) is ml.Number
+    if num_after:
         output = "{} \\cdot {}"
-    if type(self.value1) is mathlib.AddOp or\
-       type(self.value1) is mathlib.SubOp:
+    if type(self.value1) in [ml.AddOp, ml.SubOp]:
         output_1 = parentheses(self.value1)
     else:
         output_1 = convert_expr(self.value1)
-    if type(self.value2) is mathlib.AddOp or\
-       type(self.value2) is mathlib.SubOp:
+    if type(self.value2) in [ml.AddOp, ml.SubOp]:
         output_2 = parentheses(self.value2)
     else:
         output_2 = convert_expr(self.value2)
@@ -77,10 +86,7 @@ def convert_fraction(self):
 
 
 def convert_power(self):
-    if type(self.value1) is mathlib.Number or\
-       type(self.value1) is mathlib.Variable or\
-       type(self.value1) is mathlib.Function or\
-       type(self.value1) is mathlib.Root:
+    if type(self.value1) in [ml.Number, ml.Variable, ml.Function, ml.Root]:
         return "{}^{{{}}}".format(convert_expr(self.value1),
                                   convert_expr(self.value2))
     else:
@@ -109,7 +115,7 @@ def convert_integral(self):
 def convert_derivative(self):
     if self.nth.get_value() == "1":
         return "\\frac{{d}}{{d {}}}{} ".format(
-            convert_expr(self.value), convert_expr(self.variable))
+            convert_expr(self.variable), convert_expr(self.value))
     else:
         return "\\frac{{d^{{{}}}}}{{d {}^{{{}}}}}{} ".format(
             convert_expr(self.nth), convert_expr(self.variable),
@@ -117,13 +123,15 @@ def convert_derivative(self):
 
 
 # Extending mathlib classes with to_latex method for duck typing
-mathlib.MathValue.to_latex = convert_value
-mathlib.Function.to_latex = convert_function
-mathlib.AddOp.to_latex = convert_addop
-mathlib.SubOp.to_latex = convert_subop
-mathlib.MulOp.to_latex = convert_mulop
-mathlib.Fraction.to_latex = convert_fraction
-mathlib.Power.to_latex = convert_power
-mathlib.Root.to_latex = convert_root
-mathlib.Integral.to_latex = convert_integral
-mathlib.Derivative.to_latex = convert_derivative
+ml.MathValue.to_latex = convert_value
+ml.Function.to_latex = convert_function
+ml.Minus.to_latex = convert_minus
+ml.Factorial.to_latex = convert_factorial
+ml.AddOp.to_latex = convert_addop
+ml.SubOp.to_latex = convert_subop
+ml.MulOp.to_latex = convert_mulop
+ml.Fraction.to_latex = convert_fraction
+ml.Power.to_latex = convert_power
+ml.Root.to_latex = convert_root
+ml.Integral.to_latex = convert_integral
+ml.Derivative.to_latex = convert_derivative

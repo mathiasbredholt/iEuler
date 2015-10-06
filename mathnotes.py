@@ -70,6 +70,7 @@ def run(argv=None):
             prompt = prompt.strip("frink") + "\n"
             result_string = frink_query(prompt, frink_proc, frink_queue,
                                         frink_thread)
+            print(result_string)
             # generate_latex(latex.generate(frink.parse(result_string)))
             # call(__settings__[
             #      "pdflatex"] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", shell=True)
@@ -93,7 +94,6 @@ def run(argv=None):
 
         elif "latex" in prompt:
             latex.generate(maple.parse(prompt.strip("latex")), __settings__)
-            print(result_string)
             # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
         elif "quit" in prompt:
