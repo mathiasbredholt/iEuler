@@ -30,6 +30,7 @@ def run(argv=None):
     gui_mode = False
     if argv and "-gui" in argv:
         gui_mode = True
+        worksheet = {}
 
     global __settings__
 
@@ -50,14 +51,12 @@ def run(argv=None):
         if not gui_mode:
             prompt = input("math> ")
         else:
-            prompt = input("")
+            index = int(input("line index> "))
+            prompt = input("command> ")
+            add_to_worksheet(worksheet, index, prompt)
 
         if "print" in prompt:
             print(cmdmath.generate(maple.parse(prompt.strip("print"))))
-
-        elif ";" in prompt:
-            prompt = prompt.strip(";")
-            do_save = True
 
         elif "frink" in prompt:
             if frink_proc is None:
@@ -70,7 +69,7 @@ def run(argv=None):
             prompt = prompt.strip("frink") + "\n"
             result_string = frink_query(prompt, frink_proc, frink_queue,
                                         frink_thread)
-            print(result_string)
+            print(index)
             # generate_latex(latex.generate(frink.parse(result_string)))
             # call(__settings__[
             #      "pdflatex"] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", shell=True)
@@ -88,13 +87,13 @@ def run(argv=None):
             result_string = maple_query(prompt, maple_proc, maple_queue,
                                         maple_thread)
             latex.generate(maple.parse(result_string), __settings__)
-            print(result_string)
+            print(index)
 
             # print(cmdmath.generate(maple.parse(result_string)))
 
         elif "latex" in prompt:
             latex.generate(maple.parse(prompt.strip("latex")), __settings__)
-            print("Done.")
+            print(index)
             # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
         elif "quit" in prompt:
@@ -104,16 +103,16 @@ def run(argv=None):
             print("Quit.")
             break
 
-        elif ":" in prompt:
-            for item in preview:
-                print(item)
-
         else:
             result_string = prompt
             print("Sorry. I don't understand: \"{}\"".format(prompt))
 
         if do_save:
             preview.append(result_string)
+
+
+def add_to_worksheet(worksheet, index, command):
+    worksheet[index] = {"command": command}
 
 
 def frink_query(query_string, proc, queue, thread):
