@@ -7,9 +7,9 @@ from pyparsing import Word, Literal, ZeroOrMore, Optional, Forward, Suppress, Co
 def parse_expression(text):
     function = Forward()
     expression = Forward()
-    integer = Word(nums)
+    number = Combine(Word(nums) + Optional("." + Word(nums)))
     variable = Word(alphas)
-    operand = integer.setParseAction(get_value) | function.setParseAction(get_function) | variable.setParseAction(
+    operand = number.setParseAction(get_value) | function.setParseAction(get_function) | variable.setParseAction(
         get_variable)
     function << Combine(Word(alphas) + Suppress("(")) + expression + \
         ZeroOrMore(Suppress(",") + expression) + Suppress(")")
