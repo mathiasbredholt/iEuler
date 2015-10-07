@@ -50,7 +50,7 @@ def run(argv=None):
         if not gui_mode:
             prompt = input("math> ")
         else:
-            prompt = input("").strip("\n")
+            prompt = input("")
 
         if "print" in prompt:
             print(cmdmath.generate(maple.parse(prompt.strip("print"))))

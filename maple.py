@@ -9,5 +9,5 @@ def init(path):
 
 
 def parse(input_string):
-    x = parse_expression(input_string.strip(' '))
+    x = parse_expression(input_string)
     return x
