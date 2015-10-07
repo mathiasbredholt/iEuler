@@ -29,10 +29,10 @@ void MainWindow::initSubprocess()
 
 void MainWindow::readStandardOutput()
 {
-    qDebug() << proc->readAllStandardOutput();
+    int line = QString(proc->readAllStandardOutput()).toInt();
     // get line number from python
-    // emit outputReady(line)
-    emit outputReady(0);
+     emit outputReady(line)
+//    emit outputReady(0);
 }
 
 void MainWindow::readStandardError()
