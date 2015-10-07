@@ -18,7 +18,8 @@ def make_expression():
 
     expop = Literal('^')
     signop = Literal('-')
-    multop = oneOf('* /')
+    fracop = Literal('/')
+    multop = Literal('*')
     plusop = oneOf('+ -')
     factop = Literal('!')
 
@@ -28,6 +29,7 @@ def make_expression():
                                  (signop, 1, opAssoc.RIGHT,
                                   lambda x: get_unary_operator(x, right=True)),
                                  (expop, 2, opAssoc.RIGHT, get_binary_operator),
+                                 (fracop, 2, opAssoc.LEFT, get_binary_operator),
                                  (multop, 2, opAssoc.LEFT, get_binary_operator),
                                  (plusop, 2, opAssoc.LEFT, get_binary_operator)]
                                 )
