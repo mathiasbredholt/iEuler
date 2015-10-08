@@ -29,15 +29,16 @@ void MainWindow::initSubprocess()
 
 void MainWindow::readStandardOutput()
 {
+//    qDebug() << proc->readAllStandardOutput();
     int line = QString(proc->readAllStandardOutput()).toInt();
     // get line number from python
-     emit outputReady(line)
+     emit outputReady(line);
 //    emit outputReady(0);
 }
 
 void MainWindow::readStandardError()
 {
-    qDebug() << proc->readAllStandardError();
+    qDebug() << "python error: " << proc->readAllStandardError();
 }
 
 
@@ -48,7 +49,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::evaluateCode(CodeInput* target, QString inputString)
 {
-    proc->write(inputString.toLatin1()+"\n");
+    proc->write(QString::number(((Group*) target->parent())->index).toLatin1()+"\n"+inputString.toLatin1()+"\n");
     if (((Group*) target->parent())->index == numberOfLines-1) {
         createNewCodeLine();
     }

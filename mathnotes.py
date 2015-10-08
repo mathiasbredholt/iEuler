@@ -51,8 +51,8 @@ def run(argv=None):
         if not gui_mode:
             prompt = input("math> ")
         else:
-            index = int(input("line index> "))
-            prompt = input("command> ")
+            index = int(input(""))
+            prompt = input("")
             add_to_worksheet(worksheet, index, prompt)
 
         if "print" in prompt:
@@ -84,10 +84,14 @@ def run(argv=None):
                 maple_proc, maple_queue, maple_thread = maple.init(
                     __settings__["maple"])
             prompt = prompt.strip("maple") + ";\n"
-            result_string = maple_query(prompt, maple_proc, maple_queue,
-                                        maple_thread)
-            latex.generate(maple.parse(result_string), __settings__)
-            print(index)
+            try:
+                result_string = maple_query(prompt, maple_proc, maple_queue,
+                                            maple_thread)
+            except:
+                print("Timeout")
+            else:
+                latex.generate(maple.parse(result_string), __settings__)
+                print(index)
 
             # print(cmdmath.generate(maple.parse(result_string)))
 
