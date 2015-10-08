@@ -1,7 +1,7 @@
-#include "plotview3d.h"
+//#include "plotview3d.h"
 
-PlotView3D::PlotView3D()
-{
+//PlotView3D::PlotView3D() : QGLView()
+//{
 
-}
+//}
 

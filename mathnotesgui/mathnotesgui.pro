@@ -17,13 +17,15 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     group.cpp \
-    cmdpanel.cpp
+    cmdpanel.cpp \
+    plotview3d.cpp
 
 HEADERS  += \
     codeinput.h \
     mainwindow.h \
     group.h \
-    cmdpanel.h
+    cmdpanel.h \
+    plotview3d.h
 
 FORMS    += \
     mainwindow.ui

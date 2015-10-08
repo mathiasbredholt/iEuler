@@ -1,15 +1,15 @@
-#ifndef PLOTVIEW3D_H
-#define PLOTVIEW3D_H
+//#ifndef PLOTVIEW3D_H
+//#define PLOTVIEW3D_H
 
 
-class PlotView3D : public QGLView
-{
-public:
-    PlotView3D();
+//class PlotView3D : public QGLView
+//{
+//public:
+//    PlotView3D();
 
-signals:
+//signals:
 
-public slots:
-};
+//public slots:
+//};
 
-#endif // PLOTVIEW3D_H
+//#endif // PLOTVIEW3D_H
