@@ -6,6 +6,7 @@ import frink
 import latex
 import cmdmath
 import procio
+import tools_plot2d as plot2d
 
 
 def conf(os):
@@ -99,6 +100,10 @@ def run(argv=None):
             latex.generate(maple.parse(prompt.strip("latex")), __settings__)
             print(index)
             # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
+
+        elif "plot" in prompt:
+            plot2d.plot(maple.parse(prompt.strip("plot")))
+            print(index)
 
         elif "quit" in prompt:
             print("Killing processes...")

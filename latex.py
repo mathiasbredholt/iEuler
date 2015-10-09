@@ -12,7 +12,9 @@ def generate(input_expr, __settings__):
         f.write(output_string)
 
     proc, queue, thread = procio.run(__settings__[
-        "pdflatex"] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", False)
+        "pdflatex"
+    ] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex",
+                                     False)
     proc.wait()
     proc, queue, thread = procio.run(
         "convert -density 300 mathnotes.pdf mathnotes.png", False)
@@ -39,11 +41,13 @@ def convert_value(self):
 
 
 def convert_minus(self):
-    return "-{}".format(parentheses(self.value, not type(self.value) in [ml.Number, ml.Variable]))
+    return "-{}".format(parentheses(self.value, not type(self.value) in
+                                    [ml.Number, ml.Variable]))
 
 
 def convert_factorial(self):
-    return "{}!".format(parentheses(self.value, not type(self.value) in [ml.Number, ml.Variable]))
+    return "{}!".format(parentheses(self.value, not type(self.value) in
+                                    [ml.Number, ml.Variable]))
 
 
 def convert_function(self):
@@ -66,7 +70,8 @@ def convert_subop(self):
 def convert_mulop(self):
     output = "{} {}"
     num_after = type(self.value2) is ml.Number or type(self.value2) in [
-        ml.MulOp, ml.Power] and type(self.value2.get_first()) is ml.Number
+        ml.MulOp, ml.Power
+    ] and type(self.value2.get_first()) is ml.Number
     if num_after:
         output = "{} \\cdot {}"
     if type(self.value1) in [ml.AddOp, ml.SubOp]:
@@ -120,7 +125,6 @@ def convert_derivative(self):
         return "\\frac{{d^{{{}}}}}{{d {}^{{{}}}}}{} ".format(
             convert_expr(self.nth), convert_expr(self.variable),
             convert_expr(self.nth), convert_expr(self.value))
-
 
 # Extending mathlib classes with to_latex method for duck typing
 ml.MathValue.to_latex = convert_value

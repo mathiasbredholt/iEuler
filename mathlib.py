@@ -3,7 +3,6 @@
 
 
 class MathValue:
-
     def get_value(self):
         return self.value
 
@@ -14,7 +13,6 @@ class MathValue:
 
 
 class Number(MathValue):
-
     def __init__(self, value):
         self.value = value
 
@@ -25,7 +23,6 @@ class Number(MathValue):
 
 
 class Matrix(MathValue):
-
     def __init__(self, values, width, height):
         self.value = values
         self.width = width
@@ -38,7 +35,6 @@ class Matrix(MathValue):
 
 
 class Complex(MathValue):
-
     def __init__(self, realpart, imagpart):
         self.r = realpart
         self.i = imagpart
@@ -51,7 +47,6 @@ class Complex(MathValue):
 
 
 class Variable(MathValue):
-
     def __init__(self, value):
         self.value = value
 
@@ -62,7 +57,6 @@ class Variable(MathValue):
 
 
 class Function(MathValue):
-
     def __init__(self, name, args):
         self.value = args
         self.name = name
@@ -74,7 +68,6 @@ class Function(MathValue):
 
 
 class MathUnaryOperator:
-
     def __init__(self, value):
         self.value = value
 
@@ -99,7 +92,6 @@ class MathUnaryOperator:
 
 
 class Minus(MathUnaryOperator):
-
     def __str__(self):
         return "Minus({})".format(self.value)
 
@@ -107,7 +99,6 @@ class Minus(MathUnaryOperator):
 
 
 class Factorial(MathUnaryOperator):
-
     def __str__(self):
         return "Factorial({})".format(self.value)
 
@@ -115,7 +106,6 @@ class Factorial(MathUnaryOperator):
 
 
 class MathOperator:
-
     def __init__(self, value1, value2):
         self.value1 = value1
         self.value2 = value2
@@ -146,7 +136,6 @@ class MathOperator:
 
 
 class AddOp(MathOperator):
-
     def __str__(self):
         return "AddOp({},{})".format(self.value1, self.value2)
 
@@ -154,7 +143,6 @@ class AddOp(MathOperator):
 
 
 class SubOp(MathOperator):
-
     def __str__(self):
         return "SubOp({},{})".format(self.value1, self.value2)
 
@@ -162,7 +150,6 @@ class SubOp(MathOperator):
 
 
 class MulOp(MathOperator):
-
     def __str__(self):
         return "MulOp({},{})".format(self.value1, self.value2)
 
@@ -170,7 +157,6 @@ class MulOp(MathOperator):
 
 
 class Fraction(MathOperator):
-
     def __str__(self):
         return "Fraction({},{})".format(self.value1, self.value2)
 
@@ -178,7 +164,6 @@ class Fraction(MathOperator):
 
 
 class Root(MathOperator):
-
     def __str__(self):
         return "Root({},{})".format(self.value1, self.value2)
 
@@ -186,7 +171,6 @@ class Root(MathOperator):
 
 
 class Power(MathOperator):
-
     def __str__(self):
         return "Power({},{})".format(self.value1, self.value2)
 
@@ -196,7 +180,6 @@ class Power(MathOperator):
 
 
 class Integral:
-
     def __init__(self, value, variable, range_from=None, range_to=None):
         self.value = value
         self.variable = variable
@@ -213,7 +196,6 @@ class Integral:
 
 
 class Derivative:
-
     def __init__(self, value, variable, nth=Number("1")):
         self.value = value
         self.variable = variable
