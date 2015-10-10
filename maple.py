@@ -1,20 +1,25 @@
 # maple parser for mathnotes
 import procio
-from mathparser import *
 import mathlib as ml
+import re
+from pyparsing import ParserElement, Word, Literal, ZeroOrMore, Optional, Forward, Suppress, Combine, oneOf, infixNotation, opAssoc, nums, alphas
 
+ParserElement.enablePackrat()  # Vastly improves pyparsing performance
+
+
+#################
+# MAPLE PROCESS #
+#################
 
 def init(path):
     shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" ".format(path)
     return procio.run(shell_cmd)
 
 
-def parse(input_string):
-    x = parse_expression(input_string)
-    return x
+################################################
+# GENERATE MAPLE STRING FROM MATHLIB OPERATORS #
+################################################
 
-
-# generates string from mathlib operators
 def generate(input_expr):
     return convert_expr(input_expr)
 
@@ -144,15 +149,134 @@ ml.Derivative.to_maple = convert_derivative
 ml.Function.to_maple = convert_function
 
 
-def print_math(math_list):
-    output_string = ""
-    for item in math_list:
-        if type(item) is list:
-            output_string += str(item) + " "
-        elif type(item) is ml.Complex:
-            output_string += "{} + {}i ".format(item.r, item.i)
-        elif type(item) is ml.Root:
-            output_string += "sqrt({}, {}) ".format(item.value, item.nth)
-        elif type(item) is ml.Power:
-            output_string += "{}^({}) ".format(item.value, item.nth)
-    print(output_string)
+###########################################
+# PARSE MAPLE STRING TO MATHLIB OPERATORS #
+###########################################
+
+def parse(input_string):
+    x = parse_expression(input_string)
+    return x
+
+
+def make_expression():
+    function = Forward()
+    expression = Forward()
+    number = Combine(Word(nums) + Optional("." + Word(nums)))
+    variable = Word(alphas)
+    operand = number.setParseAction(get_value) | function.setParseAction(get_function) | variable.setParseAction(
+        get_variable)
+    function << Combine(Word(alphas) + Suppress("(")) + expression + \
+        ZeroOrMore(Suppress(",") + expression) + Suppress(")")
+
+    expop = Literal('^')
+    signop = Literal('-')
+    fracop = Literal('/')
+    multop = Literal('*')
+    plusop = oneOf('+ -')
+    factop = Literal('!')
+
+    expression << infixNotation(operand,
+                                [(factop, 1, opAssoc.LEFT,
+                                  get_factorial_op),
+                                 (signop, 1, opAssoc.RIGHT,
+                                  get_minus_op),
+                                 (expop, 2, opAssoc.RIGHT,
+                                  get_pow_op),
+                                 (fracop, 2, opAssoc.LEFT,
+                                  get_div_op),
+                                 (multop, 2, opAssoc.LEFT,
+                                  get_mul_op),
+                                 (plusop, 2, opAssoc.LEFT, get_add_op)]
+                                )
+    return expression
+
+
+def get_function(toks):
+    # print("toks={}".format(toks))
+    name = toks[0]
+    args = toks[1:]
+    if name == "sqrt":
+        return ml.Root(args[0], Number("2"))
+    elif name == "int":
+        return ml.Integral(args[0], args[1])
+    elif name == "diff":
+        return ml.Derivative(args[0], args[1])
+    else:
+        return ml.Function(name, args)
+
+
+def get_value(toks):
+    value = toks[0]
+    # print("Value: {}".format(value))
+    return ml.Number(value)
+
+
+def get_variable(toks):
+    name = toks[0]
+    # print("Variable: {}".format(name))
+    if name == "pi":
+        return ml.Number(name)
+    return ml.Variable(name)
+
+
+def get_pow_op(toks):
+    value1, value2, op = parse_binary_operator(toks, get_pow_op)
+    return ml.Power(value1, value2)
+
+
+def get_mul_op(toks):
+    value1, value2, op = parse_binary_operator(toks, get_mul_op)
+    return ml.MulOp(value1, value2)
+
+
+def get_div_op(toks):
+    value1, value2, op = parse_binary_operator(toks, get_div_op)
+    return ml.Fraction(value1, value2)
+
+
+def get_add_op(toks):
+    value1, value2, op = parse_binary_operator(toks, get_add_op)
+    if op == "+":
+        return ml.AddOp(value1, value2)
+    else:
+        return ml.SubOp(value1, value2)
+
+
+def parse_binary_operator(toks, func):
+    operator = toks[0][1]
+    value1 = toks[0][0]
+    if type(value1) is str:
+        value1 = get_value(value1)
+    if len(toks[0]) > 3:
+        value2 = func([toks[0][2:]])
+    else:
+        value2 = toks[0][2]
+        if type(value2) is str:
+            value2 = get_value(value2)
+    return value1, value2, operator
+
+
+def get_factorial_op(toks):
+    value, op = parse_unary_operator(toks, get_factorial_op, right=False)
+    return ml.Factorial(value)
+
+
+def get_minus_op(toks):
+    value, op = parse_unary_operator(toks, get_minus_op)
+    return ml.Minus(value)
+
+
+def parse_unary_operator(toks, func, right=True):
+    operator = toks[0][0 if right else -1]
+    # print("Operator: {}".format(operator))
+    value = toks[0][1 if right else 0]
+    if type(value) is str:
+        value = get_value(value)
+    return value, operator
+
+
+expression = make_expression()
+
+
+def parse(text):
+    return expression.parseString(text)[0]
