@@ -2,9 +2,30 @@
 # contains all datatypes
 
 
+class Equality:
+
+    def __init__(self, type, value1, value2, hidden=False):
+        self.type = type
+        self.value1 = value1
+        self.value2 = value2
+        self.hidden = hidden
+
+    def __str__(self):
+        return "Equality({},\n\t{},\n\t{}\n)".format(self.type, self.value1, self.value2)
+
+    __repr__ = __str__
+
+
 class MathValue:
+
     def get_value(self):
         return self.value
+
+    def get_decorators(self):
+        return self.decorators
+
+    def add_decorator(self, dec):
+        self.decorators.append(dec)
 
     def __str__(self):
         return "MathValue({})".format(self.value)
@@ -13,20 +34,24 @@ class MathValue:
 
 
 class Number(MathValue):
+
     def __init__(self, value):
         self.value = value
+        self.decorators = []
 
     def __str__(self):
-        return "Number({})".format(self.value)
+        return "Number({} {})".format(self.value, self.decorators)
 
     __repr__ = __str__
 
 
 class Matrix(MathValue):
+
     def __init__(self, values, width, height):
         self.value = values
         self.width = width
         self.height = height
+        self.decorators = []
 
     def __str__(self):
         return "Matrix({})".format(self.value)
@@ -35,10 +60,12 @@ class Matrix(MathValue):
 
 
 class Complex(MathValue):
+
     def __init__(self, realpart, imagpart):
         self.r = realpart
         self.i = imagpart
         self.value = (self.r, self.i)
+        self.decorators = []
 
     def __str__(self):
         return "Complex({})".format(self.value)
@@ -47,19 +74,23 @@ class Complex(MathValue):
 
 
 class Variable(MathValue):
+
     def __init__(self, value):
         self.value = value
+        self.decorators = []
 
     def __str__(self):
-        return "Variable({})".format(self.value)
+        return "Variable({} {})".format(self.value, self.decorators)
 
     __repr__ = __str__
 
 
 class Function(MathValue):
-    def __init__(self, name, args):
+
+    def __init__(self, name, *args):
         self.value = args
         self.name = name
+        self.decorators = []
 
     def __str__(self):
         return "Function({},{})".format(self.name, self.value)
@@ -68,6 +99,7 @@ class Function(MathValue):
 
 
 class MathUnaryOperator:
+
     def __init__(self, value):
         self.value = value
 
@@ -92,6 +124,7 @@ class MathUnaryOperator:
 
 
 class Minus(MathUnaryOperator):
+
     def __str__(self):
         return "Minus({})".format(self.value)
 
@@ -99,6 +132,7 @@ class Minus(MathUnaryOperator):
 
 
 class Factorial(MathUnaryOperator):
+
     def __str__(self):
         return "Factorial({})".format(self.value)
 
@@ -106,6 +140,7 @@ class Factorial(MathUnaryOperator):
 
 
 class MathOperator:
+
     def __init__(self, value1, value2):
         self.value1 = value1
         self.value2 = value2
@@ -136,6 +171,7 @@ class MathOperator:
 
 
 class AddOp(MathOperator):
+
     def __str__(self):
         return "AddOp({},{})".format(self.value1, self.value2)
 
@@ -143,6 +179,7 @@ class AddOp(MathOperator):
 
 
 class SubOp(MathOperator):
+
     def __str__(self):
         return "SubOp({},{})".format(self.value1, self.value2)
 
@@ -150,6 +187,7 @@ class SubOp(MathOperator):
 
 
 class MulOp(MathOperator):
+
     def __str__(self):
         return "MulOp({},{})".format(self.value1, self.value2)
 
@@ -157,6 +195,7 @@ class MulOp(MathOperator):
 
 
 class Fraction(MathOperator):
+
     def __str__(self):
         return "Fraction({},{})".format(self.value1, self.value2)
 
@@ -164,6 +203,7 @@ class Fraction(MathOperator):
 
 
 class Root(MathOperator):
+
     def __str__(self):
         return "Root({},{})".format(self.value1, self.value2)
 
@@ -171,6 +211,7 @@ class Root(MathOperator):
 
 
 class Power(MathOperator):
+
     def __str__(self):
         return "Power({},{})".format(self.value1, self.value2)
 
@@ -180,6 +221,7 @@ class Power(MathOperator):
 
 
 class Integral:
+
     def __init__(self, value, variable, range_from=None, range_to=None):
         self.value = value
         self.variable = variable
@@ -196,6 +238,7 @@ class Integral:
 
 
 class Derivative:
+
     def __init__(self, value, variable, nth=Number("1")):
         self.value = value
         self.variable = variable

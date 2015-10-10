@@ -1,7 +1,8 @@
 import json
 # import pyperclip
 import os
-import maple
+import parser_maple
+import parser_mathnotes
 import frink
 import latex
 import cmdmath
@@ -57,7 +58,8 @@ def run(argv=None):
             add_to_worksheet(worksheet, index, prompt)
 
         if "print" in prompt:
-            print(cmdmath.generate(maple.parse(prompt.strip("print"))))
+            # print(parser_mathnotes.parse(prompt.strip("print")))
+            print(cmdmath.generate(parser_mathnotes.parse(prompt.strip("print"))))
 
         elif "frink" in prompt:
             if frink_proc is None:
@@ -82,7 +84,7 @@ def run(argv=None):
                 # Spawn Maple subprocess.
                 # Returns instance of process, queue and thread for
                 # asynchronous I/O
-                maple_proc, maple_queue, maple_thread = maple.init(
+                maple_proc, maple_queue, maple_thread = parser_maple.init(
                     __settings__["maple"])
             prompt = prompt.strip("maple") + ";\n"
             try:
@@ -91,18 +93,19 @@ def run(argv=None):
             except:
                 print("Timeout")
             else:
-                latex.generate(maple.parse(result_string), __settings__)
+                latex.generate(parser_maple.parse(result_string), __settings__)
                 print(index)
 
-            # print(cmdmath.generate(maple.parse(result_string)))
+            # print(cmdmath.generate(parser_maple.parse(result_string)))
 
         elif "latex" in prompt:
-            latex.generate(maple.parse(prompt.strip("latex")), __settings__)
+            latex.generate(parser_maple.parse(
+                prompt.strip("latex")), __settings__)
             print(index)
             # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
         elif "plot" in prompt:
-            plot2d.plot(maple.parse(prompt.strip("plot")))
+            plot2d.plot(parser_maple.parse(prompt.strip("plot")))
             print(index)
 
         elif "quit" in prompt:
@@ -138,7 +141,7 @@ def maple_query(query_string, proc, queue, thread):
     return_string = procio.process_input(proc, queue, thread, 20)
     return_string = return_string.strip("\n")
     # print("    Return string: " + return_string)
-    cmdmath.convert_expr(maple.parse(return_string))
+    cmdmath.convert_expr(parser_maple.parse(return_string))
     return return_string
 
 # def generate_latex(output_string):

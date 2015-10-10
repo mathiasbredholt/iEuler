@@ -19,6 +19,10 @@ def parentheses(input_expr, do=True):
     return input_expr
 
 
+def convert_equality(self):
+    return "{} {} {}".format(convert_expr(self.value1), self.type, convert_expr(self.value2))
+
+
 def convert_value(self):
     return self.value
 
@@ -112,6 +116,7 @@ def convert_function(self):
     return text
 
 # Extending mathlib classes with to_cmd method for duck typing
+ml.Equality.to_cmd = convert_equality
 ml.MathValue.to_cmd = convert_value
 ml.Minus.to_cmd = convert_minus
 ml.Factorial.to_cmd = convert_factorial
