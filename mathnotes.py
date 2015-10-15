@@ -1,13 +1,7 @@
 import json
-# import pyperclip
-import os
-import parser_maple
 import parser_mathnotes
-import frink
 import latex
 import cmdmath
-import procio
-import tools_plot2d as plot2d
 
 
 def conf(os):
@@ -34,15 +28,8 @@ def run(argv=None):
         gui_mode = True
         worksheet = {}
 
-    global __settings__
-
-    with open('mathnotes.conf', 'r') as f:
-        __settings__ = json.load(f)
-
-    maple_proc = None
-    frink_proc = None
-
-    preview = []
+    parser_mathnotes.init()
+    latex.init()
 
     if not gui_mode:
         print("Welcome to MathNotes v0.1!")
@@ -50,77 +37,93 @@ def run(argv=None):
     while True:
 
         do_save = False
-        if not gui_mode:
-            prompt = input("math> ")
-        else:
+        if gui_mode:
             index = int(input(""))
             prompt = input("")
             add_to_worksheet(worksheet, index, prompt)
-
-        if "print" in prompt:
-            # print(parser_mathnotes.parse(prompt.strip("print")))
-            print(cmdmath.generate(parser_mathnotes.parse(prompt.strip("print"))))
-
-        elif "frink" in prompt:
-            if frink_proc is None:
-                print("Starting Frink...")
-                # Spawn Frink subprocess.
-                # Returns instance of process, queue and thread for
-                # asynchronous I/O
-                frink_proc, frink_queue, frink_thread = frink.init(
-                    __settings__["frink"])
-            prompt = prompt.strip("frink") + "\n"
-            result_string = frink_query(prompt, frink_proc, frink_queue,
-                                        frink_thread)
-            print(index)
-            # generate_latex(latex.generate(frink.parse(result_string)))
-            # call(__settings__[
-            #      "pdflatex"] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", shell=True)
-
-        elif "maple" in prompt:
-            if maple_proc is None:
-                if not gui_mode:
-                    print("Starting Maple...")
-                # Spawn Maple subprocess.
-                # Returns instance of process, queue and thread for
-                # asynchronous I/O
-                maple_proc, maple_queue, maple_thread = parser_maple.init(
-                    __settings__["maple"])
-            prompt = prompt.strip("maple") + ";\n"
-            try:
-                result_string = maple_query(prompt, maple_proc, maple_queue,
-                                            maple_thread)
-            except:
-                print("Timeout")
-            else:
-                latex.generate(parser_maple.parse(result_string), __settings__)
-                print(index)
-
-            # print(cmdmath.generate(parser_maple.parse(result_string)))
-
-        elif "latex" in prompt:
-            latex.generate(parser_maple.parse(
-                prompt.strip("latex")), __settings__)
-            print(index)
-            # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
-
-        elif "plot" in prompt:
-            plot2d.plot(parser_maple.parse(prompt.strip("plot")))
-            print(index)
-
-        elif "quit" in prompt:
-            print("Killing processes...")
-            os.killpg(os.getpgid(maple_proc.pid), 15)
-            os.killpg(os.getpgid(frink_proc.pid), 15)
-            print("Quit.")
-            break
-
         else:
-            result_string = prompt
-            print("Sorry. I don't understand: \"{}\"".format(prompt))
+            prompt = input("math> ")
 
-        if do_save:
-            preview.append(result_string)
+        result = parser_mathnotes.parse(prompt)
+
+        latex.generate(result)
+
+        if gui_mode:
+            print(index)
+        else:
+            print(cmdmath.generate(result))
+
+        # if "print" in prompt:
+        #     # print(parser_mathnotes.parse(prompt.strip("print")))
+        #     print(cmdmath.generate(parser_mathnotes.parse(prompt.strip("print"))))
+
+        # elif "frink" in prompt:
+        #     if frink_proc is None:
+        #         print("Starting Frink...")
+        #         # Spawn Frink subprocess.
+        #         # Returns instance of process, queue and thread for
+        #         # asynchronous I/O
+        #         frink_proc, frink_queue, frink_thread = frink.init(
+        #             __settings__["frink"])
+        #     prompt = prompt.strip("frink") + "\n"
+        #     result_string = frink_query(prompt, frink_proc, frink_queue,
+        #                                 frink_thread)
+        #     if gui_mode:
+        #         print(index)
+        #     else:
+        #         print(cmdmath.generate(parser_maple.parse(result_string)))
+        #     # generate_latex(latex.generate(frink.parse(result_string)))
+        #     # call(__settings__[
+        #     #      "pdflatex"] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", shell=True)
+
+        # elif "maple" in prompt:
+        #     if maple_proc is None:
+        #         if not gui_mode:
+        #             print("Starting Maple...")
+        #         # Spawn Maple subprocess.
+        #         # Returns instance of process, queue and thread for
+        #         # asynchronous I/O
+        #         maple_proc, maple_queue, maple_thread = parser_maple.init(
+        #             __settings__["maple"])
+        #     prompt = prompt.strip("maple") + ";\n"
+        #     try:
+        #         result_string = maple_query(prompt, maple_proc, maple_queue,
+        #                                     maple_thread)
+        #     except:
+        #         print("Timeout")
+        #     else:
+        #         latex.generate(parser_maple.parse(result_string), __settings__)
+        #         if gui_mode:
+        #             print(index)
+        #         else:
+        #             print(cmdmath.generate(parser_maple.parse(result_string)))
+
+        #     # print(cmdmath.generate(parser_maple.parse(result_string)))
+
+        # elif "latex" in prompt:
+        #     latex.generate(parser_maple.parse(
+        #         prompt.strip("latex")), __settings__)
+        #     if gui_mode:
+        #         print(index)
+        #     else:
+        #         print(cmdmath.generate(parser_maple.parse(result_string)))
+
+        #     # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
+
+        # elif "plot" in prompt:
+        #     plot2d.plot(parser_maple.parse(prompt.strip("plot")))
+        #     if gui_mode:
+        #         print(index)
+        # elif "quit" in prompt:
+        #     print("Killing processes...")
+        #     os.killpg(os.getpgid(maple_proc.pid), 15)
+        #     os.killpg(os.getpgid(frink_proc.pid), 15)
+        #     print("Quit.")
+        #     break
+
+        # else:
+        #     result_string = prompt
+        #     print("Sorry. I don't understand: \"{}\"".format(prompt))
 
 
 def add_to_worksheet(worksheet, index, command):
@@ -134,15 +137,6 @@ def frink_query(query_string, proc, queue, thread):
     print(return_string)
     return return_string
 
-
-def maple_query(query_string, proc, queue, thread):
-    proc.stdin.write(query_string)
-    procio.process_input(proc, queue, thread, 0.5, True)
-    return_string = procio.process_input(proc, queue, thread, 20)
-    return_string = return_string.strip("\n")
-    # print("    Return string: " + return_string)
-    cmdmath.convert_expr(parser_maple.parse(return_string))
-    return return_string
 
 # def generate_latex(output_string):
 #     with open("preamble.tex", "r") as f:

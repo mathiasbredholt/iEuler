@@ -1,20 +1,28 @@
 # latex generator for mathnotes
 import mathlib as ml
 import procio
+import json
+
+__settings__ = None
+
+
+def init():
+    global __settings__
+
+    with open('mathnotes.conf', 'r') as f:
+        __settings__ = json.load(f)["pdflatex"]
 
 
 # generates LaTeX string from mathlib operators
-def generate(input_expr, __settings__):
+def generate(input_expr):
     output_string = convert_expr(input_expr)
     with open("preamble.tex", "r") as f:
         output_string = f.read().replace("%content", output_string)
     with open("mathnotes.tex", "w") as f:
         f.write(output_string)
 
-    proc, queue, thread = procio.run(__settings__[
-        "pdflatex"
-    ] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex",
-                                     False)
+    proc, queue, thread = procio.run(
+        __settings__ + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", False)
     proc.wait()
     proc, queue, thread = procio.run(
         "convert -density 300 mathnotes.pdf mathnotes.png", False)
@@ -32,6 +40,10 @@ def parentheses(input_expr, do=True):
     if do:
         return "\\left( {} \\right)".format(input_expr)
     return input_expr
+
+
+def convert_equality(self):
+    return "{} {} {}".format(convert_expr(self.value1), self.type, convert_expr(self.value2))
 
 
 def convert_value(self):
@@ -128,6 +140,7 @@ def convert_derivative(self):
 
 # Extending mathlib classes with to_latex method for duck typing
 ml.MathValue.to_latex = convert_value
+ml.Equality.to_latex = convert_equality
 ml.Function.to_latex = convert_function
 ml.Minus.to_latex = convert_minus
 ml.Factorial.to_latex = convert_factorial

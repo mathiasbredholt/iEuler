@@ -5,6 +5,15 @@ from parser_mathnotes_lib import *
 from functools import reduce
 import re
 from pyparsing import ParserElement, Regex, Word, Keyword, Literal, White, Group, ZeroOrMore, NotAny, Optional, Forward, Suppress, Combine, oneOf, infixNotation, opAssoc, delimitedList, nums, alphas, printables, alphanums, alphas8bit
+import os
+import parser_maple
+import frink
+import latex
+import cmdmath
+import procio
+import tools_plot2d as plot2d
+import json
+
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
@@ -146,6 +155,16 @@ ml.Function.to_mathnotes = convert_function
 # PARSE MATHNOTES STRING TO MATHLIB OPERATORS #
 ###############################################
 
+__settings__, maple_proc, frink_proc, gui_mode = [None] * 4
+
+
+def init():
+    global __settings__
+
+    with open('mathnotes.conf', 'r') as f:
+        __settings__ = json.load(f)
+
+
 def parse(input_string):
     x = parse_expression(input_string)
     return x
@@ -163,6 +182,7 @@ def get_decorator(toks):
 
 
 def get_equality_op(toks):
+    global maple_proc
     t = toks[0]
     value1, value2, op = mp.parse_binary_operator(toks, get_equality_op)
     hidden = False
@@ -170,7 +190,14 @@ def get_equality_op(toks):
         type = "="
         if t["equals"]["modifier"]:
             if "#" in t["equals"]["modifier"]:
-                pass
+                if maple_proc is None:
+                    if not gui_mode:
+                        print("Starting Maple...")
+                    # Spawn Maple subprocess.
+                    # Returns instance of process, queue and thread for
+                    # asynchronous I/O
+                    maple_proc = parser_maple.init(__settings__["maple"])
+                value2 = parser_maple.query(value2, *maple_proc)
             if "::" in t["equals"]["modifier"]:
                 hidden = True
             elif ":" in t["equals"]["modifier"]:
@@ -239,5 +266,7 @@ def make_expression():
 expression = make_expression()
 
 
-def parse(text):
+def parse(text, gui=False):
+    global gui_mode
+    gui_mode = gui
     return expression.parseString(text)[0]

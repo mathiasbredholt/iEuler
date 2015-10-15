@@ -18,6 +18,16 @@ def init(path):
     return procio.run(shell_cmd)
 
 
+def query(query, proc, queue, thread, convert=True):
+    if convert:
+        query = generate(query) + ";\n"
+    proc.stdin.write(query)
+    procio.process_input(proc, queue, thread, 0.5, True)
+    return_string = procio.process_input(proc, queue, thread, 20)
+    return_string = return_string.strip("\n")
+    return parse(return_string)
+
+
 ################################################
 # GENERATE MAPLE STRING FROM MATHLIB OPERATORS #
 ################################################
@@ -63,12 +73,7 @@ def convert_subop(self):
 
 
 def convert_mulop(self):
-    output = "{} {}"
-    num_after = type(self.value2) is ml.Number or type(self.value2) in [
-        ml.MulOp, ml.Power
-    ] and type(self.value2.get_first()) is ml.Number
-    if num_after:
-        output = "{} * {}"
+    output = "{} * {}"
     if type(self.value1) in [ml.AddOp, ml.SubOp]:
         output_1 = parentheses(self.value1)
     else:
@@ -108,22 +113,16 @@ def convert_root(self):
 
 def convert_integral(self):
     if self.range_from is None:
-        return "int {} d{} ".format(
-            convert_expr(self.value), convert_expr(self.variable))
+        return "int({}, {}) ".format(convert_expr(self.value), convert_expr(self.variable))
     else:
-        return "int from {} to {} d{} ".format(
-            convert_expr(self.range_from), convert_expr(self.range_to),
-            convert_expr(self.value), convert_expr(self.variable))
+        return "int({}, {}={}..{}) ".format(convert_expr(self.value), convert_expr(self.variable), convert_expr(self.range_from), convert_expr(self.range_to))
 
 
 def convert_derivative(self):
     if self.nth.get_value == "1":
-        return "d{}/d{} ".format(convert_expr(self.value),
-                                 convert_expr(self.variable))
+        return "diff({}, {}) ".format(convert_expr(self.value), convert_expr(self.variable))
     else:
-        return "D({})({})({})".format(
-            convert_expr(self.nth), convert_expr(self.value),
-            convert_expr(self.variable))
+        return "diff({}, {}${}) ".format(convert_expr(self.value), convert_expr(self.variable), convert_expr(self.nth))
 
 
 def convert_function(self):
