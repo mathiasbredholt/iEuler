@@ -31,7 +31,7 @@ def get_variable(toks, variables):
 
 
 def get_pow_op(toks):
-    value1, value2, op = parse_binary_operator(toks, get_pow_op)
+    value1, value2, op = parse_binary_operator(toks, get_pow_op, right=True)
     return ml.Power(value1, value2)
 
 
@@ -63,18 +63,20 @@ def get_minus_op(toks):
     return ml.Minus(value)
 
 
-def parse_binary_operator(toks, func):
+def parse_binary_operator(toks, func, right=False):
     operator = toks[0][1]
-    value1 = toks[0][0]
+    value1 = toks[0][0 if right else -1]
     if type(value1) is str:
         value1 = get_value(value1)
     if len(toks[0]) > 3:
-        value2 = func([toks[0][2:]])
+        value2 = func([toks[0][2:] if right else toks[0][:-2]])
     else:
-        value2 = toks[0][2]
+        value2 = toks[0][2 if right else 0]
         if type(value2) is str:
             value2 = get_value(value2)
-    return value1, value2, operator
+    if right:
+        return value1, value2, operator
+    return value2, value1, operator
 
 
 def parse_unary_operator(toks, right=True):

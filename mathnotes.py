@@ -2,6 +2,8 @@ import json
 import parser_mathnotes
 import latex
 import cmdmath
+import mathlib as ml
+import tools_plot2d as plot2d
 
 
 def conf(os):
@@ -46,7 +48,10 @@ def run(argv=None):
 
         result = parser_mathnotes.parse(prompt)
 
-        latex.generate(result)
+        if type(result) is ml.Plot:
+            plot2d.plot(result)
+        else:
+            latex.generate(result)
 
         if gui_mode:
             print(index)

@@ -13,6 +13,21 @@ ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 # MAPLE PROCESS #
 #################
 
+maple_proc = None
+
+
+def evaluate(expr, settings, gui_mode=False, convert=True):
+    global maple_proc
+    if maple_proc is None:
+        if not gui_mode:
+            print("Starting Maple...")
+        # Spawn Maple subprocess.
+        # Returns instance of process, queue and thread for
+        # asynchronous I/O
+        maple_proc = init(settings)
+    return query(expr, *maple_proc, convert=convert)
+
+
 def init(path):
     shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" ".format(path)
     return procio.run(shell_cmd)
@@ -60,6 +75,11 @@ def convert_minus(self):
 def convert_factorial(self):
     return "{}!".format(parentheses(self.value, not type(self.value) in
                                     [ml.Number, ml.Variable]))
+
+
+def convert_equality(self):
+    return "{} = {}".format(convert_expr(self.value1),
+                            convert_expr(self.value2))
 
 
 def convert_addop(self):
@@ -139,6 +159,7 @@ def convert_function(self):
 ml.MathValue.to_maple = convert_value
 ml.Minus.to_maple = convert_minus
 ml.Factorial.to_maple = convert_factorial
+ml.Equality.to_maple = convert_equality
 ml.AddOp.to_maple = convert_addop
 ml.SubOp.to_maple = convert_subop
 ml.MulOp.to_maple = convert_mulop

@@ -155,7 +155,7 @@ ml.Function.to_mathnotes = convert_function
 # PARSE MATHNOTES STRING TO MATHLIB OPERATORS #
 ###############################################
 
-__settings__, maple_proc, frink_proc, gui_mode = [None] * 4
+__settings__, gui_mode = [None] * 2
 
 
 def init():
@@ -182,7 +182,6 @@ def get_decorator(toks):
 
 
 def get_equality_op(toks):
-    global maple_proc
     t = toks[0]
     value1, value2, op = mp.parse_binary_operator(toks, get_equality_op)
     hidden = False
@@ -190,14 +189,7 @@ def get_equality_op(toks):
         type = "="
         if t["equals"]["modifier"]:
             if "#" in t["equals"]["modifier"]:
-                if maple_proc is None:
-                    if not gui_mode:
-                        print("Starting Maple...")
-                    # Spawn Maple subprocess.
-                    # Returns instance of process, queue and thread for
-                    # asynchronous I/O
-                    maple_proc = parser_maple.init(__settings__["maple"])
-                value2 = parser_maple.query(value2, *maple_proc)
+                value2 = evaluate(value2)
             if "::" in t["equals"]["modifier"]:
                 hidden = True
             elif ":" in t["equals"]["modifier"]:
@@ -206,6 +198,10 @@ def get_equality_op(toks):
         type = op[0]
 
     return ml.Equality(type, value1, value2, hidden)
+
+
+def evaluate(expr, convert=True):
+    return parser_maple.evaluate(expr, __settings__["maple"], gui_mode, convert=True)
 
 
 def make_expression():
@@ -220,15 +216,21 @@ def make_expression():
     chars = letters + nums
     space = White(' ')
 
-    function = Forward()
     expr = Forward()
     number = Combine(Word(nums) + Optional("." + Word(nums)))
     name = NotAny(deco_kw_list | equality_kw_list) + Word(letters, chars)
     variable = name.copy()
-    operand = number.setParseAction(mp.get_value) | function.setParseAction(lambda x: mp.get_function(x, functions)) | variable.setParseAction(
-        lambda x: mp.get_variable(x, variables))
-    function << Combine(name + Suppress("(")) + \
+    function = Combine(name + Suppress("(")) + \
         delimitedList(expr, delim=',') + Suppress(")")
+    eval_field = Suppress('#') + expr + Suppress('#')
+    eval_direct_field = Suppress('$') + expr + Suppress('$')
+    operand = (
+        eval_field.setParseAction(lambda x: evaluate(x[0])) |
+        eval_direct_field.setParseAction(lambda x: evaluate(x[0], False)) |
+        function.setParseAction(lambda x: mp.get_function(x, functions)) |
+        variable.setParseAction(lambda x: mp.get_variable(x, variables)) |
+        number.setParseAction(mp.get_value)
+    )
 
     factop = Literal('!') + space
     signop = space + Literal('-')

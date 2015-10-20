@@ -13,6 +13,10 @@ functions = {
         "object": ml.Derivative,
         "num_args": 2
     },
+    "plot": {
+        "object": ml.Plot,
+        "num_args": 2
+    },
     "__default__": {
         "object": ml.Function,
     }
