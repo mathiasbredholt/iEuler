@@ -28,4 +28,3 @@ def plot(expr, var='x', from_x=-4, to_x=4, precision=500, func=None):
         plt.title('$y=' + latex.convert_expr(expr) + '$', fontsize=18, y=1.04)
     plt.savefig('mathnotes.png', transparent=True)
     plt.clf()
-    # plt.show()
