@@ -11,7 +11,7 @@ class Equality:
         self.hidden = hidden
 
     def __str__(self):
-        return "Equality({},\n\t{},\n\t{}\n)".format(self.type, self.value1, self.value2)
+        return "Equality(type:'{}', {}, {})".format(self.type, self.value1, self.value2)
 
     __repr__ = __str__
 
@@ -94,6 +94,18 @@ class Function(MathValue):
 
     def __str__(self):
         return "Function({},{})".format(self.name, self.value)
+
+    __repr__ = __str__
+
+
+class Plot(MathValue):
+
+    def __init__(self, value):
+        self.value = value
+        self.decorators = []
+
+    def __str__(self):
+        return "Plot({})".format(self.value)
 
     __repr__ = __str__
 

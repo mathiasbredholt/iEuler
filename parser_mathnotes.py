@@ -5,6 +5,15 @@ from parser_mathnotes_lib import *
 from functools import reduce
 import re
 from pyparsing import ParserElement, Regex, Word, Keyword, Literal, White, Group, ZeroOrMore, NotAny, Optional, Forward, Suppress, Combine, oneOf, infixNotation, opAssoc, delimitedList, nums, alphas, printables, alphanums, alphas8bit
+import os
+import parser_maple
+import frink
+import latex
+import cmdmath
+import procio
+import tools_plot2d as plot2d
+import json
+
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
@@ -146,6 +155,16 @@ ml.Function.to_mathnotes = convert_function
 # PARSE MATHNOTES STRING TO MATHLIB OPERATORS #
 ###############################################
 
+__settings__, gui_mode = [None] * 2
+
+
+def init():
+    global __settings__
+
+    with open('mathnotes.conf', 'r') as f:
+        __settings__ = json.load(f)
+
+
 def parse(input_string):
     x = parse_expression(input_string)
     return x
@@ -170,7 +189,7 @@ def get_equality_op(toks):
         type = "="
         if t["equals"]["modifier"]:
             if "#" in t["equals"]["modifier"]:
-                pass
+                value2 = evaluate(value2)
             if "::" in t["equals"]["modifier"]:
                 hidden = True
             elif ":" in t["equals"]["modifier"]:
@@ -179,6 +198,10 @@ def get_equality_op(toks):
         type = op[0]
 
     return ml.Equality(type, value1, value2, hidden)
+
+
+def evaluate(expr, convert=True):
+    return parser_maple.evaluate(expr, __settings__["maple"], gui_mode, convert=True)
 
 
 def make_expression():
@@ -193,15 +216,21 @@ def make_expression():
     chars = letters + nums
     space = White(' ')
 
-    function = Forward()
     expr = Forward()
     number = Combine(Word(nums) + Optional("." + Word(nums)))
     name = NotAny(deco_kw_list | equality_kw_list) + Word(letters, chars)
     variable = name.copy()
-    operand = number.setParseAction(mp.get_value) | function.setParseAction(lambda x: mp.get_function(x, functions)) | variable.setParseAction(
-        lambda x: mp.get_variable(x, variables))
-    function << Combine(name + Suppress("(")) + \
+    function = Combine(name + Suppress("(")) + \
         delimitedList(expr, delim=',') + Suppress(")")
+    eval_field = Suppress('#') + expr + Suppress('#')
+    eval_direct_field = Suppress('$') + expr + Suppress('$')
+    operand = (
+        eval_field.setParseAction(lambda x: evaluate(x[0])) |
+        eval_direct_field.setParseAction(lambda x: evaluate(x[0], False)) |
+        function.setParseAction(lambda x: mp.get_function(x, functions)) |
+        variable.setParseAction(lambda x: mp.get_variable(x, variables)) |
+        number.setParseAction(mp.get_value)
+    )
 
     factop = Literal('!') + space
     signop = space + Literal('-')
@@ -239,5 +268,7 @@ def make_expression():
 expression = make_expression()
 
 
-def parse(text):
+def parse(text, gui=False):
+    global gui_mode
+    gui_mode = gui
     return expression.parseString(text)[0]

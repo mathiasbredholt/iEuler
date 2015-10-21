@@ -13,9 +13,34 @@ ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 # MAPLE PROCESS #
 #################
 
+maple_proc = None
+
+
+def evaluate(expr, settings, gui_mode=False, convert=True):
+    global maple_proc
+    if maple_proc is None:
+        if not gui_mode:
+            print("Starting Maple...")
+        # Spawn Maple subprocess.
+        # Returns instance of process, queue and thread for
+        # asynchronous I/O
+        maple_proc = init(settings)
+    return query(expr, *maple_proc, convert=convert)
+
+
 def init(path):
     shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" ".format(path)
     return procio.run(shell_cmd)
+
+
+def query(query, proc, queue, thread, convert=True):
+    if convert:
+        query = generate(query) + ";\n"
+    proc.stdin.write(query)
+    procio.process_input(proc, queue, thread, 0.5, True)
+    return_string = procio.process_input(proc, queue, thread, 20)
+    return_string = return_string.strip("\n")
+    return parse(return_string)
 
 
 ################################################
@@ -52,6 +77,11 @@ def convert_factorial(self):
                                     [ml.Number, ml.Variable]))
 
 
+def convert_equality(self):
+    return "{} = {}".format(convert_expr(self.value1),
+                            convert_expr(self.value2))
+
+
 def convert_addop(self):
     return "{} + {}".format(convert_expr(self.value1),
                             convert_expr(self.value2))
@@ -63,12 +93,7 @@ def convert_subop(self):
 
 
 def convert_mulop(self):
-    output = "{} {}"
-    num_after = type(self.value2) is ml.Number or type(self.value2) in [
-        ml.MulOp, ml.Power
-    ] and type(self.value2.get_first()) is ml.Number
-    if num_after:
-        output = "{} * {}"
+    output = "{} * {}"
     if type(self.value1) in [ml.AddOp, ml.SubOp]:
         output_1 = parentheses(self.value1)
     else:
@@ -108,22 +133,16 @@ def convert_root(self):
 
 def convert_integral(self):
     if self.range_from is None:
-        return "int {} d{} ".format(
-            convert_expr(self.value), convert_expr(self.variable))
+        return "int({}, {}) ".format(convert_expr(self.value), convert_expr(self.variable))
     else:
-        return "int from {} to {} d{} ".format(
-            convert_expr(self.range_from), convert_expr(self.range_to),
-            convert_expr(self.value), convert_expr(self.variable))
+        return "int({}, {}={}..{}) ".format(convert_expr(self.value), convert_expr(self.variable), convert_expr(self.range_from), convert_expr(self.range_to))
 
 
 def convert_derivative(self):
     if self.nth.get_value == "1":
-        return "d{}/d{} ".format(convert_expr(self.value),
-                                 convert_expr(self.variable))
+        return "diff({}, {}) ".format(convert_expr(self.value), convert_expr(self.variable))
     else:
-        return "D({})({})({})".format(
-            convert_expr(self.nth), convert_expr(self.value),
-            convert_expr(self.variable))
+        return "diff({}, {}${}) ".format(convert_expr(self.value), convert_expr(self.variable), convert_expr(self.nth))
 
 
 def convert_function(self):
@@ -140,6 +159,7 @@ def convert_function(self):
 ml.MathValue.to_maple = convert_value
 ml.Minus.to_maple = convert_minus
 ml.Factorial.to_maple = convert_factorial
+ml.Equality.to_maple = convert_equality
 ml.AddOp.to_maple = convert_addop
 ml.SubOp.to_maple = convert_subop
 ml.MulOp.to_maple = convert_mulop
