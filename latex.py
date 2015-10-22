@@ -30,7 +30,9 @@ def generate(input_expr):
     return output_string
 
 
-def convert_expr(input_expr):
+def convert_expr(input_expr, display=True):
+    if type(input_expr) is ml.Fraction:
+        return input_expr.to_latex(display)
     return input_expr.to_latex()
 
 
@@ -97,18 +99,17 @@ def convert_mulop(self):
     return output.format(output_1, output_2)
 
 
-def convert_fraction(self):
-    return "\\dfrac{{{}}}{{{}}} ".format(
-        convert_expr(self.value1), convert_expr(self.value2))
+def convert_fraction(self, display=True):
+    return "\\{}frac{{{}}}{{{}}} ".format("d" if display else "", convert_expr(self.value1), convert_expr(self.value2))
 
 
 def convert_power(self):
     if type(self.value1) in [ml.Number, ml.Variable, ml.Function, ml.Root]:
         return "{}^{{{}}}".format(convert_expr(self.value1),
-                                  convert_expr(self.value2))
+                                  convert_expr(self.value2, display=False))
     else:
         return "{}^{{{}}}".format(parentheses(self.value1),
-                                  convert_expr(self.value2))
+                                  convert_expr(self.value2, display=False))
 
 
 def convert_root(self):

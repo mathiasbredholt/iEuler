@@ -180,10 +180,22 @@ def parse(input_string):
     return x
 
 
+def get_pow_op(toks):
+    p = mp.get_pow_op(toks)
+    if (
+            type(p.value2) is ml.Fraction and
+            type(p.value2.value1) is ml.Number and
+            p.value2.value1.value == "1" and
+            not '.' in p.value2.value2.value):
+        p = ml.Root(p.value1, p.value2.value2)
+    return p
+
+
 def make_expression():
     function = Forward()
     expression = Forward()
-    number = Combine(Word(nums) + Optional("." + Word(nums)))
+    number = Combine(Word(nums) + Optional("." + Word(nums))
+                     ) | Combine("." + Word(nums))
     variable = Word(alphas)
     operand = number.setParseAction(mp.get_value) | function.setParseAction(lambda x: mp.get_function(x, functions)) | variable.setParseAction(
         lambda x: mp.get_variable(x, variables))
@@ -200,7 +212,7 @@ def make_expression():
     expression << infixNotation(operand,
                                 [(factop, 1, opAssoc.LEFT, mp.get_factorial_op),
                                  (signop, 1, opAssoc.RIGHT, mp.get_minus_op),
-                                 (expop, 2, opAssoc.RIGHT, mp.get_pow_op),
+                                 (expop, 2, opAssoc.RIGHT, get_pow_op),
                                  (fracop, 2, opAssoc.LEFT, mp.get_div_op),
                                  (multop, 2, opAssoc.LEFT, mp.get_mul_op),
                                  (plusop, 2, opAssoc.LEFT, mp.get_add_op)]

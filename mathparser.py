@@ -5,6 +5,8 @@ import mathlib as ml
 
 def get_value(toks):
     value = toks[0]
+    if value[0] == ".":
+        return ml.Number("0" + value)
     # print("Value: {}".format(value))
     return ml.Number(value)
 

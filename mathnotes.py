@@ -46,17 +46,18 @@ def run(argv=None):
         else:
             prompt = input("math> ")
 
-        result = parser_mathnotes.parse(prompt)
+        if prompt:
+            result = parser_mathnotes.parse(prompt)
 
-        if type(result) is ml.Plot:
-            plot2d.plot(result)
-        else:
-            latex.generate(result)
+            if type(result) is ml.Plot:
+                plot2d.plot(result)
+            else:
+                latex.generate(result)
 
-        if gui_mode:
-            print(index)
-        else:
-            print(cmdmath.generate(result))
+            if gui_mode:
+                print(index)
+            else:
+                print(cmdmath.generate(result))
 
         # if "print" in prompt:
         #     # print(parser_mathnotes.parse(prompt.strip("print")))

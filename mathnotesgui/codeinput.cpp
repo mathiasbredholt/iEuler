@@ -1,4 +1,5 @@
 #include "codeinput.h"
+#include <QDebug>
 
 CodeInput::CodeInput(QWidget *parent) : QPlainTextEdit(parent)
 {
@@ -11,6 +12,9 @@ CodeInput::CodeInput(QWidget *parent) : QPlainTextEdit(parent)
 
 bool CodeInput::eventFilter(QObject *object, QEvent *e)
 {
+    if (e->type() == QEvent::Timer) {
+        return true;
+    }
     if (object == this && e->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
         if (keyEvent->key() == Qt::Key_Return) {
@@ -30,5 +34,6 @@ bool CodeInput::eventFilter(QObject *object, QEvent *e)
             return true;
         }
     }
+
     return false;
 }
