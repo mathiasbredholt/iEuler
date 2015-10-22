@@ -1,6 +1,6 @@
 # latex generator for mathnotes
 import mathlib as ml
-import procio
+import modules.tools.procio as procio
 import json
 
 __settings__ = None
@@ -9,14 +9,14 @@ __settings__ = None
 def init():
     global __settings__
 
-    with open('mathnotes.conf', 'r') as f:
+    with open('settings.conf', 'r') as f:
         __settings__ = json.load(f)["pdflatex"]
 
 
 # generates LaTeX string from mathlib operators
 def generate(input_expr):
     output_string = convert_expr(input_expr)
-    with open("preamble.tex", "r") as f:
+    with open("modules/latex/preamble.tex", "r") as f:
         output_string = f.read().replace("%content", output_string)
     with open("mathnotes.tex", "w") as f:
         f.write(output_string)
@@ -49,6 +49,8 @@ def convert_equality(self):
 
 
 def convert_value(self):
+    if type(self) is ml.Unit:
+        return "\\,\\mathrm{{{}}}".format(self.prefix + self.name)
     if self.value == "pi":
         return "\\pi"
     return self.value
@@ -104,7 +106,7 @@ def convert_fraction(self, display=True):
 
 
 def convert_power(self):
-    if type(self.value1) in [ml.Number, ml.Variable, ml.Function, ml.Root]:
+    if type(self.value1) in [ml.Number, ml.Variable, ml.Function, ml.Root, ml.Unit]:
         return "{}^{{{}}}".format(convert_expr(self.value1),
                                   convert_expr(self.value2, display=False))
     else:

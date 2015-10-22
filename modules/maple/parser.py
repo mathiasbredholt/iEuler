@@ -1,8 +1,8 @@
 # maple parser for mathnotes
-import procio
+import modules.tools.procio as procio
 import mathlib as ml
-import mathparser as mp
-from parser_maple_lib import *
+import parsing as parsing
+from modules.maple.lib import *
 import re
 from pyparsing import ParserElement, Word, Literal, ZeroOrMore, Optional, Forward, Suppress, Combine, oneOf, infixNotation, opAssoc, nums, alphas
 
@@ -64,6 +64,9 @@ def parentheses(input_expr, do=True):
 
 
 def convert_value(self):
+    if type(self) is ml.Unit:
+        # TODO
+        return ""
     return self.value
 
 
@@ -181,7 +184,7 @@ def parse(input_string):
 
 
 def get_pow_op(toks):
-    p = mp.get_pow_op(toks)
+    p = parsing.get_pow_op(toks)
     if (
             type(p.value2) is ml.Fraction and
             type(p.value2.value1) is ml.Number and
@@ -197,8 +200,8 @@ def make_expression():
     number = Combine(Word(nums) + Optional("." + Word(nums))
                      ) | Combine("." + Word(nums))
     variable = Word(alphas)
-    operand = number.setParseAction(mp.get_value) | function.setParseAction(lambda x: mp.get_function(x, functions)) | variable.setParseAction(
-        lambda x: mp.get_variable(x, variables))
+    operand = number.setParseAction(parsing.get_value) | function.setParseAction(lambda x: parsing.get_function(x, functions)) | variable.setParseAction(
+        lambda x: parsing.get_variable(x, variables))
     function << Combine(Word(alphas) + Suppress("(")) + expression + \
         ZeroOrMore(Suppress(",") + expression) + Suppress(")")
 
@@ -210,12 +213,12 @@ def make_expression():
     factop = Literal('!')
 
     expression << infixNotation(operand,
-                                [(factop, 1, opAssoc.LEFT, mp.get_factorial_op),
-                                 (signop, 1, opAssoc.RIGHT, mp.get_minus_op),
+                                [(factop, 1, opAssoc.LEFT, parsing.get_factorial_op),
+                                 (signop, 1, opAssoc.RIGHT, parsing.get_minus_op),
                                  (expop, 2, opAssoc.RIGHT, get_pow_op),
-                                 (fracop, 2, opAssoc.LEFT, mp.get_div_op),
-                                 (multop, 2, opAssoc.LEFT, mp.get_mul_op),
-                                 (plusop, 2, opAssoc.LEFT, mp.get_add_op)]
+                                 (fracop, 2, opAssoc.LEFT, parsing.get_div_op),
+                                 (multop, 2, opAssoc.LEFT, parsing.get_mul_op),
+                                 (plusop, 2, opAssoc.LEFT, parsing.get_add_op)]
                                 )
     return expression
 

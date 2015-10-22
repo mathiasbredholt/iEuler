@@ -3,8 +3,8 @@ import matplotlib
 matplotlib.use('AGG')
 import matplotlib.pyplot as plt
 import mathlib as ml
-import parser_numpy as pn
-import latex
+import modules.numpy.parser as pn
+import modules.latex.parser
 
 
 def plot(expr, var='x', from_x=-4, to_x=4, precision=500, func=None):
@@ -18,14 +18,14 @@ def plot(expr, var='x', from_x=-4, to_x=4, precision=500, func=None):
         plt.ylabel('${}({})$'.format(func.name, func.value[0].value),
                    fontsize=16)
         # plt.title(
-        #     '$' + latex.convert_expr(func) + '=' + latex.convert_expr(expr.value) +
+        #     '$' + modules.latex.parser.convert_expr(func) + '=' + modules.latex.parser.convert_expr(expr.value) +
         #     '$',
         #     fontsize=18,
         #     y=1.04)
     else:
         plt.xlabel('$x$', fontsize=16)
         plt.ylabel('$y$', fontsize=16)
-        # plt.title('$y=' + latex.convert_expr(expr.value) +
+        # plt.title('$y=' + modules.latex.parser.convert_expr(expr.value) +
         #           '$', fontsize=18, y=1.04)
     plt.savefig('mathnotes.png', transparent=True)
     plt.clf()
