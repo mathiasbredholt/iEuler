@@ -7,15 +7,17 @@ Group::Group(QWidget *parent, int index) : QWidget(parent)
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     QVBoxLayout *vlayout = new QVBoxLayout();
     input = new CodeInput(this);
-    output = new QLabel(this);
-    output->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+//    output = new QLabel(this);
+//    output->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    output = new MathRenderer();
     vlayout->addWidget(input);
-    vlayout->addWidget(output);
+    vlayout->addWidget(output->view);
     setLayout(vlayout);
 }
 
 void Group::outputReady(int lineIndex)
 {
-    if (lineIndex == index)
-    output->setPixmap(QPixmap("mathnotes.png"));
+    output->render(QString("3+4"));
+//    if (lineIndex == index)
+//    output->setPixmap(QPixmap("mathnotes.png"));
 }

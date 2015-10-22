@@ -1,2 +1,5 @@
-<RCC/>
-
+<RCC>
+    <qresource prefix="/html">
+        <file alias="test">html/test.html</file>
+    </qresource>
+</RCC>

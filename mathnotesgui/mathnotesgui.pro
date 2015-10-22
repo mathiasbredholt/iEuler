@@ -5,6 +5,8 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += webkit
+QT       += webkitwidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,14 +20,19 @@ SOURCES += \
     mainwindow.cpp \
     group.cpp \
     cmdpanel.cpp \
-    plotview3d.cpp
+    plotview3d.cpp \
+    mathrenderer.cpp
 
 HEADERS  += \
     codeinput.h \
     mainwindow.h \
     group.h \
     cmdpanel.h \
-    plotview3d.h
+    plotview3d.h \
+    mathrenderer.h
 
 FORMS    += \
     mainwindow.ui
+
+RESOURCES += \
+    math_resources.qrc

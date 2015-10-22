@@ -6,6 +6,7 @@
 #include <QVBoxLayout>
 #include <QPixmap>
 #include "codeinput.h"
+#include "mathrenderer.h"
 
 class Group : public QWidget
 {
@@ -14,8 +15,10 @@ public:
     explicit Group(QWidget *parent = 0, int index = 0);
     int index;
     CodeInput* input;
-    QLabel* output;
 
+private:
+    // QLabel* output;
+    MathRenderer *output;
 
 signals:
 
