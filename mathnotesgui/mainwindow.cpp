@@ -29,10 +29,16 @@ void MainWindow::initSubprocess()
 
 void MainWindow::readStandardOutput()
 {
-//    qDebug() << proc->readAllStandardOutput();
-    int line = QString(proc->readAllStandardOutput()).toInt();
-    // get line number from python
-     emit outputReady(line);
+    // get line number and latex string from ieuler
+    QString stdout = proc->readAllStandardOutput() + " 3+4";
+    qDebug() << stdout;
+    int split = stdout.indexOf(' ');
+    int line = stdout.left(split).toInt();
+    QString latexString = stdout.right(split+1);
+    qDebug() << line;
+    qDebug() << latexString;
+    // send signal to render math
+    emit outputReady(line, latexString);
 //    emit outputReady(0);
 }
 
@@ -74,7 +80,7 @@ void MainWindow::createNewCodeLine()
     connect(gp->input, SIGNAL(evaluateCode(CodeInput*, QString)), this, SLOT(evaluateCode(CodeInput*, QString)));
     connect(gp->input, SIGNAL(deleteGroup(QWidget*)), this, SLOT(deleteGroup(QWidget*)));
     connect(gp->input, SIGNAL(arrowsPressed(bool)), this, SLOT(arrowsPressed(bool)));
-    connect(this, SIGNAL(outputReady(int)), gp, SLOT(outputReady(int)));
+    connect(this, SIGNAL(outputReady(int, QString)), gp, SLOT(outputReady(int, QString)));
     numberOfLines++;
 }
 

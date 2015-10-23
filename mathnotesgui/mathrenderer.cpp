@@ -1,5 +1,6 @@
 #include "mathrenderer.h"
 #include <QFile>
+#include <QDir>
 
 QString readFile (const QString& filename)
 {
@@ -25,7 +26,9 @@ MathRenderer::MathRenderer(QObject *parent) : QObject(parent)
     view->setAttribute(Qt::WA_OpaquePaintEvent, false);
 }
 
-void MathRenderer::render(QString *latexString) {
-//    view->setHtml(readFile(":/html/test"));
-    view->setHtml(latexString);
+void MathRenderer::render(QString latexString) {
+    QString html = readFile(":/webkit/test");
+    html.replace("#LATEX#", latexString);
+    QUrl baseUrl = QUrl::fromLocalFile(QDir::currentPath() + "/mathnotesgui/webkit/");
+    view->setHtml(html, baseUrl);
 }

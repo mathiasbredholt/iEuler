@@ -15,9 +15,9 @@ Group::Group(QWidget *parent, int index) : QWidget(parent)
     setLayout(vlayout);
 }
 
-void Group::outputReady(int lineIndex)
+void Group::outputReady(int lineIndex, QString latexString)
 {
-    output->render(QString("3+4"));
-//    if (lineIndex == index)
+    if (lineIndex == index)
+        output->render(latexString);
 //    output->setPixmap(QPixmap("mathnotes.png"));
 }

@@ -41,7 +41,7 @@ protected:
     void keyPressEvent(QKeyEvent *);
 
 signals:
-    void outputReady(int lineIndex);
+    void outputReady(int lineIndex, QString latexString);
 
 private slots:
     void readStandardOutput();

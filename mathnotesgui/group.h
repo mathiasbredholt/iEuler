@@ -23,7 +23,7 @@ private:
 signals:
 
 public slots:
-    void outputReady(int lineIndex);
+    void outputReady(int lineIndex, QString latexString);
 };
 
 #endif // GROUP_H

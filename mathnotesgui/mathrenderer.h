@@ -10,7 +10,7 @@ class MathRenderer : public QObject
 public:
     explicit MathRenderer(QObject *parent = 0);
     QWebView *view;
-    void render(QString *latexString);
+    void render(QString latexString);
 
 signals:
 
