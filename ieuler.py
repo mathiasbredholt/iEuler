@@ -1,9 +1,8 @@
 import json
-import parser_mathnotes
-import latex
-import cmdmath
+import modules.ieuler.parser as parser
+import modules.latex.parser
 import mathlib as ml
-import tools_plot2d as plot2d
+import modules.tools.plot2d as plot2d
 
 
 def conf(os):
@@ -20,7 +19,7 @@ def conf(os):
             "/Library/Frameworks/Maple.framework/Versions/2015/bin/maple",
             "pdflatex": "/usr/local/texlive/2015/bin/x86_64-darwin/pdftex"
         }
-    with open('mathnotes.conf', 'w') as f:
+    with open('settings.conf', 'w') as f:
         json.dump(__settings__, f)
 
 
@@ -30,8 +29,8 @@ def run(argv=None):
         gui_mode = True
         worksheet = {}
 
-    parser_mathnotes.init()
-    latex.init()
+    parser.init()
+    modules.latex.parser.init()
 
     if not gui_mode:
         print("Welcome to MathNotes v0.1!")
@@ -47,21 +46,22 @@ def run(argv=None):
             prompt = input("math> ")
 
         if prompt:
-            result = parser_mathnotes.parse(prompt)
+            result = parser.parse(prompt)
 
             if type(result) is ml.Plot:
                 plot2d.plot(result)
             else:
-                latex.generate(result)
+                modules.latex.parser.generate(result)
 
             if gui_mode:
                 print(index)
             else:
-                print(cmdmath.generate(result))
+                print(result)
+                print(parser.generate(result))
 
         # if "print" in prompt:
-        #     # print(parser_mathnotes.parse(prompt.strip("print")))
-        #     print(cmdmath.generate(parser_mathnotes.parse(prompt.strip("print"))))
+        #     # print(modules.ieuler.parser.parse(prompt.strip("print")))
+        #     print(cmdmath.generate(modules.ieuler.parser.parse(prompt.strip("print"))))
 
         # elif "frink" in prompt:
         #     if frink_proc is None:
@@ -77,7 +77,7 @@ def run(argv=None):
         #     if gui_mode:
         #         print(index)
         #     else:
-        #         print(cmdmath.generate(parser_maple.parse(result_string)))
+        #         print(cmdmath.generate(modules.maple.parser.parse(result_string)))
         #     # generate_latex(latex.generate(frink.parse(result_string)))
         #     # call(__settings__[
         #     #      "pdflatex"] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", shell=True)
@@ -89,7 +89,7 @@ def run(argv=None):
         #         # Spawn Maple subprocess.
         #         # Returns instance of process, queue and thread for
         #         # asynchronous I/O
-        #         maple_proc, maple_queue, maple_thread = parser_maple.init(
+        #         maple_proc, maple_queue, maple_thread = modules.maple.parser.init(
         #             __settings__["maple"])
         #     prompt = prompt.strip("maple") + ";\n"
         #     try:
@@ -98,26 +98,26 @@ def run(argv=None):
         #     except:
         #         print("Timeout")
         #     else:
-        #         latex.generate(parser_maple.parse(result_string), __settings__)
+        #         latex.generate(modules.maple.parser.parse(result_string), __settings__)
         #         if gui_mode:
         #             print(index)
         #         else:
-        #             print(cmdmath.generate(parser_maple.parse(result_string)))
+        #             print(cmdmath.generate(modules.maple.parser.parse(result_string)))
 
-        #     # print(cmdmath.generate(parser_maple.parse(result_string)))
+        #     # print(cmdmath.generate(modules.maple.parser.parse(result_string)))
 
         # elif "latex" in prompt:
-        #     latex.generate(parser_maple.parse(
+        #     latex.generate(modules.maple.parser.parse(
         #         prompt.strip("latex")), __settings__)
         #     if gui_mode:
         #         print(index)
         #     else:
-        #         print(cmdmath.generate(parser_maple.parse(result_string)))
+        #         print(cmdmath.generate(modules.maple.parser.parse(result_string)))
 
         #     # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
 
         # elif "plot" in prompt:
-        #     plot2d.plot(parser_maple.parse(prompt.strip("plot")))
+        #     plot2d.plot(modules.maple.parser.parse(prompt.strip("plot")))
         #     if gui_mode:
         #         print(index)
         # elif "quit" in prompt:
@@ -145,7 +145,7 @@ def frink_query(query_string, proc, queue, thread):
 
 
 # def generate_latex(output_string):
-#     with open("preamble.tex", "r") as f:
+#     with open("modules/latex/preamble.tex", "r") as f:
 #         output_string = f.read().replace("%content", output_string)
 #     with open("mathnotes.tex", "w") as f:
 #         f.write(output_string)

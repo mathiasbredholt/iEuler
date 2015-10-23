@@ -1,17 +1,16 @@
 # parser for mathnotes default syntax
 import mathlib as ml
-import mathparser as mp
-from parser_mathnotes_lib import *
+import parsing as parsing
+from modules.ieuler.lib import *
 from functools import reduce
 import re
 from pyparsing import ParserElement, Regex, Word, Keyword, Literal, White, Group, ZeroOrMore, NotAny, Optional, Forward, Suppress, Combine, oneOf, infixNotation, opAssoc, delimitedList, nums, alphas, printables, alphanums, alphas8bit
 import os
-import parser_maple
-import frink
-import latex
-import cmdmath
-import procio
-import tools_plot2d as plot2d
+import modules.maple.parser
+import modules.frink.parser
+import modules.latex.parser
+import modules.tools.procio as procio
+import modules.tools.plot2d as plot2d
 import json
 
 
@@ -27,7 +26,7 @@ def generate(input_expr):
 
 
 def convert_expr(input_expr):
-    return input_expr.to_maple()
+    return input_expr.to_mathnotes()
 
 
 def parentheses(input_expr, do=True):
@@ -39,6 +38,8 @@ def parentheses(input_expr, do=True):
 
 
 def convert_value(self):
+    if type(self) is ml.Unit:
+        return self.prefix + self.name
     return self.value
 
 
@@ -161,7 +162,7 @@ __settings__, gui_mode = [None] * 2
 def init():
     global __settings__
 
-    with open('mathnotes.conf', 'r') as f:
+    with open('settings.conf', 'r') as f:
         __settings__ = json.load(f)
 
 
@@ -175,15 +176,20 @@ def make_keyword_list(list):
     return reduce(lambda x, y: x | y, map(Keyword, list))
 
 
+def make_word_list(list):
+    # ['x', 'y'] -> Keyword('x') | Keyword('y')
+    return reduce(lambda x, y: x | y, map(Word, list))
+
+
 def get_decorator(toks):
-    value, op = mp.parse_unary_operator(toks)
+    value, op = parsing.parse_unary_operator(toks)
     value.add_decorator(op)
     return value
 
 
 def get_equality_op(toks):
     t = toks[0]
-    value1, value2, op = mp.parse_binary_operator(toks, get_equality_op)
+    value1, value2, op = parsing.parse_binary_operator(toks, get_equality_op)
     hidden = False
     if "equals" in t:
         type = "="
@@ -201,7 +207,7 @@ def get_equality_op(toks):
 
 
 def evaluate(expr, convert=True):
-    return parser_maple.evaluate(expr, __settings__["maple"], gui_mode, convert=True)
+    return modules.maple.parser.evaluate(expr, __settings__["maple"], gui_mode, convert=True)
 
 
 def make_expression():
@@ -212,12 +218,17 @@ def make_expression():
         ['hat', 'bar', 'ul', 'vec', 'dot', 'ddot', 'tdot'])
     equality_kw_list = make_keyword_list(
         ['in', '!in', 'sub', 'sup', 'sube', 'supe'])
+    units_list = make_word_list(
+        ['V', 'A', 'J', 'm', 's', 'K', 'W', 'H', 'F', 'T', 'g', 'Hz', 'N', 'Pa', 'C', 'Ohm', 'S', 'Wb', 'lm', 'lx', 'Bq', 'Gy', 'Sv', 'cd', 'mol'])
+    unit_prefixes_list = make_word_list(
+        ['y', 'z', 'a', 'f', 'p', 'n', 'μ', 'm', 'c', 'd', 'da', 'h', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'])
     letters = alphas + alphas8bit + "_"
     chars = letters + nums
     space = White(' ')
 
     expr = Forward()
-    number = Combine(Word(nums) + Optional("." + Word(nums)))
+    unit = units_list | (Optional(unit_prefixes_list) + units_list)
+    number = Combine(Word(nums) + Optional("." + Word(nums))) + Optional(unit)
     name = NotAny(deco_kw_list | equality_kw_list) + Word(letters, chars)
     variable = name.copy()
     function = Combine(name + Suppress("(")) + \
@@ -227,9 +238,10 @@ def make_expression():
     operand = (
         eval_field.setParseAction(lambda x: evaluate(x[0])) |
         eval_direct_field.setParseAction(lambda x: evaluate(x[0], False)) |
-        function.setParseAction(lambda x: mp.get_function(x, functions)) |
-        variable.setParseAction(lambda x: mp.get_variable(x, variables)) |
-        number.setParseAction(mp.get_value)
+        function.setParseAction(lambda x: parsing.get_function(x, functions)) |
+        unit.setParseAction(lambda x: parsing.get_unit(x, variables)) |
+        variable.setParseAction(lambda x: parsing.get_variable(x, variables)) |
+        number.setParseAction(parsing.get_value)
     )
 
     factop = Literal('!') + space
@@ -249,15 +261,16 @@ def make_expression():
     left = opAssoc.LEFT
     expr << infixNotation(operand,
                           [
-                              (factop,          1, left,    mp.get_factorial_op),
+                              (factop,          1, left,
+                               parsing.get_factorial_op),
                               (deco_kw_list,    1, right,   get_decorator),
-                              (signop,          1, right,   mp.get_minus_op),
-                              (expop,           2, right,   mp.get_pow_op),
-                              (fracop,          2, left,    mp.get_div_op),
-                              (multop1,         2, left,    mp.get_mul_op),
-                              (multop2,         2, left,    mp.get_mul_op),
-                              (crossop,         2, left,    mp.get_mul_op),
-                              (plusop,          2, left,    mp.get_add_op),
+                              (signop,          1, right,   parsing.get_minus_op),
+                              (expop,           2, right,   parsing.get_pow_op),
+                              (fracop,          2, left,    parsing.get_div_op),
+                              (multop1,         2, left,    parsing.get_mul_op),
+                              (multop2,         2, left,    parsing.get_mul_op),
+                              (crossop,         2, left,    parsing.get_mul_op),
+                              (plusop,          2, left,    parsing.get_add_op),
                               (equalop,         2, left,    get_equality_op)
                           ]
                           )

@@ -6,9 +6,12 @@ import mathlib as ml
 def get_value(toks):
     value = toks[0]
     if value[0] == ".":
-        return ml.Number("0" + value)
+        number = ml.Number("0" + value)
     # print("Value: {}".format(value))
-    return ml.Number(value)
+    number = ml.Number(value)
+    if len(toks) > 1 and type(toks[1]) is ml.Unit:
+        return ml.MulOp(number, toks[1])
+    return number
 
 
 def get_function(toks, functions):
@@ -30,6 +33,15 @@ def get_variable(toks, variables):
         return variables[name]["object"]()
     else:
         return variables["__default__"]["object"](name)
+
+
+def get_unit(toks, variables):
+    if len(toks) > 1:
+        name = toks[0] + toks[1]
+        if name in variables:
+            return variables[name]["object"]()
+        return ml.Unit(toks[1], toks[0])
+    return ml.Unit(toks[0])
 
 
 def get_pow_op(toks):
