@@ -30,21 +30,20 @@ void MainWindow::initSubprocess()
 void MainWindow::readStandardOutput()
 {
     // get line number and latex string from ieuler
-    QString stdout = proc->readAllStandardOutput() + " 3+4";
+    QString stdout = proc->readAllStandardOutput();
     qDebug() << stdout;
     int split = stdout.indexOf(' ');
     int line = stdout.left(split).toInt();
-    QString latexString = stdout.right(split+1);
+    QString latexString = stdout.mid(split);
     qDebug() << line;
     qDebug() << latexString;
     // send signal to render math
     emit outputReady(line, latexString);
-//    emit outputReady(0);
 }
 
 void MainWindow::readStandardError()
 {
-    qDebug() << "python error: " << proc->readAllStandardError();
+    qDebug() << "python error: \n" << proc->readAllStandardError();
 }
 
 

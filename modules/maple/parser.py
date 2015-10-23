@@ -8,7 +8,6 @@ from pyparsing import ParserElement, Word, Literal, ZeroOrMore, Optional, Forwar
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
-
 #################
 # MAPLE PROCESS #
 #################
@@ -19,8 +18,8 @@ maple_proc = None
 def evaluate(expr, settings, gui_mode=False, convert=True):
     global maple_proc
     if maple_proc is None:
-        if not gui_mode:
-            print("Starting Maple...")
+        # if not gui_mode:
+        # print("Starting Maple...")
         # Spawn Maple subprocess.
         # Returns instance of process, queue and thread for
         # asynchronous I/O
@@ -42,10 +41,10 @@ def query(query, proc, queue, thread, convert=True):
     return_string = return_string.strip("\n")
     return parse(return_string)
 
-
 ################################################
 # GENERATE MAPLE STRING FROM MATHLIB OPERATORS #
 ################################################
+
 
 def generate(input_expr):
     return convert_expr(input_expr)
@@ -136,16 +135,22 @@ def convert_root(self):
 
 def convert_integral(self):
     if self.range_from is None:
-        return "int({}, {}) ".format(convert_expr(self.value), convert_expr(self.variable))
+        return "int({}, {}) ".format(convert_expr(self.value),
+                                     convert_expr(self.variable))
     else:
-        return "int({}, {}={}..{}) ".format(convert_expr(self.value), convert_expr(self.variable), convert_expr(self.range_from), convert_expr(self.range_to))
+        return "int({}, {}={}..{}) ".format(
+            convert_expr(self.value), convert_expr(self.variable),
+            convert_expr(self.range_from), convert_expr(self.range_to))
 
 
 def convert_derivative(self):
     if self.nth.get_value == "1":
-        return "diff({}, {}) ".format(convert_expr(self.value), convert_expr(self.variable))
+        return "diff({}, {}) ".format(convert_expr(self.value),
+                                      convert_expr(self.variable))
     else:
-        return "diff({}, {}${}) ".format(convert_expr(self.value), convert_expr(self.variable), convert_expr(self.nth))
+        return "diff({}, {}${}) ".format(convert_expr(self.value),
+                                         convert_expr(self.variable),
+                                         convert_expr(self.nth))
 
 
 def convert_function(self):
@@ -173,10 +178,10 @@ ml.Integral.to_maple = convert_integral
 ml.Derivative.to_maple = convert_derivative
 ml.Function.to_maple = convert_function
 
-
 ###########################################
 # PARSE MAPLE STRING TO MATHLIB OPERATORS #
 ###########################################
+
 
 def parse(input_string):
     x = parse_expression(input_string)
@@ -186,10 +191,9 @@ def parse(input_string):
 def get_pow_op(toks):
     p = parsing.get_pow_op(toks)
     if (
-            type(p.value2) is ml.Fraction and
-            type(p.value2.value1) is ml.Number and
-            p.value2.value1.value == "1" and
-            not '.' in p.value2.value2.value):
+        type(p.value2) is ml.Fraction and
+        type(p.value2.value1) is ml.Number and p.value2.value1.value == "1" and
+        not '.' in p.value2.value2.value):
         p = ml.Root(p.value1, p.value2.value2)
     return p
 
@@ -197,11 +201,12 @@ def get_pow_op(toks):
 def make_expression():
     function = Forward()
     expression = Forward()
-    number = Combine(Word(nums) + Optional("." + Word(nums))
-                     ) | Combine("." + Word(nums))
+    number = Combine(Word(nums) + Optional("." + Word(nums))) | Combine(
+        "." + Word(nums))
     variable = Word(alphas)
-    operand = number.setParseAction(parsing.get_value) | function.setParseAction(lambda x: parsing.get_function(x, functions)) | variable.setParseAction(
-        lambda x: parsing.get_variable(x, variables))
+    operand = number.setParseAction(parsing.get_value) | function.setParseAction(
+        lambda x: parsing.get_function(x, functions)) | variable.setParseAction(
+            lambda x: parsing.get_variable(x, variables))
     function << Combine(Word(alphas) + Suppress("(")) + expression + \
         ZeroOrMore(Suppress(",") + expression) + Suppress(")")
 
@@ -212,14 +217,13 @@ def make_expression():
     plusop = oneOf('+ -')
     factop = Literal('!')
 
-    expression << infixNotation(operand,
-                                [(factop, 1, opAssoc.LEFT, parsing.get_factorial_op),
-                                 (signop, 1, opAssoc.RIGHT, parsing.get_minus_op),
-                                 (expop, 2, opAssoc.RIGHT, get_pow_op),
-                                 (fracop, 2, opAssoc.LEFT, parsing.get_div_op),
-                                 (multop, 2, opAssoc.LEFT, parsing.get_mul_op),
-                                 (plusop, 2, opAssoc.LEFT, parsing.get_add_op)]
-                                )
+    expression << infixNotation(
+        operand, [(factop, 1, opAssoc.LEFT, parsing.get_factorial_op),
+                  (signop, 1, opAssoc.RIGHT, parsing.get_minus_op),
+                  (expop, 2, opAssoc.RIGHT, get_pow_op),
+                  (fracop, 2, opAssoc.LEFT, parsing.get_div_op),
+                  (multop, 2, opAssoc.LEFT, parsing.get_mul_op),
+                  (plusop, 2, opAssoc.LEFT, parsing.get_add_op)])
     return expression
 
 

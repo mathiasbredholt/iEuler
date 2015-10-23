@@ -1,4 +1,4 @@
-import mathnotes
+import ieuler
 import sys
 
-mathnotes.run(sys.argv[1])
+ieuler.run(sys.argv[1])

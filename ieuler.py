@@ -33,7 +33,7 @@ def run(argv=None):
     modules.latex.parser.init()
 
     if not gui_mode:
-        print("Welcome to MathNotes v0.1!")
+        print("Welcome to iEuler v0.1!")
 
     while True:
 
@@ -43,18 +43,19 @@ def run(argv=None):
             prompt = input("")
             add_to_worksheet(worksheet, index, prompt)
         else:
-            prompt = input("math> ")
+            prompt = input("iEuler> ")
 
         if prompt:
             result = parser.parse(prompt)
 
             if type(result) is ml.Plot:
                 plot2d.plot(result)
-            else:
-                modules.latex.parser.generate(result)
+            # else:
+            # modules.latex.parser.generate(result)
 
             if gui_mode:
-                print(index)
+                print('{} {}'.format(index, modules.latex.parser.convert_expr(
+                    result)))
             else:
                 print(result)
                 print(parser.generate(result))
@@ -142,7 +143,6 @@ def frink_query(query_string, proc, queue, thread):
     return_string = return_string.strip("\n")
     print(return_string)
     return return_string
-
 
 # def generate_latex(output_string):
 #     with open("modules/latex/preamble.tex", "r") as f:
