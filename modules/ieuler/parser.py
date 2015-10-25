@@ -176,9 +176,9 @@ def make_keyword_list(list):
     return reduce(lambda x, y: x | y, map(Keyword, list))
 
 
-def make_word_list(list):
+def make_literal_list(list):
     # ['x', 'y'] -> Keyword('x') | Keyword('y')
-    return reduce(lambda x, y: x | y, map(Word, list))
+    return reduce(lambda x, y: x | y, map(Literal, list))
 
 
 def get_decorator(toks):
@@ -218,16 +218,18 @@ def make_expression():
         ['hat', 'bar', 'ul', 'vec', 'dot', 'ddot', 'tdot'])
     equality_kw_list = make_keyword_list(
         ['in', '!in', 'sub', 'sup', 'sube', 'supe'])
-    units_list = make_word_list(
-        ['V', 'A', 'J', 'm', 's', 'K', 'W', 'H', 'F', 'T', 'g', 'Hz', 'N', 'Pa', 'C', 'Ohm', 'S', 'Wb', 'lm', 'lx', 'Bq', 'Gy', 'Sv', 'cd', 'mol'])
-    unit_prefixes_list = make_word_list(
-        ['y', 'z', 'a', 'f', 'p', 'n', 'μ', 'm', 'c', 'd', 'da', 'h', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'])
+    units = ['V', 'A', 'J', 'm', 's', 'K', 'W', 'H', 'F', 'T', 'g', 'Hz', 'N',
+             'Pa', 'C', 'Ohm', 'S', 'Wb', 'lm', 'lx', 'Bq', 'Gy', 'Sv', 'cd', 'mol']
+    units_list = make_literal_list(units)
+    unit_prefixes = ['y', 'z', 'a', 'f', 'p', 'n', 'μ', 'm', 'c',
+                     'd', 'da', 'h', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y']
+    unit_prefixes_list = make_literal_list(unit_prefixes)
     letters = alphas + alphas8bit + "_"
     chars = letters + nums
     space = White(' ')
 
     expr = Forward()
-    unit = units_list | (Optional(unit_prefixes_list) + units_list)
+    unit = Optional(unit_prefixes_list) + units_list
     number = Combine(Word(nums) + Optional("." + Word(nums))) + Optional(unit)
     name = NotAny(deco_kw_list | equality_kw_list) + Word(letters, chars)
     variable = name.copy()

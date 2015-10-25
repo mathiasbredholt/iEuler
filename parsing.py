@@ -61,6 +61,8 @@ def get_div_op(toks):
 
 def get_add_op(toks):
     value1, value2, op = parse_binary_operator(toks, get_add_op)
+    print("value1: {}, value2: {}, op: {}, toks: {}".format(
+        value1, value2, op, toks))
     if op == "+":
         return ml.AddOp(value1, value2)
     else:
@@ -78,7 +80,8 @@ def get_minus_op(toks):
 
 
 def parse_binary_operator(toks, func, right=False):
-    operator = toks[0][1]
+    print("toks: {}".format(toks))
+    operator = toks[0][1 if right else -2]
     value1 = toks[0][0 if right else -1]
     if type(value1) is str:
         value1 = get_value(value1)

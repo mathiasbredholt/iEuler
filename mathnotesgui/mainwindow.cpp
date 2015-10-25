@@ -30,11 +30,11 @@ void MainWindow::initSubprocess()
 void MainWindow::readStandardOutput()
 {
     // get line number and latex string from ieuler
-    QString stdout = proc->readAllStandardOutput();
-    qDebug() << stdout;
-    int split = stdout.indexOf(' ');
-    int line = stdout.left(split).toInt();
-    QString latexString = stdout.mid(split);
+    QString std_out = proc->readAllStandardOutput();
+    qDebug() << std_out;
+    int split = std_out.indexOf(' ');
+    int line = std_out.left(split).toInt();
+    QString latexString = std_out.mid(split);
     qDebug() << line;
     qDebug() << latexString;
     // send signal to render math
