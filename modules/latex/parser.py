@@ -53,10 +53,33 @@ def convert_equality(self):
 
 def convert_value(self):
     if type(self) is ml.Unit:
-        return "\\,\\mathrm{{{}}}".format(self.prefix + self.name)
-    if self.value == "pi":
-        return "\\pi"
-    return self.value
+        result = "\\,\\mathrm{{{}}}".format(self.prefix + self.name)
+    elif self.value == "pi":
+        result = "\\pi"
+    else:
+        result = self.value
+    return convert_decorators(self, result)
+
+
+def convert_decorators(self, string):
+    if self.get_decorators():
+        for dec in self.get_decorators():
+            if dec == "hat":
+                string = "\\hat{{{}}}".format(string)
+            elif dec == "bar":
+                string = "\\bar{{{}}}".format(string)
+            elif dec == "ul":
+                string = "\\underline{{{}}}".format(string)
+            elif dec == "vec":
+                string = "\\boldsymbol{{\\mathbf{{{}}}}}".format(string)
+            elif dec == "dot":
+                string = "\\dot{{{}}}".format(string)
+            elif dec == "ddot":
+                string = "\\ddot{{{}}}".format(string)
+            elif dec == "tdot":
+                string = "\\dddot{{{}}}".format(string)
+
+    return string
 
 
 def convert_minus(self):
