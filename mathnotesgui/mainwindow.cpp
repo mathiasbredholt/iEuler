@@ -31,12 +31,9 @@ void MainWindow::readStandardOutput()
 {
     // get line number and latex string from ieuler
     QString stdout = proc->readAllStandardOutput();
-    qDebug() << stdout;
     int split = stdout.indexOf(' ');
     int line = stdout.left(split).toInt();
     QString latexString = stdout.mid(split);
-    qDebug() << line;
-    qDebug() << latexString;
     // send signal to render math
     emit outputReady(line, latexString);
 }
@@ -46,7 +43,6 @@ void MainWindow::readStandardError()
     qDebug() << "python error: \n" << proc->readAllStandardError();
 }
 
-
 MainWindow::~MainWindow()
 {
     delete ui;
@@ -54,9 +50,10 @@ MainWindow::~MainWindow()
 
 void MainWindow::evaluateCode(CodeInput* target, QString inputString)
 {
+    inputString = inputString.replace('\n',' ');
     proc->write(QString::number(((Group*) target->parent())->index).toLatin1()+"\n"+inputString.toLatin1()+"\n");
     if (((Group*) target->parent())->index == numberOfLines-1) {
-        createNewCodeLine();
+//        createNewCodeLine();
     }
 }
 

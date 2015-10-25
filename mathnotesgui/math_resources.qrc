@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/webkit">
         <file alias="test">webkit/test.html</file>
+        <file alias="render">webkit/render.js</file>
     </qresource>
 </RCC>

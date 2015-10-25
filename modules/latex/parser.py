@@ -22,7 +22,9 @@ def generate(input_expr):
         f.write(output_string)
 
     proc, queue, thread = procio.run(
-        __settings__ + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", False)
+        __settings__ +
+        " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex",
+        False)
     proc.wait()
     proc, queue, thread = procio.run(
         "convert -density 300 mathnotes.pdf mathnotes.png", False)
@@ -45,7 +47,8 @@ def parentheses(input_expr, do=True):
 
 
 def convert_equality(self):
-    return "{} {} {}".format(convert_expr(self.value1), self.type, convert_expr(self.value2))
+    return "{} {} {}".format(convert_expr(self.value1), self.type,
+                             convert_expr(self.value2))
 
 
 def convert_value(self):
@@ -102,16 +105,22 @@ def convert_mulop(self):
 
 
 def convert_fraction(self, display=True):
-    return "\\{}frac{{{}}}{{{}}} ".format("d" if display else "", convert_expr(self.value1), convert_expr(self.value2))
+    # removed dfrac for compatibility issues with MathJax
+    return "\\{}frac{{{}}}{{{}}} ".format("" if display else "",
+                                          convert_expr(self.value1),
+                                          convert_expr(self.value2))
 
 
 def convert_power(self):
-    if type(self.value1) in [ml.Number, ml.Variable, ml.Function, ml.Root, ml.Unit]:
+    if type(self.value1) in [ml.Number, ml.Variable, ml.Function, ml.Root,
+                             ml.Unit]:
         return "{}^{{{}}}".format(convert_expr(self.value1),
-                                  convert_expr(self.value2, display=False))
+                                  convert_expr(self.value2,
+                                               display=False))
     else:
         return "{}^{{{}}}".format(parentheses(self.value1),
-                                  convert_expr(self.value2, display=False))
+                                  convert_expr(self.value2,
+                                               display=False))
 
 
 def convert_root(self):
