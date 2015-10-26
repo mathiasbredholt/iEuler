@@ -229,7 +229,7 @@ def make_expression():
     space = White(' ')
 
     expr = Forward()
-    unit = Optional(unit_prefixes_list) + units_list
+    unit = Optional(unit_prefixes_list) + units_list + NotAny(Word(chars))
     number = Combine(Word(nums) + Optional("." + Word(nums))) + Optional(unit)
     name = NotAny(deco_kw_list | equality_kw_list) + Word(letters, chars)
     variable = name.copy()
@@ -242,7 +242,7 @@ def make_expression():
         eval_direct_field.setParseAction(lambda x: evaluate(x[0], False)) |
         function.setParseAction(lambda x: parsing.get_function(x, functions)) |
         unit.setParseAction(lambda x: parsing.get_unit(x, variables)) |
-        variable.setParseAction(lambda x: parsing.get_variable(x, variables)) |
+        variable.setParseAction(lambda x: parsing.get_variable(x, variables, symbols)) |
         number.setParseAction(parsing.get_value)
     )
 

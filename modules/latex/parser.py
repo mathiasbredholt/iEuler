@@ -2,6 +2,7 @@
 import mathlib as ml
 import modules.tools.procio as procio
 import json
+from modules.latex.lib import *
 
 __settings__ = None
 
@@ -55,12 +56,10 @@ def convert_value(self):
     if type(self) is ml.Unit:
         result = "\\,\\mathrm{{{}}}".format(self.prefix + self.name)
     elif type(self) is ml.Variable and self.is_symbol:
-        if self.name in special_symbols:
-            result = special_symbols[name]
+        if self.value in special_symbols:
+            result = special_symbols[value]
         else:
-            result = "\\{}".format(name)
-    elif self.value == "pi":
-        result = "\\pi"
+            result = "\\{}".format(self.value)
     else:
         result = self.value
     return convert_decorators(self, result)

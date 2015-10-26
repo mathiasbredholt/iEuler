@@ -21,6 +21,7 @@ MathRenderer::MathRenderer(QObject *parent) : QObject(parent)
     view = new QWebView();
     view->setMaximumHeight(128);
     view->installEventFilter(this);
+    view->setZoomFactor(1.5);
 
     // Make webview transparent
     QPalette palette = view->palette();

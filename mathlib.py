@@ -81,7 +81,7 @@ class Variable(MathValue):
         self.is_symbol = is_symbol
 
     def __str__(self):
-        return "Variable({} {})".format(self.value, self.decorators)
+        return "Variable({} {} {}symbol)".format(self.value, self.decorators, "" if self.is_symbol else "not ")
 
     __repr__ = __str__
 
