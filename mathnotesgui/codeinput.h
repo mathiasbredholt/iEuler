@@ -11,8 +11,6 @@ class CodeInput : public QPlainTextEdit
     Q_OBJECT
 public:
     explicit CodeInput(QWidget *parent = 0);
-//    QSize sizeHint() const;
-//    QSize minimumSizeHint() const;
 
 signals:
     void previewCode(CodeInput* target, QString inputString);
@@ -23,7 +21,6 @@ signals:
 private:
      bool eventFilter(QObject *object, QEvent *event);
      void addNewLine();
-     void removeLine();
 
 private slots:
      void receivedTextInput();
