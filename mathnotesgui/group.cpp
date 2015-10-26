@@ -3,9 +3,9 @@
 Group::Group(QWidget *parent, int index) : QWidget(parent)
 {
     this->index = index;
-
+    setFocusPolicy(Qt::NoFocus);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    setFixedHeight(192);
+    setFixedHeight(112);
 
     QVBoxLayout *vlayout = new QVBoxLayout();
 

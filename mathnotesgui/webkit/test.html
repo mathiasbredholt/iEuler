@@ -19,14 +19,21 @@
 <div style="display: none" id="input"></div>
 <div style="font-size: 1.5em; visibility: hidden" id="eq">${}$</div>
 <script>
-var QUEUE = MathJax.Hub.queue;  // shorthand for the queue
-var math = null;                // the element jax for the math output.
-QUEUE.Push(function () {
-  math = MathJax.Hub.getAllJax("eq")[0];
+var hub_queue = MathJax.Hub.queue;
+var math = null;
+var last_input = "";
+
+hub_queue.Push(function () {
+    math = MathJax.Hub.getAllJax("eq")[0];
 });
+
 window.UpdateMath = function () {
-  QUEUE.Push(["Text",math,document.getElementById("input").innerHTML, function () {
-    document.getElementById("eq").style.visibility = "visible";
-  }]);
+    var tex = document.getElementById("input").innerHTML;
+    if (last_input != tex) hub_queue.queue = [];
+    last_input = tex;
+
+    hub_queue.Push(["Text", math, tex, function () {
+        document.getElementById("eq").style.visibility = "visible";
+    }]);
 }
 </script>

@@ -14,6 +14,13 @@
 #include <QLabel>
 #include <QObject>
 #include "cmdpanel.h"
+#include <QDebug>
+#include "mathrenderer.h"
+#include <QTabWidget>
+#include <QScrollArea>
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QMessageBox>
 
 namespace Ui {
 class MainWindow;
@@ -29,13 +36,23 @@ public:
 
 private:
     Ui::MainWindow *ui;
+    QTabWidget *tabs;
     CmdPanel *cmdpanel;
     QProcess *proc;
 
     int numberOfLines;
 
-    void createNewCodeLine();
+    void createGroup();
+    void createNewTab();
     void initSubprocess();
+
+    void openFile();
+    void saveFile();
+
+    QWidget *getTabContents();
+
+    void closeEvent(QCloseEvent *event);
+
 
 protected:
     void keyPressEvent(QKeyEvent *);
@@ -54,6 +71,10 @@ private slots:
     void on_action100_triggered();
     void on_action150_triggered();
     void on_action200_triggered();
+    void on_actionNew_triggered();
+    void on_actionClose_triggered();
+    void on_actionOpen_triggered();
+    void on_actionSave_triggered();
 };
 
 #endif // MAINWINDOW_H
