@@ -40,13 +40,15 @@ def run(argv=None):
         do_save = False
         if gui_mode:
             index = int(input(""))
+            evaluate = "evaluate" in input("")
             prompt = input("")
             add_to_worksheet(worksheet, index, prompt)
         else:
             prompt = input("iEuler> ")
+            evaluate = True
 
         if prompt:
-            result = parser.parse(prompt)
+            result = parser.parse(prompt, evaluate, gui_mode)
 
             if type(result) is ml.Plot:
                 plot2d.plot(result)

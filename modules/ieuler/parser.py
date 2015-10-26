@@ -283,7 +283,9 @@ def make_expression():
 expression = make_expression()
 
 
-def parse(text, gui=False):
+def parse(text, eval=True, gui=False):
     global gui_mode
+    global evaluate
     gui_mode = gui
+    evaluate = eval
     return expression.parseString(text)[0]
