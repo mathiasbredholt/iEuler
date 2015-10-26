@@ -51,6 +51,9 @@ private slots:
     void deleteGroup(QWidget* target);
     void on_actionShow_command_panel_triggered();
     void arrowsPressed(bool upArrowPressed);
+    void on_action100_triggered();
+    void on_action150_triggered();
+    void on_action200_triggered();
 };
 
 #endif // MAINWINDOW_H

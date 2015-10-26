@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <QDebug>
+#include "mathrenderer.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -112,4 +113,19 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Escape) {
         cmdpanel->hide();
     }
+}
+
+void MainWindow::on_action100_triggered()
+{
+    MathRenderer::ZOOM_FACTOR = 1;
+}
+
+void MainWindow::on_action150_triggered()
+{
+    MathRenderer::ZOOM_FACTOR = 1.5;
+}
+
+void MainWindow::on_action200_triggered()
+{
+    MathRenderer::ZOOM_FACTOR = 2;
 }

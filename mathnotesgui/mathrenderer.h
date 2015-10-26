@@ -8,6 +8,8 @@ class MathRenderer : public QObject
 {
     Q_OBJECT
 public:
+    static qreal ZOOM_FACTOR;
+
     explicit MathRenderer(QObject *parent = 0);
     QWebView *view;
     void render(QString latexString);

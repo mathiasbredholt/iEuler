@@ -105,7 +105,16 @@
     </property>
     <addaction name="actionShow_command_panel"/>
    </widget>
+   <widget class="QMenu" name="menuZoom">
+    <property name="title">
+     <string>Zoom</string>
+    </property>
+    <addaction name="action100"/>
+    <addaction name="action150"/>
+    <addaction name="action200"/>
+   </widget>
    <addaction name="menuTools"/>
+   <addaction name="menuZoom"/>
   </widget>
   <action name="actionShow_command_panel">
    <property name="checkable">
@@ -116,6 +125,30 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+P</string>
+   </property>
+  </action>
+  <action name="action100">
+   <property name="text">
+    <string>100%</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+0</string>
+   </property>
+  </action>
+  <action name="action150">
+   <property name="text">
+    <string>150%</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+1</string>
+   </property>
+  </action>
+  <action name="action200">
+   <property name="text">
+    <string>200%</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+2</string>
    </property>
   </action>
  </widget>

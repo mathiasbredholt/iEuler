@@ -5,6 +5,8 @@
 #include <QWebElement>
 #include <QEvent>
 
+qreal MathRenderer::ZOOM_FACTOR = 1;
+
 QString readFile (const QString& filename)
 {
     QFile file(filename);
@@ -21,6 +23,7 @@ MathRenderer::MathRenderer(QObject *parent) : QObject(parent)
     view = new QWebView();
     view->setMaximumHeight(128);
     view->installEventFilter(this);
+    view->setZoomFactor(MathRenderer::ZOOM_FACTOR);
 
     // Make webview transparent
     QPalette palette = view->palette();
@@ -37,12 +40,16 @@ MathRenderer::MathRenderer(QObject *parent) : QObject(parent)
 }
 
 void MathRenderer::render(QString latexString) {
+    view->setZoomFactor(MathRenderer::ZOOM_FACTOR);
     view->page()->mainFrame()->findFirstElement("#input").setInnerXml(latexString);
     view->page()->mainFrame()->evaluateJavaScript("UpdateMath()");
 }
 
 bool MathRenderer::eventFilter(QObject *object, QEvent *e)
 {
-    if (e->type() == QEvent::Wheel) e->ignore();
+    if (e->type() == QEvent::Wheel) {
+        e->ignore();
+        return true;
+    }
     return false;
 }
