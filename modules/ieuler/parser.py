@@ -195,7 +195,8 @@ def get_equality_op(toks):
         type = "="
         if t["equals"]["modifier"]:
             if "#" in t["equals"]["modifier"]:
-                value2 = evaluate(value2)
+                if evaluate:
+                    value2 = evaluate_expression(value2)
             if "::" in t["equals"]["modifier"]:
                 hidden = True
             elif ":" in t["equals"]["modifier"]:
@@ -206,7 +207,7 @@ def get_equality_op(toks):
     return ml.Equality(type, value1, value2, hidden)
 
 
-def evaluate(expr, convert=True):
+def evaluate_expression(expr, convert=True):
     return modules.maple.parser.evaluate(expr, __settings__["maple"], gui_mode, convert=True)
 
 
