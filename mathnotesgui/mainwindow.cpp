@@ -52,14 +52,22 @@ MainWindow::~MainWindow()
 
 void MainWindow::previewCode(CodeInput* target, QString inputString)
 {
+    QString index = QString::number(((Group*) target->parent())->index);
     inputString = inputString.replace('\n',' ');
-    proc->write(QString::number(((Group*) target->parent())->index).toLatin1()+"\n"+inputString.toLatin1()+"\n");
+
+    proc->write(index.toLatin1()+"\n");
+    proc->write("preview\n");
+    proc->write(inputString.toLatin1()+"\n");
 }
 
 void MainWindow::evaluateCode(CodeInput* target, QString inputString)
 {
+    QString index = QString::number(((Group*) target->parent())->index);
     inputString = inputString.replace('\n',' ');
-    proc->write(QString::number(((Group*) target->parent())->index).toLatin1()+"\n"+inputString.toLatin1()+"\n");
+
+    proc->write(index.toLatin1()+"\n");
+    proc->write("evaluate\n");
+    proc->write(inputString.toLatin1()+"\n");
     if (((Group*) target->parent())->index == numberOfLines-1) {
         createNewCodeLine();
     }
