@@ -4,7 +4,7 @@ import parsing as parsing
 from modules.ieuler.lib import *
 from functools import reduce
 import re
-from pyparsing import ParserElement, Regex, Word, Keyword, Literal, White, Group, ZeroOrMore, NotAny, Optional, Forward, Suppress, Combine, oneOf, infixNotation, opAssoc, delimitedList, nums, alphas, printables, alphanums, alphas8bit
+from pyparsing import *
 import os
 import modules.maple.parser
 import modules.frink.parser
@@ -39,7 +39,7 @@ def parentheses(input_expr, do=True):
 
 def convert_value(self):
     if type(self) is ml.Unit:
-        return self.prefix + self.name
+        return self.prefix + self.value
     return self.value
 
 
@@ -215,27 +215,26 @@ def make_expression():
 
     ParserElement.setDefaultWhitespaceChars(' \t')
 
-    deco_kw_list = make_keyword_list(
-        ['hat', 'bar', 'ul', 'vec', 'dot', 'ddot', 'tdot', 'arrow', 'arr'])
-    equality_kw_list = make_keyword_list(
-        ['in', '!in', 'sub', 'sup', 'sube', 'supe'])
-    units = ['V', 'A', 'J', 'm', 's', 'K', 'W', 'H', 'F', 'T', 'g', 'Hz', 'N',
-             'Pa', 'C', 'Ohm', 'S', 'Wb', 'lm', 'lx', 'Bq', 'Gy', 'Sv', 'cd', 'mol']
-    units_list = make_literal_list(units)
-    unit_prefixes = ['y', 'z', 'a', 'f', 'p', 'n', 'μ', 'm', 'c',
-                     'd', 'da', 'h', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y']
-    unit_prefixes_list = make_literal_list(unit_prefixes)
-    letters = alphas + alphas8bit + "_"
+    deco_kw_list = make_keyword_list(decorator_keywords)
+    equality_kw_list = make_keyword_list(equality_keywords)
+    units_list = oneOf(units)
+    unit_prefixes_list = oneOf(unit_prefixes)
+    letters = alphas  # + alphas8bit
     chars = letters + nums
     space = White(' ')
+    word_start = NotAny(chars)
+    word_end = NotAny(chars)
+    no_white = NotAny(White())
 
     expr = Forward()
-    unit = Optional(unit_prefixes_list) + units_list + NotAny(Word(chars))
-    number = Combine(Word(nums) + Optional("." + Word(nums))) + Optional(unit)
+    unit = units_list + NotAny(no_white + Word(chars)) | (Optional(unit_prefixes_list + no_white)
+                                                          + units_list + NotAny(no_white + Word(chars)))
     name = NotAny(deco_kw_list | equality_kw_list) + Word(letters, chars)
     variable = name.copy()
     function = Combine(name + Suppress("(")) + \
         delimitedList(expr, delim=',') + Suppress(")")
+    number = (Combine(Word(nums) + Optional("." + Word(nums))) +
+              Optional(NotAny(White()) + (function | unit | variable)))
     eval_field = Suppress('#') + expr + Suppress('#')
     eval_direct_field = Suppress('$') + expr + Suppress('$')
     operand = (
@@ -247,8 +246,8 @@ def make_expression():
         number.setParseAction(parsing.get_value)
     )
 
-    factop = Literal('!') + space
-    signop = space + Literal('-')
+    factop = no_white + Literal('!') + word_end
+    signop = word_start + Literal('-') + no_white
     expop = Literal('^')
     fracop = Literal('/')
     multop1 = space.copy()
