@@ -88,13 +88,13 @@ class Variable(MathValue):
 
 class Unit(MathValue):
 
-    def __init__(self, name, prefix=""):
-        self.name = name
+    def __init__(self, unit, prefix=""):
+        self.value = unit
         self.prefix = prefix
         self.decorators = []
 
     def __str__(self):
-        return "Unit({}, prefix: {})".format(self.name, self.prefix)
+        return "Unit({}, prefix: {})".format(self.value, self.prefix)
 
     __repr__ = __str__
 

@@ -54,7 +54,7 @@ def convert_equality(self):
 
 def convert_value(self):
     if type(self) is ml.Unit:
-        result = "\\,\\mathrm{{{}}}".format(self.prefix + self.name)
+        result = "\\mathrm{{{}}}".format(self.prefix + self.value)
     elif type(self) is ml.Variable and self.is_symbol:
         if self.value in special_symbols:
             result = special_symbols[value]

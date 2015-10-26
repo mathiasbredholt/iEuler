@@ -4,12 +4,13 @@ import mathlib as ml
 
 
 def get_value(toks):
+    # print("get_value toks: {}".format(toks))
     value = toks[0]
     if value[0] == ".":
         number = ml.Number("0" + value)
-    # print("Value: {}".format(value))
-    number = ml.Number(value)
-    if len(toks) > 1 and type(toks[1]) is ml.Unit:
+    else:
+        number = ml.Number(value)
+    if len(toks) > 1 and type(toks[1]) in [ml.Function, ml.Unit, ml.Variable]:
         return ml.MulOp(number, toks[1])
     return number
 
@@ -27,6 +28,7 @@ def get_function(toks, functions):
 
 
 def get_variable(toks, variables, symbols={"__standard__": []}):
+    # print("get_variable toks: {}".format(toks))
     name = toks[0]
     # print("Variable: {}".format(name))
     if name in variables:
@@ -40,6 +42,7 @@ def get_variable(toks, variables, symbols={"__standard__": []}):
 
 
 def get_unit(toks, variables):
+    # print("get_unit toks: {}".format(toks))
     if len(toks) > 1:
         name = toks[0] + toks[1]
         if name in variables:
@@ -54,6 +57,7 @@ def get_pow_op(toks):
 
 
 def get_mul_op(toks):
+    # print("get_mul_op toks: {}".format(toks))
     value1, value2, op = parse_binary_operator(toks, get_mul_op)
     return ml.MulOp(value1, value2)
 
