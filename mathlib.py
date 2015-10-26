@@ -75,9 +75,10 @@ class Complex(MathValue):
 
 class Variable(MathValue):
 
-    def __init__(self, value):
+    def __init__(self, value, is_symbol=False):
         self.value = value
         self.decorators = []
+        self.is_symbol = is_symbol
 
     def __str__(self):
         return "Variable({} {})".format(self.value, self.decorators)

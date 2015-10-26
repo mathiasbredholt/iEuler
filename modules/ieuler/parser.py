@@ -215,7 +215,7 @@ def make_expression():
     ParserElement.setDefaultWhitespaceChars(' \t')
 
     deco_kw_list = make_keyword_list(
-        ['hat', 'bar', 'ul', 'vec', 'dot', 'ddot', 'tdot'])
+        ['hat', 'bar', 'ul', 'vec', 'dot', 'ddot', 'tdot', 'arrow', 'arr'])
     equality_kw_list = make_keyword_list(
         ['in', '!in', 'sub', 'sup', 'sube', 'supe'])
     units = ['V', 'A', 'J', 'm', 's', 'K', 'W', 'H', 'F', 'T', 'g', 'Hz', 'N',

@@ -26,11 +26,15 @@ def get_function(toks, functions):
         return functions["__default__"]["object"](name, *args)
 
 
-def get_variable(toks, variables):
+def get_variable(toks, variables, symbols={"__standard__": []}):
     name = toks[0]
     # print("Variable: {}".format(name))
     if name in variables:
         return variables[name]["object"]()
+    elif name in symbols["__standard__"]:
+        return ml.Variable(name, True)
+    elif name in symbols:
+        return ml.Variable(symbols[name], True)
     else:
         return variables["__default__"]["object"](name)
 

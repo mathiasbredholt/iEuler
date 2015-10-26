@@ -54,6 +54,11 @@ def convert_equality(self):
 def convert_value(self):
     if type(self) is ml.Unit:
         result = "\\,\\mathrm{{{}}}".format(self.prefix + self.name)
+    elif type(self) is ml.Variable and self.is_symbol:
+        if self.name in special_symbols:
+            result = special_symbols[name]
+        else:
+            result = "\\{}".format(name)
     elif self.value == "pi":
         result = "\\pi"
     else:
@@ -78,6 +83,8 @@ def convert_decorators(self, string):
                 string = "\\ddot{{{}}}".format(string)
             elif dec == "tdot":
                 string = "\\dddot{{{}}}".format(string)
+            elif dec == "arr" or dec == "arrow":
+                string = "\\vec{{{}}}".format(string)
 
     return string
 
