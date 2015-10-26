@@ -46,6 +46,7 @@ signals:
 private slots:
     void readStandardOutput();
     void readStandardError();
+    void previewCode(CodeInput *target, QString inputString);
     void evaluateCode(CodeInput *target, QString inputString);
     void deleteGroup(QWidget* target);
     void on_actionShow_command_panel_triggered();

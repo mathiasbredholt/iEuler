@@ -15,6 +15,10 @@ public:
 signals:
 
 public slots:
+
+
+private:
+    bool eventFilter(QObject *object, QEvent *event);
 };
 
 #endif // MATHRENDERER_H

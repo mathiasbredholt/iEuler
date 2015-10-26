@@ -11,16 +11,19 @@ class CodeInput : public QPlainTextEdit
     Q_OBJECT
 public:
     explicit CodeInput(QWidget *parent = 0);
+//    QSize sizeHint() const;
+//    QSize minimumSizeHint() const;
 
 signals:
-     void evaluateCode(CodeInput* target,QString inputString);     
-     void deleteGroup(QWidget *target);
-     void arrowsPressed(bool upArrowPressed);
+    void previewCode(CodeInput* target, QString inputString);
+    void evaluateCode(CodeInput* target,QString inputString);
+    void deleteGroup(QWidget *target);
+    void arrowsPressed(bool upArrowPressed);
 
 private:
-     int numberOfLines;
      bool eventFilter(QObject *object, QEvent *event);
      void addNewLine();
+     void removeLine();
 
 private slots:
      void receivedTextInput();

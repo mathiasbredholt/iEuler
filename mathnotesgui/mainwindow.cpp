@@ -30,10 +30,11 @@ void MainWindow::initSubprocess()
 void MainWindow::readStandardOutput()
 {
     // get line number and latex string from ieuler
-    QString std_out = proc->readAllStandardOutput();
+    QString std_out = proc->readAllStandardOutput().simplified();
     int split = std_out.indexOf(' ');
     int line = std_out.left(split).toInt();
     QString latexString = std_out.mid(split);
+    latexString = latexString.replace('\n', ' ');
     // send signal to render math
     emit outputReady(line, latexString);
 }
@@ -48,12 +49,18 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::previewCode(CodeInput* target, QString inputString)
+{
+    inputString = inputString.replace('\n',' ');
+    proc->write(QString::number(((Group*) target->parent())->index).toLatin1()+"\n"+inputString.toLatin1()+"\n");
+}
+
 void MainWindow::evaluateCode(CodeInput* target, QString inputString)
 {
     inputString = inputString.replace('\n',' ');
     proc->write(QString::number(((Group*) target->parent())->index).toLatin1()+"\n"+inputString.toLatin1()+"\n");
     if (((Group*) target->parent())->index == numberOfLines-1) {
-//        createNewCodeLine();
+        createNewCodeLine();
     }
 }
 
@@ -73,6 +80,7 @@ void MainWindow::createNewCodeLine()
     Group* gp = new Group(this, numberOfLines);
     ui->content->layout()->addWidget(gp);
     gp->input->setFocus();
+    connect(gp->input, SIGNAL(previewCode(CodeInput*, QString)), this, SLOT(previewCode(CodeInput*, QString)));
     connect(gp->input, SIGNAL(evaluateCode(CodeInput*, QString)), this, SLOT(evaluateCode(CodeInput*, QString)));
     connect(gp->input, SIGNAL(deleteGroup(QWidget*)), this, SLOT(deleteGroup(QWidget*)));
     connect(gp->input, SIGNAL(arrowsPressed(bool)), this, SLOT(arrowsPressed(bool)));

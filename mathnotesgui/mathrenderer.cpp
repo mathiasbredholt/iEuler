@@ -3,6 +3,7 @@
 #include <QDir>
 #include <QWebFrame>
 #include <QWebElement>
+#include <QEvent>
 
 QString readFile (const QString& filename)
 {
@@ -19,6 +20,7 @@ MathRenderer::MathRenderer(QObject *parent) : QObject(parent)
 {
     view = new QWebView();
     view->setMaximumHeight(128);
+    view->installEventFilter(this);
 
     // Make webview transparent
     QPalette palette = view->palette();
@@ -31,9 +33,16 @@ MathRenderer::MathRenderer(QObject *parent) : QObject(parent)
     QString html = readFile(":/webkit/test");
     QUrl baseUrl = QUrl::fromLocalFile(QDir::currentPath() + "/mathnotesgui/webkit/");
     view->setHtml(html, baseUrl);
+//    view->page()->mainFrame()->evaluateJavaScript(readFile(":/webkit/render"));
 }
 
 void MathRenderer::render(QString latexString) {
-    view->page()->mainFrame()->findFirstElement("#eq").setInnerXml("$$" + latexString + "$$");
-    view->page()->mainFrame()->evaluateJavaScript(readFile(":/webkit/render"));
+    view->page()->mainFrame()->findFirstElement("#input").setInnerXml(latexString);
+    view->page()->mainFrame()->evaluateJavaScript("UpdateMath()");
+}
+
+bool MathRenderer::eventFilter(QObject *object, QEvent *e)
+{
+    if (e->type() == QEvent::Wheel) e->ignore();
+    return false;
 }

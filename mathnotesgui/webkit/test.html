@@ -2,22 +2,31 @@
   MathJax.Hub.Config({
     extensions: ["tex2jax.js"],
     jax: ["input/TeX", "output/SVG"],
-    messageStyle: 'none',
     displayAlign: 'left',
     tex2jax: {
       inlineMath: [['$','$'], ['\\(','\\)']],
       preview: 'none'
     },
-    menuSettings: {
-      mpContext: false,
-      mpMouse: false
-    }
+    showMathMenu: false,
+    showMathMenuMSIE: false,
+    showProcessingMessages: false,
+    messageStyle: 'none'
   });
 </script>
 <script type="text/javascript"
   src="MathJax/MathJax.js">
 </script>
-<div style="font-size: 1.5em" id="eq"></div>
+<div style="display: none" id="input"></div>
+<div style="font-size: 1.5em; visibility: hidden" id="eq">${}$</div>
 <script>
-    document.getElementById("eq").style.visibility = "hidden";
+var QUEUE = MathJax.Hub.queue;  // shorthand for the queue
+var math = null;                // the element jax for the math output.
+QUEUE.Push(function () {
+  math = MathJax.Hub.getAllJax("eq")[0];
+});
+window.UpdateMath = function () {
+  QUEUE.Push(["Text",math,document.getElementById("input").innerHTML, function () {
+    document.getElementById("eq").style.visibility = "visible";
+  }]);
+}
 </script>
