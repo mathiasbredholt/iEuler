@@ -288,4 +288,7 @@ def parse(text, eval=True, gui=False):
     global evaluate
     gui_mode = gui
     evaluate = eval
-    return expression.parseString(text)[0]
+    try:
+        return expression.parseString(text)[0]
+    except ParseException:
+        return ml.Variable("ParseException")
