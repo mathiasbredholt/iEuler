@@ -4,11 +4,19 @@
 
 class Equality:
 
-    def __init__(self, type, value1, value2, hidden=False):
+    def __init__(self, type, value1, value2, assignment=False, hidden=False):
         self.type = type
         self.value1 = value1
         self.value2 = value2
+        self.assignment = assignment
         self.hidden = hidden
+
+    def get_first(self):
+        if type(self.value1) is Equality:
+            return self.value1.get_first()
+        else:
+            # value1 is a value
+            return self.value1
 
     def __str__(self):
         return "Equality(type:'{}', {}, {})".format(self.type, self.value1, self.value2)

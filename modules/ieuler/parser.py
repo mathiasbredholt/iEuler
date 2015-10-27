@@ -37,6 +37,11 @@ def parentheses(input_expr, do=True):
     return input_expr
 
 
+def convert_equality(self):
+    return "{} {} {}".format(convert_expr(self.value1), self.type,
+                             convert_expr(self.value2))
+
+
 def convert_value(self):
     if type(self) is ml.Unit:
         return self.prefix + self.value
@@ -138,6 +143,7 @@ def convert_function(self):
     return text
 
 # Extending mathlib classes with to_maple method for duck typing
+ml.Equality.to_mathnotes = convert_equality
 ml.MathValue.to_mathnotes = convert_value
 ml.Minus.to_mathnotes = convert_minus
 ml.Factorial.to_mathnotes = convert_factorial
@@ -156,7 +162,7 @@ ml.Function.to_mathnotes = convert_function
 # PARSE MATHNOTES STRING TO MATHLIB OPERATORS #
 ###############################################
 
-__settings__, gui_mode = [None] * 2
+__settings__ = None
 
 
 def init():
@@ -191,6 +197,7 @@ def get_equality_op(toks):
     t = toks[0]
     value1, value2, op = parsing.parse_binary_operator(toks, get_equality_op)
     hidden = False
+    assignment = False
     if "equals" in t:
         type = "="
         if t["equals"]["modifier"]:
@@ -199,16 +206,35 @@ def get_equality_op(toks):
                     value2 = evaluate_expression(value2)
             if "::" in t["equals"]["modifier"]:
                 hidden = True
+                assign_variable(value1, value2)
             elif ":" in t["equals"]["modifier"]:
-                pass
+                assign_variable(value1, value2)
     else:
         type = op[0]
 
-    return ml.Equality(type, value1, value2, hidden)
+    return ml.Equality(type, value1, value2, assignment, hidden)
+
+
+def assign_variable(variable, value):
+    global user_variables
+    if type(variable) is ml.Equality:
+        variable = variable.get_first()
+    if type(variable) is ml.Variable:
+        user_variables[variable.value] = value
+    else:
+        raise NameError('Can only assign variables!')
 
 
 def evaluate_expression(expr, convert=True):
     return modules.maple.parser.evaluate(expr, __settings__["maple"], gui_mode, convert=True)
+
+
+def get_variable_value(toks):
+    var, op = parsing.parse_unary_operator(toks)
+    if type(var) is ml.Variable:
+        if var.value in user_variables:
+            return user_variables[var.value]
+    return var
 
 
 def make_expression():
@@ -248,6 +274,7 @@ def make_expression():
 
     factop = no_white + Literal('!') + word_end
     signop = word_start + Literal('-') + no_white
+    insert_value = word_start + Literal('@') + no_white
     expop = Literal('^')
     fracop = Literal('/')
     multop1 = space.copy()
@@ -263,6 +290,7 @@ def make_expression():
     left = opAssoc.LEFT
     expr << infixNotation(operand,
                           [
+                              (insert_value,    1, right,   get_variable_value),
                               (factop,          1, left,
                                parsing.get_factorial_op),
                               (deco_kw_list,    1, right,   get_decorator),
@@ -283,11 +311,13 @@ def make_expression():
 expression = make_expression()
 
 
-def parse(text, eval=True, gui=False):
+def parse(text, vars, eval=True, gui=False):
     global gui_mode
     global evaluate
+    global user_variables
     gui_mode = gui
     evaluate = eval
+    user_variables = vars
     try:
         return expression.parseString(text)[0]
     except ParseException:
