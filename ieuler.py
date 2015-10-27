@@ -93,9 +93,12 @@ def load_worksheet(path, gui_mode=True):
     worksheet = {}
     f = open(path, 'r')
     for i, line in enumerate(f):
-        worksheet[i] = {"command": line}
-        send_result(i, line, False, gui_mode)
+        worksheet[i] = {"command": line.strip()}
+        print("{} {}".format(i, line.strip()))
     f.close()
+    print("Done")
+    for key in worksheet:
+        send_result(key, worksheet[key]["command"], False, gui_mode)
     return worksheet
 
 
