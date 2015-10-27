@@ -284,7 +284,7 @@ def make_expression():
     function = Combine(name + Suppress("(")) + \
         delimitedList(expr, delim=',') + Suppress(")")
 
-    number = (Combine(Word(nums) + Optional("." + Word(nums))) +
+    number = (Combine(Word(nums) + Optional("." + Optional(Word(nums)))) +
               Optional(NotAny(White()) + (function | unit | variable)))
 
     eval_field = Suppress('#') + expr + Suppress('#')
@@ -292,8 +292,8 @@ def make_expression():
     eval_direct_field = Suppress('$') + expr + Suppress('$')
 
     operand = (
-        eval_field.setParseAction(lambda x: evaluate(x[0]))
-        | eval_direct_field.setParseAction(lambda x: evaluate(x[0], False))
+        eval_field.setParseAction(lambda x: evaluate_expression(x[0]))
+        | eval_direct_field.setParseAction(lambda x: evaluate_expression(x[0], False))
         | function.setParseAction(lambda x: parsing.get_function(x, functions))
         | unit.setParseAction(lambda x: parsing.get_unit(x, user_variables))
         | variable.setParseAction(

@@ -81,6 +81,8 @@ def convert_value(self):
             result = special_symbols[self.value]
         else:
             result = "\\{}".format(self.value)
+    elif self.value[-1] == ".":
+        result = self.value.strip(".")
     else:
         result = self.value
     return convert_decorators(self, result)
