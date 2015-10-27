@@ -84,9 +84,9 @@ class Complex(MathValue):
 
 class Variable(MathValue):
 
-    def __init__(self, value, is_symbol=False):
+    def __init__(self, value, is_symbol=False, decs=[]):
         self.value = value
-        self.decorators = []
+        self.decorators = decs
         self.is_symbol = is_symbol
 
     def __str__(self):
@@ -102,6 +102,9 @@ class Unit(MathValue):
         self.value = unit
         self.prefix = prefix
         self.decorators = []
+
+    def convert_to_variable(self):
+        return Variable(self.prefix + self.value, False, self.decorators)
 
     def __str__(self):
         return "Unit({}, prefix: {})".format(self.value, self.prefix)

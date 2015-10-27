@@ -46,10 +46,12 @@ def get_variable(toks, variables, symbols={"__standard__": []}, user_variables={
 
 def get_unit(toks, variables):
     # print("get_unit toks: {}".format(toks))
+    if toks[0] in variables:
+        return ml.Variable(toks[0])
     if len(toks) > 1:
         name = toks[0] + toks[1]
         if name in variables:
-            return variables[name]["object"]()
+            return ml.Variable(name)
         return ml.Unit(toks[1], toks[0])
     return ml.Unit(toks[0])
 

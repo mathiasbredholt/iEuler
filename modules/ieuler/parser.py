@@ -231,10 +231,13 @@ def assign_variable(variable, value):
     global user_variables
     if type(variable) is ml.Equality:
         variable = variable.get_first()
+    if type(variable) is ml.Unit:
+        variable = variable.convert_to_variable()
     if type(variable) is ml.Variable:
         user_variables[variable.value] = value
     else:
-        raise NameError('Can only assign variables!')
+        raise NameError(
+            'Can only assign variables, not {}!'.format(type(variable)))
 
 
 def evaluate_expression(expr, convert=True):
@@ -246,6 +249,7 @@ def evaluate_expression(expr, convert=True):
 
 def get_variable_value(toks):
     var, op = parsing.parse_unary_operator(toks)
+    print(var)
     if type(var) is ml.Variable:
         if var.value in user_variables:
             return user_variables[var.value]
@@ -292,7 +296,7 @@ def make_expression():
         eval_field.setParseAction(lambda x: evaluate(x[0]))
         | eval_direct_field.setParseAction(lambda x: evaluate(x[0], False))
         | function.setParseAction(lambda x: parsing.get_function(x, functions))
-        | unit.setParseAction(lambda x: parsing.get_unit(x, variables))
+        | unit.setParseAction(lambda x: parsing.get_unit(x, user_variables))
         | variable.setParseAction(
             lambda x: parsing.get_variable(x, variables, symbols))
         | number.setParseAction(parsing.get_value))
