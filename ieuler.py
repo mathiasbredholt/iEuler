@@ -40,19 +40,16 @@ def run(argv=None):
         do_save = False
         if gui_mode:
             inp = input("")
-            try:
-                index = int(inp)
-            except ValueError:
-                if inp == "save":
-                    path = input("")
-                    save_worksheet(worksheet, path)
-                elif inp == "load":
-                    path = input("")
-                    worksheet = load_worksheet(path)
-                else:
-                    raise ValueError('Expected index or command')
+            if inp == "save":
+                path = input("")
+                save_worksheet(worksheet, path)
+                prompt = None
+            elif inp == "load":
+                path = input("")
+                worksheet = load_worksheet(path)
                 prompt = None
             else:
+                index = int(inp)
                 evaluate = "evaluate" in input("")
                 prompt = input("")
                 add_to_worksheet(worksheet, index, prompt)
@@ -62,7 +59,7 @@ def run(argv=None):
             evaluate = True
 
         if prompt:
-            send_result(inde, prompt, evaluate, gui_mode)
+            send_result(index, prompt, evaluate, gui_mode)
 
 
 def send_result(index, command, evaluate, gui_mode):
@@ -93,9 +90,12 @@ def load_worksheet(path, gui_mode=True):
     worksheet = {}
     f = open(path, 'r')
     for i, line in enumerate(f):
-        worksheet[i] = {"command": line}
-        send_result(i, line, False, gui_mode)
+        worksheet[i] = {"command": line.strip()}
+        print("{} {}".format(i, line.strip()))
     f.close()
+    print("Done")
+    for key in worksheet:
+        send_result(key, worksheet[key]["command"], False, gui_mode)
     return worksheet
 
 
