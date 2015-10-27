@@ -15,7 +15,7 @@ def init():
 
 
 # generates LaTeX string from mathlib operators
-def generate(input_expr):
+def generate_preview(input_expr):
     output_string = convert_expr(input_expr)
     with open("modules/latex/preamble.tex", "r") as f:
         output_string = f.read().replace("%content", output_string)
@@ -33,6 +33,23 @@ def generate(input_expr):
     return output_string
 
 
+def export(worksheet):
+    output_string = ""
+    for index, value in worksheet.items():
+        output_string = output_string + "$$" + value["latex"] + "$$"
+
+    with open("modules/latex/preamble.tex", "r") as f:
+        output_string = f.read().replace("%content", output_string)
+
+    with open("output.tex", "w") as f:
+        f.write(output_string)
+
+    proc, queue, thread = procio.run(
+        __settings__ + " -interaction=batchmode -fmt pdflatex output.tex",
+        False)
+    proc.wait()
+
+
 def convert_expr(input_expr, display=True):
     if type(input_expr) is ml.Fraction:
         return input_expr.to_latex(display)
@@ -48,8 +65,12 @@ def parentheses(input_expr, do=True):
 
 
 def convert_equality(self):
-    return "{} {} {}".format(convert_expr(self.value1), self.type,
-                             convert_expr(self.value2))
+    if self.type == "in":
+        return "{} \\in {}".format(convert_expr(self.value1),
+                                   convert_expr(self.value2))
+    else:
+        return "{} {} {}".format(convert_expr(self.value1), self.type,
+                                 convert_expr(self.value2))
 
 
 def convert_value(self):
@@ -57,7 +78,7 @@ def convert_value(self):
         result = "\\mathrm{{{}}}".format(self.prefix + self.value)
     elif type(self) is ml.Variable and self.is_symbol:
         if self.value in special_symbols:
-            result = special_symbols[value]
+            result = special_symbols[self.value]
         else:
             result = "\\{}".format(self.value)
     else:
@@ -135,6 +156,13 @@ def convert_mulop(self):
     return output.format(output_1, output_2)
 
 
+def convert_crossop(self):
+    output = "{} \\times {}"
+    output_1 = convert_expr(self.value1)
+    output_2 = convert_expr(self.value2)
+    return output.format(output_1, output_2)
+
+
 def convert_fraction(self, display=True):
     # removed dfrac for compatibility issues with MathJax
     return "\\{}frac{{{}}}{{{}}} ".format("" if display else "",
@@ -181,6 +209,11 @@ def convert_derivative(self):
             convert_expr(self.nth), convert_expr(self.variable),
             convert_expr(self.nth), convert_expr(self.value))
 
+
+def convert_range(self):
+    return "\left[ \, {} \, ; {} \, \\right]".format(convert_expr(self.value1),
+                                                     convert_expr(self.value2))
+
 # Extending mathlib classes with to_latex method for duck typing
 ml.MathValue.to_latex = convert_value
 ml.Equality.to_latex = convert_equality
@@ -190,8 +223,10 @@ ml.Factorial.to_latex = convert_factorial
 ml.AddOp.to_latex = convert_addop
 ml.SubOp.to_latex = convert_subop
 ml.MulOp.to_latex = convert_mulop
+ml.CrossOp.to_latex = convert_crossop
 ml.Fraction.to_latex = convert_fraction
 ml.Power.to_latex = convert_power
 ml.Root.to_latex = convert_root
 ml.Integral.to_latex = convert_integral
 ml.Derivative.to_latex = convert_derivative
+ml.Range.to_latex = convert_range

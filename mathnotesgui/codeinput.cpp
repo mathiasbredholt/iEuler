@@ -9,7 +9,7 @@ CodeInput::CodeInput(QWidget *parent) : QPlainTextEdit(parent)
     setFocusPolicy(Qt::StrongFocus);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     setFixedHeight(24);
-    setStyleSheet("QPlainTextEdit { border: none; background: #FAFAFA; font-size: 14px;  }");
+    setStyleSheet("QPlainTextEdit { border: none; background: #EEE; font-size: 14px;  }");
     installEventFilter(this);
     setTabChangesFocus(false);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

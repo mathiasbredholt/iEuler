@@ -21,6 +21,7 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QMessageBox>
+#include <QStringList>
 
 namespace Ui {
 class MainWindow;
@@ -42,8 +43,8 @@ private:
 
     int numberOfLines;
 
-    void createGroup();
-    void createNewTab();
+    void createGroup(QString cmd = "");
+    void createNewTab(bool empty = false);
     void initSubprocess();
 
     void openFile();
@@ -52,6 +53,8 @@ private:
     QWidget *getTabContents();
 
     void closeEvent(QCloseEvent *event);
+
+    bool loadingMode;
 
 
 protected:

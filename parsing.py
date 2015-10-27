@@ -1,4 +1,3 @@
-
 import re
 import mathlib as ml
 
@@ -19,7 +18,8 @@ def get_function(toks, functions):
     name = toks[0]
     args = toks[1:]
     if name in functions:
-        if "num_args" in functions[name] and functions[name]["num_args"] != len(args):
+        if "num_args" in functions[name] and functions[name]["num_args"
+                                                             ] != len(args):
             # error
             pass
         return functions[name]["object"](*args)
@@ -65,6 +65,11 @@ def get_mul_op(toks):
     return ml.MulOp(value1, value2)
 
 
+def get_cross_op(toks):
+    value1, value2, op = parse_binary_operator(toks, get_cross_op)
+    return ml.CrossOp(value1, value2)
+
+
 def get_div_op(toks):
     value1, value2, op = parse_binary_operator(toks, get_div_op)
     return ml.Fraction(value1, value2)
@@ -76,6 +81,11 @@ def get_add_op(toks):
         return ml.AddOp(value1, value2)
     else:
         return ml.SubOp(value1, value2)
+
+
+def get_range_op(toks):
+    value1, value2, op = parse_binary_operator(toks, get_range_op)
+    return ml.Range(value1, value2)
 
 
 def get_factorial_op(toks):
@@ -110,7 +120,6 @@ def parse_unary_operator(toks, right=True):
     if type(value) is str:
         value = get_value(value)
     return value, operator
-
 
 # General functions for jagged multidimensinsional lists
 

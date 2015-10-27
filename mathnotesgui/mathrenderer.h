@@ -17,10 +17,14 @@ public:
 signals:
 
 public slots:
+    void hasLoaded();
 
 
 private:
+    bool isReady;
     bool eventFilter(QObject *object, QEvent *event);
+
+private slots:
 };
 
 #endif // MATHRENDERER_H

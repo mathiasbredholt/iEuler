@@ -19,7 +19,8 @@ class Equality:
             return self.value1
 
     def __str__(self):
-        return "Equality(type:'{}', {}, {})".format(self.type, self.value1, self.value2)
+        return "Equality(type:'{}', {}, {})".format(self.type, self.value1,
+                                                    self.value2)
 
     __repr__ = __str__
 
@@ -89,7 +90,8 @@ class Variable(MathValue):
         self.is_symbol = is_symbol
 
     def __str__(self):
-        return "Variable({} {} {}symbol)".format(self.value, self.decorators, "" if self.is_symbol else "not ")
+        return "Variable({} {} {}symbol)".format(
+            self.value, self.decorators, "" if self.is_symbol else "not ")
 
     __repr__ = __str__
 
@@ -228,6 +230,14 @@ class MulOp(MathOperator):
     __repr__ = __str__
 
 
+class CrossOp(MathOperator):
+
+    def __str__(self):
+        return "CrossOp({},{})".format(self.value1, self.value2)
+
+    __repr__ = __str__
+
+
 class Fraction(MathOperator):
 
     def __str__(self):
@@ -248,6 +258,14 @@ class Power(MathOperator):
 
     def __str__(self):
         return "Power({},{})".format(self.value1, self.value2)
+
+    __repr__ = __str__
+
+
+class Range(MathOperator):
+
+    def __str__(self):
+        return "Range({},{})".format(self.value1, self.value2)
 
     __repr__ = __str__
 
