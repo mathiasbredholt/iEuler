@@ -212,8 +212,7 @@ def get_equality_op(toks):
         type = "="
         if t["equals"]["modifier"]:
             if "#" in t["equals"]["modifier"]:
-                if evaluate:
-                    value2 = evaluate_expression(value2)
+                value2 = evaluate_expression(value2)
             if "::" in t["equals"]["modifier"]:
                 hidden = True
                 if evaluate:
@@ -241,10 +240,9 @@ def assign_variable(variable, value):
 
 
 def evaluate_expression(expr, convert=True):
-    return modules.maple.parser.evaluate(expr,
-                                         __settings__["maple"],
-                                         gui_mode,
-                                         convert=True)
+    if evaluate:
+        return modules.maple.parser.evaluate(expr, __settings__["maple"], gui_mode, convert)
+    return expr
 
 
 def get_variable_value(toks):
