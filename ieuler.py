@@ -48,35 +48,38 @@ def run(argv=None):
                 path = input("")
                 worksheet = load_worksheet(path)
                 prompt = None
+            elif inp == "export":
+                modules.latex.parser.export(worksheet)
             else:
                 index = int(inp)
                 evaluate = "evaluate" in input("")
-                prompt = input("")
-                add_to_worksheet(worksheet, index, prompt)
+                command = input("")
+                if command:
+                    gui_send_result(index, command, evaluate, worksheet)
 
         else:
-            prompt = input("iEuler> ")
-            evaluate = True
-
-        if prompt:
-            send_result(index, prompt, evaluate, gui_mode)
+            command = input("iEuler> ")
+            console_send_result(command)
 
 
-def send_result(index, command, evaluate, gui_mode):
-    result = parser.parse(command, evaluate, gui_mode)
+def console_send_result(command):
+    result = parser.parse(command, True, False)
+    print(parser.generate(result))
+
+
+def gui_send_result(index, command, evaluate, worksheet):
+    result = parser.parse(command, evaluate, True)
 
     if type(result) is ml.Plot:
         plot2d.plot(result)
 
-    if gui_mode:
-        print('{} {}'.format(index, modules.latex.parser.convert_expr(result)))
-    else:
-        print(result)
-        print(parser.generate(result))
+    latex = modules.latex.parser.convert_expr(result)
+    add_to_worksheet(worksheet, index, command, latex)
+    print('{} {}'.format(index, latex))
 
 
-def add_to_worksheet(worksheet, index, command):
-    worksheet[index] = {"command": command}
+def add_to_worksheet(worksheet, index, command, latex):
+    worksheet[index] = {"command": command, "latex": latex}
 
 
 def save_worksheet(worksheet, path):

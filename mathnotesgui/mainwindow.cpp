@@ -80,6 +80,7 @@ void MainWindow::createGroup(QString cmd)
     connect(this, SIGNAL(outputReady(int, QString)), gp, SLOT(outputReady(int, QString)));
     numberOfLines++;
     gp->input->setPlainText(cmd);
+    gp->input->setFocus();
 }
 
 void MainWindow::deleteGroup(QWidget *target)

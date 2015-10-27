@@ -13,13 +13,12 @@ import modules.tools.procio as procio
 import modules.tools.plot2d as plot2d
 import json
 
-
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
+####################################################
+# GENERATE IEULER STRING FROM MATHLIB OPERATORS #
+####################################################
 
-####################################################
-# GENERATE MATHNOTES STRING FROM MATHLIB OPERATORS #
-####################################################
 
 def generate(input_expr):
     return convert_expr(input_expr)
@@ -81,6 +80,11 @@ def convert_mulop(self):
     return output.format(output_1, output_2)
 
 
+def convert_crossop(self):
+    return "{} x {}".format(convert_expr(self.value1),
+                            convert_expr(self.value2))
+
+
 def convert_fraction(self):
     return "{}/{} ".format(
         parentheses(self.value1, type(self.value1) in [ml.AddOp, ml.SubOp]),
@@ -137,6 +141,11 @@ def convert_function(self):
     text += ")"
     return text
 
+
+def convert_range(self):
+    return "[{};{}]".format(convert_expr(self.value1),
+                            convert_expr(self.value2))
+
 # Extending mathlib classes with to_maple method for duck typing
 ml.MathValue.to_mathnotes = convert_value
 ml.Minus.to_mathnotes = convert_minus
@@ -144,13 +153,14 @@ ml.Factorial.to_mathnotes = convert_factorial
 ml.AddOp.to_mathnotes = convert_addop
 ml.SubOp.to_mathnotes = convert_subop
 ml.MulOp.to_mathnotes = convert_mulop
+ml.CrossOp.to_mathnotes = convert_crossop
 ml.Fraction.to_mathnotes = convert_fraction
 ml.Power.to_mathnotes = convert_power
 ml.Root.to_mathnotes = convert_root
 ml.Integral.to_mathnotes = convert_integral
 ml.Derivative.to_mathnotes = convert_derivative
 ml.Function.to_mathnotes = convert_function
-
+ml.Range.to_mathnotes = convert_range
 
 ###############################################
 # PARSE MATHNOTES STRING TO MATHLIB OPERATORS #
@@ -208,7 +218,10 @@ def get_equality_op(toks):
 
 
 def evaluate_expression(expr, convert=True):
-    return modules.maple.parser.evaluate(expr, __settings__["maple"], gui_mode, convert=True)
+    return modules.maple.parser.evaluate(expr,
+                                         __settings__["maple"],
+                                         gui_mode,
+                                         convert=True)
 
 
 def make_expression():
@@ -227,24 +240,34 @@ def make_expression():
     no_white = NotAny(White())
 
     expr = Forward()
-    unit = units_list + NotAny(no_white + Word(chars)) | (Optional(unit_prefixes_list + no_white)
-                                                          + units_list + NotAny(no_white + Word(chars)))
-    name = NotAny(deco_kw_list | equality_kw_list) + Word(letters, chars)
+
+    unit = units_list + NotAny(no_white + Word(chars)) | (
+        Optional(unit_prefixes_list + no_white) + units_list +
+        NotAny(no_white + Word(chars)))
+
+    name = NotAny(deco_kw_list | equality_kw_list | Keyword('cross')) + Word(
+        letters, chars)
+
     variable = name.copy()
+
     function = Combine(name + Suppress("(")) + \
         delimitedList(expr, delim=',') + Suppress(")")
+
     number = (Combine(Word(nums) + Optional("." + Word(nums))) +
               Optional(NotAny(White()) + (function | unit | variable)))
+
     eval_field = Suppress('#') + expr + Suppress('#')
+
     eval_direct_field = Suppress('$') + expr + Suppress('$')
+
     operand = (
-        eval_field.setParseAction(lambda x: evaluate(x[0])) |
-        eval_direct_field.setParseAction(lambda x: evaluate(x[0], False)) |
-        function.setParseAction(lambda x: parsing.get_function(x, functions)) |
-        unit.setParseAction(lambda x: parsing.get_unit(x, variables)) |
-        variable.setParseAction(lambda x: parsing.get_variable(x, variables, symbols)) |
-        number.setParseAction(parsing.get_value)
-    )
+        eval_field.setParseAction(lambda x: evaluate(x[0]))
+        | eval_direct_field.setParseAction(lambda x: evaluate(x[0], False))
+        | function.setParseAction(lambda x: parsing.get_function(x, functions))
+        | unit.setParseAction(lambda x: parsing.get_unit(x, variables))
+        | variable.setParseAction(
+            lambda x: parsing.get_variable(x, variables, symbols))
+        | number.setParseAction(parsing.get_value))
 
     factop = no_white + Literal('!') + word_end
     signop = word_start + Literal('-') + no_white
@@ -253,29 +276,29 @@ def make_expression():
     multop1 = space.copy()
     multop2 = Literal('*')
     crossop = Keyword('cross')
+    rangeop = Literal('..')
     plusop = oneOf('+ -')
     equals = Group(Regex(
-        r'((?P<modifier>[:#])+(?P<option>[a-zA-Z]*))?=')).setResultsName("equals")
+        r'((?P<modifier>[:#])+(?P<option>[a-zA-Z]*))?=')).setResultsName(
+            "equals")
     other_equals = oneOf('== <= >= < >')
     equalop = Group(other_equals) | equals | Group(equality_kw_list)
 
     right = opAssoc.RIGHT
     left = opAssoc.LEFT
-    expr << infixNotation(operand,
-                          [
-                              (factop,          1, left,
-                               parsing.get_factorial_op),
-                              (deco_kw_list,    1, right,   get_decorator),
-                              (signop,          1, right,   parsing.get_minus_op),
-                              (expop,           2, right,   parsing.get_pow_op),
-                              (fracop,          2, left,    parsing.get_div_op),
-                              (multop1,         2, left,    parsing.get_mul_op),
-                              (multop2,         2, left,    parsing.get_mul_op),
-                              (crossop,         2, left,    parsing.get_mul_op),
-                              (plusop,          2, left,    parsing.get_add_op),
-                              (equalop,         2, left,    get_equality_op)
-                          ]
-                          )
+    expr << infixNotation(operand, [
+        (factop, 1, left, parsing.get_factorial_op),
+        (deco_kw_list, 1, right, get_decorator),
+        (signop, 1, right, parsing.get_minus_op),
+        (expop, 2, right, parsing.get_pow_op),
+        (fracop, 2, left, parsing.get_div_op),
+        (crossop, 2, left, parsing.get_cross_op),
+        (multop1, 2, left, parsing.get_mul_op),
+        (multop2, 2, left, parsing.get_mul_op),
+        (plusop, 2, left, parsing.get_add_op),
+        (rangeop, 2, left, parsing.get_range_op),
+        (equalop, 2, left, get_equality_op)
+    ])
     expr.parseWithTabs()
     return expr
 
