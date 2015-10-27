@@ -39,104 +39,64 @@ def run(argv=None):
 
         do_save = False
         if gui_mode:
-            index = int(input(""))
-            evaluate = "evaluate" in input("")
-            prompt = input("")
-            add_to_worksheet(worksheet, index, prompt)
+            inp = input("")
+            try:
+                index = int(inp)
+            except ValueError:
+                if inp == "save":
+                    path = input("")
+                    save_worksheet(worksheet, path)
+                elif inp == "load":
+                    path = input("")
+                    worksheet = load_worksheet(path)
+                else:
+                    raise ValueError('Expected index or command')
+                prompt = None
+            else:
+                evaluate = "evaluate" in input("")
+                prompt = input("")
+                add_to_worksheet(worksheet, index, prompt)
+
         else:
             prompt = input("iEuler> ")
             evaluate = True
 
         if prompt:
-            result = parser.parse(prompt, evaluate, gui_mode)
+            send_result(inde, prompt, evaluate, gui_mode)
 
-            if type(result) is ml.Plot:
-                plot2d.plot(result)
-            # else:
-            # modules.latex.parser.generate(result)
 
-            if gui_mode:
-                print('{} {}'.format(index, modules.latex.parser.convert_expr(
-                    result)))
-            else:
-                print(result)
-                print(parser.generate(result))
+def send_result(index, command, evaluate, gui_mode):
+    result = parser.parse(command, evaluate, gui_mode)
 
-        # if "print" in prompt:
-        #     # print(modules.ieuler.parser.parse(prompt.strip("print")))
-        #     print(cmdmath.generate(modules.ieuler.parser.parse(prompt.strip("print"))))
+    if type(result) is ml.Plot:
+        plot2d.plot(result)
 
-        # elif "frink" in prompt:
-        #     if frink_proc is None:
-        #         print("Starting Frink...")
-        #         # Spawn Frink subprocess.
-        #         # Returns instance of process, queue and thread for
-        #         # asynchronous I/O
-        #         frink_proc, frink_queue, frink_thread = frink.init(
-        #             __settings__["frink"])
-        #     prompt = prompt.strip("frink") + "\n"
-        #     result_string = frink_query(prompt, frink_proc, frink_queue,
-        #                                 frink_thread)
-        #     if gui_mode:
-        #         print(index)
-        #     else:
-        #         print(cmdmath.generate(modules.maple.parser.parse(result_string)))
-        #     # generate_latex(latex.generate(frink.parse(result_string)))
-        #     # call(__settings__[
-        #     #      "pdflatex"] + " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex", shell=True)
-
-        # elif "maple" in prompt:
-        #     if maple_proc is None:
-        #         if not gui_mode:
-        #             print("Starting Maple...")
-        #         # Spawn Maple subprocess.
-        #         # Returns instance of process, queue and thread for
-        #         # asynchronous I/O
-        #         maple_proc, maple_queue, maple_thread = modules.maple.parser.init(
-        #             __settings__["maple"])
-        #     prompt = prompt.strip("maple") + ";\n"
-        #     try:
-        #         result_string = maple_query(prompt, maple_proc, maple_queue,
-        #                                     maple_thread)
-        #     except:
-        #         print("Timeout")
-        #     else:
-        #         latex.generate(modules.maple.parser.parse(result_string), __settings__)
-        #         if gui_mode:
-        #             print(index)
-        #         else:
-        #             print(cmdmath.generate(modules.maple.parser.parse(result_string)))
-
-        #     # print(cmdmath.generate(modules.maple.parser.parse(result_string)))
-
-        # elif "latex" in prompt:
-        #     latex.generate(modules.maple.parser.parse(
-        #         prompt.strip("latex")), __settings__)
-        #     if gui_mode:
-        #         print(index)
-        #     else:
-        #         print(cmdmath.generate(modules.maple.parser.parse(result_string)))
-
-        #     # pyperclip.copy(os.getcwd() + "/mathnotes.pdf")
-
-        # elif "plot" in prompt:
-        #     plot2d.plot(modules.maple.parser.parse(prompt.strip("plot")))
-        #     if gui_mode:
-        #         print(index)
-        # elif "quit" in prompt:
-        #     print("Killing processes...")
-        #     os.killpg(os.getpgid(maple_proc.pid), 15)
-        #     os.killpg(os.getpgid(frink_proc.pid), 15)
-        #     print("Quit.")
-        #     break
-
-        # else:
-        #     result_string = prompt
-        #     print("Sorry. I don't understand: \"{}\"".format(prompt))
+    if gui_mode:
+        print('{} {}'.format(index, modules.latex.parser.convert_expr(result)))
+    else:
+        print(result)
+        print(parser.generate(result))
 
 
 def add_to_worksheet(worksheet, index, command):
     worksheet[index] = {"command": command}
+
+
+def save_worksheet(worksheet, path):
+    f = open(path, 'w')
+    for key in worksheet:
+        f.write(worksheet[key]["command"] + "\n")
+    f.close()
+
+
+def load_worksheet(path, gui_mode=True):
+    worksheet = {}
+    f = open(path, 'r')
+    for i, line in enumerate(f):
+        worksheet[i] = {"command": line}
+        send_result(i, line, False, gui_mode)
+    f.close()
+    return worksheet
 
 
 def frink_query(query_string, proc, queue, thread):

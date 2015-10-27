@@ -14,6 +14,7 @@ CodeInput::CodeInput(QWidget *parent) : QPlainTextEdit(parent)
     setTabChangesFocus(false);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     connect(this, SIGNAL(textChanged()), this, SLOT(receivedTextInput()));
+    setFocus();
 }
 
 bool CodeInput::eventFilter(QObject *object, QEvent *e)

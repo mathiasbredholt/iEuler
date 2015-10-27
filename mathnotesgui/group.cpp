@@ -1,23 +1,22 @@
 #include "group.h"
 
-Group::Group(QWidget *parent, int index) : QWidget(parent)
+Group::Group(QWidget *parent, int index, QString cmd) : QWidget(parent)
 {
     this->index = index;
     setFocusPolicy(Qt::NoFocus);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     setFixedHeight(112);
-
-    QVBoxLayout *vlayout = new QVBoxLayout();
+    setLayout(new QVBoxLayout());
 
     input = new CodeInput(this);
-    vlayout->addWidget(input);
-//    output = new QLabel(this);
-//    output->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    input->setPlainText(cmd);
+    layout()->addWidget(input);
 
     output = new MathRenderer();
-    vlayout->addWidget(output->view);
+    layout()->addWidget(output->view);
 
-    setLayout(vlayout);
+//    output = new QLabel(this);
+//    output->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 }
 
 void Group::outputReady(int lineIndex, QString latexString)
