@@ -36,7 +36,7 @@ def generate_preview(input_expr):
 def export(worksheet):
     output_string = ""
     for index, value in worksheet.items():
-        output_string = output_string + "$$" + value["latex"] + "$$"
+        output_string = output_string + "$$" + value["latex"] + "$$\\\\"
 
     with open("modules/latex/preamble.tex", "r") as f:
         output_string = f.read().replace("%content", output_string)

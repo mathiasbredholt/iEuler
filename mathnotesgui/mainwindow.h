@@ -49,6 +49,7 @@ private:
 
     void openFile();
     void saveFile();
+    void exportFile();
 
     QWidget *getTabContents();
 
@@ -78,6 +79,7 @@ private slots:
     void on_actionClose_triggered();
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
+    void on_actionExport_triggered();
 };
 
 #endif // MAINWINDOW_H

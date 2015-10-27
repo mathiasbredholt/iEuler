@@ -23,23 +23,27 @@
 var hub_queue = MathJax.Hub.queue;
 var math = null;
 var last_input = "";
-var ready = false;
+var timeout;
 
 hub_queue.Push(function () {
     math = MathJax.Hub.getAllJax("eq")[0];
     Renderer.hasLoaded();
 });
 
-window.UpdateMath = function () {
+function render() {
     var tex = document.getElementById("input").innerHTML;
+
     if (last_input != tex) hub_queue.queue = [];
     last_input = tex;
+
     hub_queue.Push(["Text", math, tex, function () {
         document.getElementById("eq").style.visibility = "visible";
+        setTimeout(function() { ready = true; }, 250);
     }]);
 }
 
-window.isReady = function() {
-    return ready;
+window.UpdateMath = function () {
+    clearTimeout(timeout);
+    timeout = setTimeout(function() { render() }, 200);
 }
 </script>

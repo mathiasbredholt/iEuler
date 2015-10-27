@@ -184,6 +184,11 @@ void MainWindow::saveFile()
     proc->write(path.toLocal8Bit()+"\n");
 }
 
+void MainWindow::exportFile()
+{
+    proc->write("export\n");
+}
+
 void MainWindow::on_actionShow_command_panel_triggered()
 {
     if (cmdpanel->isVisible()) {
@@ -250,4 +255,9 @@ void MainWindow::on_actionOpen_triggered()
 void MainWindow::on_actionSave_triggered()
 {
     saveFile();
+}
+
+void MainWindow::on_actionExport_triggered()
+{
+    exportFile();
 }
