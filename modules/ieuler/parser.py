@@ -249,7 +249,6 @@ def evaluate_expression(expr, convert=True):
 
 def get_variable_value(toks):
     var, op = parsing.parse_unary_operator(toks)
-    print(var)
     if type(var) is ml.Variable:
         if var.value in user_variables:
             return user_variables[var.value]
