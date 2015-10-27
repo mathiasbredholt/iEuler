@@ -149,11 +149,11 @@ void MainWindow::openFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getOpenFileName(this,
-        tr("Open iEuler file"), dir, tr("Text Files (*.txt)"));
+        tr("Open iEuler file"), dir, tr("Text Files (*.euler)"));
     if (path != "") {
         qDebug() << path;
-    //    proc->write("open\n");
-    //    proc->write(path+"\n");
+//        proc->write("open\n");
+        proc->write(path.toLocal8Bit()+"\n");
     }
 }
 
@@ -161,10 +161,10 @@ void MainWindow::saveFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getSaveFileName(this,
-        tr("Save iEuler file"), dir, tr("Text Files (*.txt)"));
+        tr("Save iEuler file"), dir, tr("Text Files (*.euler)"));
     qDebug() << path;
 //    proc->write("save\n");
-//    proc->write(path+"\n");
+//    proc->write(path.toLocal8Bit()+"\n");
 }
 
 void MainWindow::on_actionShow_command_panel_triggered()
@@ -215,7 +215,7 @@ void MainWindow::on_actionNew_triggered()
 
 void MainWindow::on_actionClose_triggered()
 {
-    if (tabs->count() > 1) {
+    if (tabs->currentIndex() > 0) {
         tabs->setCurrentIndex(tabs->currentIndex() - 1);
         tabs->removeTab(tabs->currentIndex() + 1);
     }
