@@ -152,8 +152,8 @@ void MainWindow::openFile()
         tr("Open iEuler file"), dir, tr("Text Files (*.txt)"));
     if (path != "") {
         qDebug() << path;
-    //    proc->write("open\n");
-    //    proc->write(path+"\n");
+        proc->write("load\n");
+        proc->write(path.toLocal8Bit()+"\n");
     }
 }
 
@@ -163,8 +163,8 @@ void MainWindow::saveFile()
     QString path = QFileDialog::getSaveFileName(this,
         tr("Save iEuler file"), dir, tr("Text Files (*.txt)"));
     qDebug() << path;
-//    proc->write("save\n");
-//    proc->write(path+"\n");
+    proc->write("save\n");
+    proc->write(path.toLocal8Bit()+"\n");
 }
 
 void MainWindow::on_actionShow_command_panel_triggered()
