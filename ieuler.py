@@ -29,6 +29,8 @@ def run(argv=None):
         gui_mode = True
         worksheet = {}
 
+    user_variables = {}
+
     parser.init()
     modules.latex.parser.init()
 
@@ -55,20 +57,21 @@ def run(argv=None):
                 evaluate = "evaluate" in input("")
                 command = input("")
                 if command:
-                    gui_send_result(index, command, evaluate, worksheet)
+                    gui_send_result(
+                        index, command, user_variables, evaluate, worksheet)
 
         else:
             command = input("iEuler> ")
-            console_send_result(command)
+            console_send_result(command, user_variables)
 
 
-def console_send_result(command):
-    result = parser.parse(command, True, False)
+def console_send_result(command, user_variables):
+    result = parser.parse(command, user_variables, True, False)
     print(parser.generate(result))
 
 
-def gui_send_result(index, command, evaluate, worksheet):
-    result = parser.parse(command, evaluate, True)
+def gui_send_result(index, command, user_variables, evaluate, worksheet):
+    result = parser.parse(command, user_variables, evaluate, True)
 
     if type(result) is ml.Plot:
         plot2d.plot(result)

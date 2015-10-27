@@ -27,11 +27,14 @@ def get_function(toks, functions):
         return functions["__default__"]["object"](name, *args)
 
 
-def get_variable(toks, variables, symbols={"__standard__": []}):
+def get_variable(toks, variables, symbols={"__standard__": []}, user_variables={}):
     # print("get_variable toks: {}".format(toks))
     name = toks[0]
     # print("Variable: {}".format(name))
-    if name in variables:
+    if name in user_variables:
+        return user_variables[name]
+    elif name in variables:
+        print(variables)
         return variables[name]["object"]()
     elif name in symbols["__standard__"]:
         return ml.Variable(name, True)
@@ -43,10 +46,12 @@ def get_variable(toks, variables, symbols={"__standard__": []}):
 
 def get_unit(toks, variables):
     # print("get_unit toks: {}".format(toks))
+    if toks[0] in variables:
+        return ml.Variable(toks[0])
     if len(toks) > 1:
         name = toks[0] + toks[1]
         if name in variables:
-            return variables[name]["object"]()
+            return ml.Variable(name)
         return ml.Unit(toks[1], toks[0])
     return ml.Unit(toks[0])
 
