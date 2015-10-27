@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
 {    
     ui->setupUi(this);
     initSubprocess();
+    MathRenderer::initRenderer();
 
 
     loadingMode = false;
@@ -46,7 +47,7 @@ void MainWindow::closeEvent(QCloseEvent *e) {
 
 // Tabs
 
-void MainWindow::createNewTab(bool empty)
+void MainWindow::createNewTab(bool empty, QString fileName)
 {
     QFrame *contents = new QFrame();
     contents->setLayout(new QVBoxLayout());
@@ -59,8 +60,10 @@ void MainWindow::createNewTab(bool empty)
     scrollArea->setWidgetResizable(true);
     scrollArea->setFocusPolicy(Qt::NoFocus);
 
-    tabs->addTab(scrollArea, "Untitled");
+    tabs->addTab(scrollArea, fileName);
     tabs->setCurrentWidget(scrollArea);
+    connect(tabs, SIGNAL(tabBarClicked(int)), this, SLOT(onTabChange(int)));
+    setWindowTitle("iEuler - "+fileName);
 
     numberOfLines = 0;
     if (!empty) createGroup();
@@ -168,7 +171,8 @@ void MainWindow::openFile()
     QString path = QFileDialog::getOpenFileName(this,
         tr("Open iEuler file"), dir, tr("Text Files (*.euler)"));
     if (path != "") {
-        createNewTab(true);
+        QFileInfo fi(path);
+        createNewTab(true, fi.fileName());
         loadingMode = true;
         proc->write("load\n");
         proc->write(path.toLocal8Bit()+"\n");
@@ -260,4 +264,9 @@ void MainWindow::on_actionSave_triggered()
 void MainWindow::on_actionExport_triggered()
 {
     exportFile();
+}
+
+void MainWindow::onTabChange(int index)
+{
+    setWindowTitle("iEuler - "+tabs->tabText(index));
 }

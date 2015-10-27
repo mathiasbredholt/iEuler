@@ -32,18 +32,14 @@ hub_queue.Push(function () {
 
 function render() {
     var tex = document.getElementById("input").innerHTML;
-
-    if (last_input != tex) hub_queue.queue = [];
-    last_input = tex;
-
     hub_queue.Push(["Text", math, tex, function () {
         document.getElementById("eq").style.visibility = "visible";
-        setTimeout(function() { ready = true; }, 250);
+        Target.hasRendered();
     }]);
 }
 
 window.UpdateMath = function () {
     clearTimeout(timeout);
-    timeout = setTimeout(function() { render() }, 200);
+    timeout = setTimeout(function() { render() }, 50);
 }
 </script>

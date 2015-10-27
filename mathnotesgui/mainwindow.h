@@ -19,9 +19,11 @@
 #include <QTabWidget>
 #include <QScrollArea>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QStandardPaths>
 #include <QMessageBox>
 #include <QStringList>
+
 
 namespace Ui {
 class MainWindow;
@@ -44,8 +46,9 @@ private:
     int numberOfLines;
 
     void createGroup(QString cmd = "");
-    void createNewTab(bool empty = false);
+    void createNewTab(bool empty = false, QString fileName = "Untitled.euler");
     void initSubprocess();
+    void initRenderer();
 
     void openFile();
     void saveFile();
@@ -80,6 +83,8 @@ private slots:
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
     void on_actionExport_triggered();
+
+    void onTabChange(int index);
 };
 
 #endif // MAINWINDOW_H
