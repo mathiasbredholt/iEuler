@@ -12,7 +12,7 @@ class Group : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Group(QWidget *parent = 0, int index = 0, QString cmd = "");
+    explicit Group(QWidget *parent = 0, int index = 0);
     int index;
     CodeInput* input;
 

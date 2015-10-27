@@ -5,11 +5,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {    
     ui->setupUi(this);
+    initSubprocess();
+
 
     loadingMode = false;
-
-    numberOfLines = 0;
-
 
     // Create tabs
     tabs = new QTabWidget(this);
@@ -22,8 +21,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Create Command panel
     cmdpanel = new CmdPanel(this);
     ui->container->layout()->addWidget(cmdpanel);
-
-    initSubprocess();
 }
 
 MainWindow::~MainWindow()
@@ -64,6 +61,8 @@ void MainWindow::createNewTab(bool empty)
 
     tabs->addTab(scrollArea, "Untitled");
     tabs->setCurrentWidget(scrollArea);
+
+    numberOfLines = 0;
     if (!empty) createGroup();
 }
 
@@ -72,7 +71,7 @@ void MainWindow::createNewTab(bool empty)
 
 void MainWindow::createGroup(QString cmd)
 {
-    Group* gp = new Group(this, numberOfLines, cmd);
+    Group* gp = new Group(this, numberOfLines);
     getTabContents()->layout()->addWidget(gp);
     connect(gp->input, SIGNAL(previewCode(CodeInput*, QString)), this, SLOT(previewCode(CodeInput*, QString)));
     connect(gp->input, SIGNAL(evaluateCode(CodeInput*, QString)), this, SLOT(evaluateCode(CodeInput*, QString)));
@@ -80,6 +79,7 @@ void MainWindow::createGroup(QString cmd)
     connect(gp->input, SIGNAL(arrowsPressed(bool)), this, SLOT(arrowsPressed(bool)));
     connect(this, SIGNAL(outputReady(int, QString)), gp, SLOT(outputReady(int, QString)));
     numberOfLines++;
+    gp->input->setPlainText(cmd);
 }
 
 void MainWindow::deleteGroup(QWidget *target)
@@ -104,26 +104,29 @@ void MainWindow::initSubprocess()
 
 void MainWindow::readStandardOutput()
 {
-    QString cmdInput = proc->readAllStandardOutput();
+    while (proc->canReadLine()) {
+        QString cmdInput = QString::fromLocal8Bit(proc->readLine());
 
-    if (cmdInput == "Done\n") loadingMode = false;
-
-    if (!loadingMode) {
-        // get line index and latex string from iEuler
-        int split = cmdInput.indexOf(' ');
-        int index = cmdInput.left(split).toInt();
-        QString latexString = cmdInput.mid(split);
-        latexString = latexString.replace('\n', ' ');
-         if (index > numberOfLines - 1) {
-             createGroup();
-         }
-        // send signal to render math
-        emit outputReady(index, latexString);
-    } else {
-        int split = cmdInput.indexOf(' ');
-        int index = cmdInput.left(split).toInt();
-        QString cmdString = cmdInput.mid(split);
-        createGroup(cmdString);
+        if (!loadingMode) {
+            // get line index and latex string from iEuler
+            int split = cmdInput.indexOf(' ');
+            int index = cmdInput.left(split).toInt();
+            QString latexString = cmdInput.mid(split + 1);
+            latexString = latexString.replace("\n", "");
+             if (index > numberOfLines - 1) {
+                 createGroup();
+             }
+            // send signal to render math
+            emit outputReady(index, latexString);
+        } else if (cmdInput == "Done\n") {
+            loadingMode = false;
+        } else {
+            int split = cmdInput.indexOf(' ');
+    //        int index = cmdInput.left(split).toInt();
+            QString cmdString = cmdInput.mid(split + 1);
+            cmdString = cmdString.replace("\n", "");
+            createGroup(cmdString);
+        }
     }
 }
 
@@ -165,7 +168,7 @@ void MainWindow::openFile()
         tr("Open iEuler file"), dir, tr("Text Files (*.euler)"));
     if (path != "") {
         createNewTab(true);
-        qDebug() << path;
+        loadingMode = true;
         proc->write("load\n");
         proc->write(path.toLocal8Bit()+"\n");
     }
@@ -176,7 +179,6 @@ void MainWindow::saveFile()
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getSaveFileName(this,
         tr("Save iEuler file"), dir, tr("Text Files (*.euler)"));
-    qDebug() << path;
     proc->write("save\n");
     proc->write(path.toLocal8Bit()+"\n");
 }

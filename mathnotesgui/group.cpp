@@ -1,6 +1,6 @@
 #include "group.h"
 
-Group::Group(QWidget *parent, int index, QString cmd) : QWidget(parent)
+Group::Group(QWidget *parent, int index) : QWidget(parent)
 {
     this->index = index;
     setFocusPolicy(Qt::NoFocus);
@@ -9,7 +9,6 @@ Group::Group(QWidget *parent, int index, QString cmd) : QWidget(parent)
     setLayout(new QVBoxLayout());
 
     input = new CodeInput(this);
-    input->setPlainText(cmd);
     layout()->addWidget(input);
 
     output = new MathRenderer();

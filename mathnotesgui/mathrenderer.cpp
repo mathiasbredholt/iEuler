@@ -21,6 +21,8 @@ QString readFile (const QString& filename)
 
 MathRenderer::MathRenderer(QObject *parent) : QObject(parent)
 {
+    isReady = false;
+
     view = new QWebView();
     view->setMaximumHeight(80);
     view->installEventFilter(this);
@@ -37,12 +39,14 @@ MathRenderer::MathRenderer(QObject *parent) : QObject(parent)
     QString html = readFile(":/webkit/test");
     QUrl baseUrl = QUrl::fromLocalFile(QDir::currentPath() + "/mathnotesgui/webkit/");
     view->setHtml(html, baseUrl);
+    view->page()->mainFrame()->addToJavaScriptWindowObject("Renderer", this);
 }
 
 void MathRenderer::render(QString latexString) {
+    QWebFrame *frame = view->page()->mainFrame();
     view->setZoomFactor(MathRenderer::ZOOM_FACTOR);
-    view->page()->mainFrame()->findFirstElement("#input").setInnerXml(latexString);
-    view->page()->mainFrame()->evaluateJavaScript("UpdateMath()");
+    frame->findFirstElement("#input").setInnerXml(latexString);
+    if (isReady) frame->evaluateJavaScript("UpdateMath()");
 }
 
 bool MathRenderer::eventFilter(QObject *object, QEvent *e)
@@ -58,4 +62,11 @@ bool MathRenderer::eventFilter(QObject *object, QEvent *e)
         return true;
     }
     return false;
+}
+
+void MathRenderer::hasLoaded()
+{
+    isReady = true;
+    QWebFrame *frame = view->page()->mainFrame();
+    frame->evaluateJavaScript("UpdateMath()");
 }

@@ -21,6 +21,7 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QMessageBox>
+#include <QStringList>
 
 namespace Ui {
 class MainWindow;

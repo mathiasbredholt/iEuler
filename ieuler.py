@@ -94,8 +94,6 @@ def load_worksheet(path, gui_mode=True):
         print("{} {}".format(i, line.strip()))
     f.close()
     print("Done")
-    for key in worksheet:
-        send_result(key, worksheet[key]["command"], False, gui_mode)
     return worksheet
 
 
