@@ -224,6 +224,8 @@ void MainWindow::on_action100_triggered()
     MathRenderer::ZOOM_FACTOR = 1;
 }
 
+
+
 void MainWindow::on_action150_triggered()
 {
     MathRenderer::ZOOM_FACTOR = 1.5;
@@ -269,4 +271,9 @@ void MainWindow::on_actionExport_triggered()
 void MainWindow::onTabChange(int index)
 {
     setWindowTitle("iEuler - "+tabs->tabText(index));
+}
+
+void MainWindow::on_action130_triggered()
+{
+    MathRenderer::ZOOM_FACTOR = 1.3;
 }

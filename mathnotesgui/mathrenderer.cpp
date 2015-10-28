@@ -65,14 +65,23 @@ void MathRenderer::hasLoaded()
 
 void MathRenderer::hasRendered()
 {
-    QPixmap pixmap(label->size());
-    renderer->render(&pixmap);
-    label->setPixmap(pixmap);
-    pixmap.save("output.png");
 
     if (!renderQueue.empty()) {
         render();
     } else {
         isRendering = false;
+
+        QPixmap pixmap(label->size());
+        renderer->render(&pixmap);
+        label->setPixmap(pixmap);
+        pixmap.save("output.png");
+    }
+}
+
+void MathRenderer::toggleRendering(bool disable)
+{
+    isReady = !disable;
+    if (!disable && !renderQueue.empty()){
+        MathRenderer::render();
     }
 }

@@ -26,7 +26,6 @@ bool CodeInput::eventFilter(QObject *object, QEvent *e)
         e->ignore();
         return true;
     }
-
     // Keyboard events
     else if (object == this && e->type() == QEvent::KeyPress) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
@@ -55,8 +54,12 @@ bool CodeInput::eventFilter(QObject *object, QEvent *e)
                 return true;
             }
         }
+        emit autoRepeating(keyEvent->isAutoRepeat());
     }
-
+    else if (object == this && e->type() == QEvent::KeyRelease) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+        emit autoRepeating(keyEvent->isAutoRepeat());
+    }
     return false;
 }
 

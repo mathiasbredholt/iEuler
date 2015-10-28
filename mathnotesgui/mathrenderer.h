@@ -27,6 +27,7 @@ signals:
 public slots:
     void hasLoaded();
     void hasRendered();
+    void toggleRendering(bool disable);
 
 private:
     static QWebView *renderer;

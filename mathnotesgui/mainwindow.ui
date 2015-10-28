@@ -41,7 +41,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>22</height>
+     <height>31</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuTools">
@@ -55,6 +55,7 @@
      <string>Zoom</string>
     </property>
     <addaction name="action100"/>
+    <addaction name="action130"/>
     <addaction name="action150"/>
     <addaction name="action200"/>
    </widget>
@@ -145,6 +146,14 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="action130">
+   <property name="text">
+    <string>130%</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+3</string>
    </property>
   </action>
  </widget>
