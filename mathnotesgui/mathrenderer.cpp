@@ -5,8 +5,11 @@
 #include <QWebElement>
 #include <QEvent>
 #include <QNativeGestureEvent>
+#include <QApplication>
+#include <QDesktopWidget>
 
-qreal MathRenderer::ZOOM_FACTOR = 1;
+qreal MathRenderer::zoomFactor = 1;
+qreal MathRenderer::baseScaling;
 QWebView *MathRenderer::renderer;
 bool MathRenderer::isReady = false;
 bool MathRenderer::isRendering = false;
@@ -34,8 +37,13 @@ MathRenderer::MathRenderer(QObject *parent) : QObject(parent)
 
 void MathRenderer::initRenderer()
 {
+    // Detect dpi
+    QWidget* window = QApplication::desktop()->screen();
+    const int horizontalDpi = window->logicalDpiX();
+    baseScaling = horizontalDpi / 96.0;
+
     renderer = new QWebView();
-    renderer->setZoomFactor(MathRenderer::ZOOM_FACTOR);
+    renderer->setZoomFactor(zoomFactor*baseScaling);
 
     QString html = readFile(":/webkit/test");
     QUrl baseUrl = QUrl::fromLocalFile(QDir::currentPath() + "/mathnotesgui/webkit/");
@@ -48,7 +56,7 @@ void MathRenderer::render()
     QWebFrame *frame = renderer->page()->mainFrame();
     MathRenderer *target = renderQueue.dequeue();
     renderer->page()->mainFrame()->addToJavaScriptWindowObject("Target", target);
-    renderer->setZoomFactor(MathRenderer::ZOOM_FACTOR);
+    renderer->setZoomFactor(zoomFactor*baseScaling);
     frame->findFirstElement("#input").setInnerXml(target->latexString);
     frame->evaluateJavaScript("UpdateMath()");
 }

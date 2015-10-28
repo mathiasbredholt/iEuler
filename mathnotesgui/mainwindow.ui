@@ -55,7 +55,6 @@
      <string>Zoom</string>
     </property>
     <addaction name="action100"/>
-    <addaction name="action130"/>
     <addaction name="action150"/>
     <addaction name="action200"/>
    </widget>
@@ -146,14 +145,6 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+E</string>
-   </property>
-  </action>
-  <action name="action130">
-   <property name="text">
-    <string>130%</string>
-   </property>
-   <property name="shortcut">
-    <string>Ctrl+3</string>
    </property>
   </action>
  </widget>

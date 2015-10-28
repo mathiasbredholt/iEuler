@@ -10,7 +10,8 @@ class MathRenderer : public QObject
 {
     Q_OBJECT
 public:
-    static qreal ZOOM_FACTOR;
+    static qreal zoomFactor;
+    static qreal baseScaling;
     static void initRenderer();
     static QQueue<MathRenderer*> renderQueue;
     static void render();
