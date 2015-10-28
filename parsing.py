@@ -28,19 +28,30 @@ def get_function(toks, functions):
 
 
 def get_variable(toks, variables, symbols={"__standard__": []}, user_variables={}):
-    # print("get_variable toks: {}".format(toks))
-    name = toks[0]
+    value = toks[0]
+    if len(toks) > 2 and toks[1] == "_":
+        if type(toks[2]) is str:
+            subscript = ml.Variable(str)
+        elif type(toks[2]) is ml.Unit:
+            subscript = toks[2].convert_to_variable()
+        else:
+            subscript = toks[2]
+        name = value + "_" + toks[2].name()
+    else:
+        subscript = None
+        name = value
+
     # print("Variable: {}".format(name))
     if name in user_variables:
         return user_variables[name]
     elif name in variables:
         return variables[name]["object"]()
-    elif name in symbols["__standard__"]:
-        return ml.Variable(name, True)
-    elif name in symbols:
-        return ml.Variable(symbols[name], True)
+    elif value in symbols["__standard__"]:
+        return ml.Variable(value, symbol=True, subscript=subscript)
+    elif value in symbols:
+        return ml.Variable(symbols[value], symbol=True, subscript=subscript)
     else:
-        return variables["__default__"]["object"](name)
+        return variables["__default__"]["object"](value, subscript=subscript)
 
 
 def get_unit(toks, variables):

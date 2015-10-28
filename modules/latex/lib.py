@@ -17,3 +17,9 @@ special_symbols = {
     "naturals": "\\mathbb{N}",
     "infinity": "\\infty",
 }
+
+equalities = {
+    'in': "\\in",
+    '>=': "\\geq",
+    '<=': "\\leq"
+}

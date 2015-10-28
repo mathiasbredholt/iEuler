@@ -33,8 +33,16 @@ class MathValue:
     def get_decorators(self):
         return self.decorators
 
+    def is_vector(self):
+        return type(self) is Matrix or 'vec' in self.decorators
+
     def add_decorator(self, dec):
-        self.decorators.append(dec)
+        decos = list(self.decorators)  # copy
+        decos.append(dec)
+        self.decorators = decos
+
+    def name(self):
+        return self.value
 
     def __str__(self):
         return "MathValue({})".format(self.value)
@@ -84,14 +92,19 @@ class Complex(MathValue):
 
 class Variable(MathValue):
 
-    def __init__(self, value, is_symbol=False, decs=[]):
+    def __init__(self, value, is_symbol=False, decs=[], subscript=None):
         self.value = value
         self.decorators = decs
         self.is_symbol = is_symbol
+        self.subscript = subscript
+
+    def name(self):
+        if self.subscript:
+            return self.value + "_" + self.subscript.name()
+        return self.value
 
     def __str__(self):
-        return "Variable({} {} {}symbol)".format(
-            self.value, self.decorators, "" if self.is_symbol else "not ")
+        return "Variable(name: {}, value: {} subscript: {} deco:{} symbol: {})".format(self.name(), self.value, self.subscript, self.decorators, "yes" if self.is_symbol else "no")
 
     __repr__ = __str__
 
@@ -156,6 +169,9 @@ class MathUnaryOperator:
     def get_last(self):
         return get_first(self)
 
+    def is_vector(self):
+        return self.value.is_vector()
+
     def __str__(self):
         return "MathUnaryOperator({},{})".format(self.value1, self.value2)
 
@@ -211,6 +227,9 @@ class MathOperator:
 
 class AddOp(MathOperator):
 
+    def is_vector(self):
+        return self.value1.is_vector() or self.value2.is_vector()
+
     def __str__(self):
         return "AddOp({},{})".format(self.value1, self.value2)
 
@@ -218,6 +237,9 @@ class AddOp(MathOperator):
 
 
 class SubOp(MathOperator):
+
+    def is_vector(self):
+        return self.value1.is_vector() or self.value2.is_vector()
 
     def __str__(self):
         return "SubOp({},{})".format(self.value1, self.value2)
@@ -227,6 +249,12 @@ class SubOp(MathOperator):
 
 class MulOp(MathOperator):
 
+    def is_vector(self):
+        return self.value1.is_vector() != self.value2.is_vector()
+
+    def is_dot(self):
+        return self.value1.is_vector() and self.value2.is_vector()
+
     def __str__(self):
         return "MulOp({},{})".format(self.value1, self.value2)
 
@@ -234,6 +262,9 @@ class MulOp(MathOperator):
 
 
 class CrossOp(MathOperator):
+
+    def is_vector(self):
+        return True
 
     def __str__(self):
         return "CrossOp({},{})".format(self.value1, self.value2)
@@ -243,6 +274,9 @@ class CrossOp(MathOperator):
 
 class Fraction(MathOperator):
 
+    def is_vector(self):
+        return self.value1.is_vector()
+
     def __str__(self):
         return "Fraction({},{})".format(self.value1, self.value2)
 
@@ -250,6 +284,9 @@ class Fraction(MathOperator):
 
 
 class Root(MathOperator):
+
+    def is_vector(self):
+        return False
 
     def __str__(self):
         return "Root({},{})".format(self.value1, self.value2)
@@ -259,6 +296,9 @@ class Root(MathOperator):
 
 class Power(MathOperator):
 
+    def is_vector(self):
+        return False
+
     def __str__(self):
         return "Power({},{})".format(self.value1, self.value2)
 
@@ -266,6 +306,9 @@ class Power(MathOperator):
 
 
 class Range(MathOperator):
+
+    def is_vector(self):
+        return False
 
     def __str__(self):
         return "Range({},{})".format(self.value1, self.value2)
@@ -276,6 +319,9 @@ class Range(MathOperator):
 
 
 class Integral:
+
+    def is_vector(self):
+        return self.value.is_vector()
 
     def __init__(self, value, variable, range_from=None, range_to=None):
         self.value = value
@@ -293,6 +339,9 @@ class Integral:
 
 
 class Derivative:
+
+    def is_vector(self):
+        return self.value.is_vector()
 
     def __init__(self, value, variable, nth=Number("1")):
         self.value = value

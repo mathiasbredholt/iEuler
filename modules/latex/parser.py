@@ -65,9 +65,9 @@ def parentheses(input_expr, do=True):
 
 
 def convert_equality(self):
-    if self.type == "in":
-        return "{} \\in {}".format(convert_expr(self.value1),
-                                   convert_expr(self.value2))
+    if self.type in equalities:
+        return "{} {} {}".format(convert_expr(self.value1), equalities[self.type],
+                                 convert_expr(self.value2))
     else:
         return "{} {} {}".format(convert_expr(self.value1), self.type,
                                  convert_expr(self.value2))
@@ -76,11 +76,21 @@ def convert_equality(self):
 def convert_value(self):
     if type(self) is ml.Unit:
         result = "\\mathrm{{{}}}".format(self.prefix + self.value)
-    elif type(self) is ml.Variable and self.is_symbol:
-        if self.value in special_symbols:
-            result = special_symbols[self.value]
+    elif type(self) is ml.Variable:
+        if self.is_symbol:
+            if self.value in special_symbols:
+                result = special_symbols[self.value]
+            else:
+                result = "\\{}".format(self.value)
         else:
-            result = "\\{}".format(self.value)
+            result = self.value
+        result = convert_decorators(self, result)
+        if self.subscript:
+            if len(self.subscript.name()) == 1:
+                result += "_{}".format(convert_expr(self.subscript))
+            else:
+                result += "_{{{}}}".format(convert_expr(self.subscript))
+        return result
     elif self.value[-1] == ".":
         result = self.value.strip(".")
     else:
@@ -141,7 +151,10 @@ def convert_subop(self):
 
 
 def convert_mulop(self):
-    output = "{} {}"
+    if self.is_dot():
+        output = "{} \\cdot {}"
+    else:
+        output = "{} {}"
     num_after = type(self.value2) is ml.Number or type(self.value2) in [
         ml.MulOp, ml.Power
     ] and type(self.value2.get_first()) is ml.Number

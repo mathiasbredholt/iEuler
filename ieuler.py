@@ -67,6 +67,8 @@ def run(argv=None):
 
 def console_send_result(command, user_variables):
     result = parser.parse(command, user_variables, True, False)
+    print(result)
+    print("latex: {}".format(modules.latex.parser.convert_expr(result)))
     print(parser.generate(result))
 
 

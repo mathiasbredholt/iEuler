@@ -44,6 +44,8 @@ def convert_equality(self):
 def convert_value(self):
     if type(self) is ml.Unit:
         return self.prefix + self.value
+    elif type(self) is ml.Variable:
+        return self.name()
     return self.value
 
 
@@ -197,8 +199,18 @@ def make_literal_list(list):
     return reduce(lambda x, y: x | y, map(Literal, list))
 
 
+def get_variable_value(toks):
+    var, op = parsing.parse_unary_operator(toks)
+    if type(var) is ml.Variable:
+        if var.value in user_variables:
+            return user_variables[var.value]
+    return var
+
+
 def get_decorator(toks):
     value, op = parsing.parse_unary_operator(toks)
+    if type(value) is ml.Unit:
+        value = value.convert_to_variable()
     value.add_decorator(op)
     return value
 
@@ -245,14 +257,6 @@ def evaluate_expression(expr, convert=True):
     return expr
 
 
-def get_variable_value(toks):
-    var, op = parsing.parse_unary_operator(toks)
-    if type(var) is ml.Variable:
-        if var.value in user_variables:
-            return user_variables[var.value]
-    return var
-
-
 def make_expression():
 
     ParserElement.setDefaultWhitespaceChars(' \t')
@@ -270,20 +274,23 @@ def make_expression():
 
     expr = Forward()
 
-    unit = units_list + NotAny(no_white + Word(chars)) | (
+    unit = (units_list + NotAny(no_white + Word(chars)) | (
         Optional(unit_prefixes_list + no_white) + units_list +
-        NotAny(no_white + Word(chars)))
+        NotAny(no_white + Word(chars)))) + NotAny(no_white + Literal('_'))
 
     name = NotAny(deco_kw_list | equality_kw_list | Keyword('cross')) + Word(
         letters, chars)
 
-    variable = name.copy()
+    variable = Forward()
+    number = Forward()
+    variable << Suppress(Optional(Literal('_') + no_white)) + name + \
+        Optional(no_white + Literal('_') + no_white + (variable | number))
 
     function = Combine(name + Suppress("(")) + \
         delimitedList(expr, delim=',') + Suppress(")")
 
-    number = (Combine(Word(nums) + Optional("." + Optional(Word(nums)))) +
-              Optional(NotAny(White()) + (function | unit | variable)))
+    number << (Combine(Word(nums) + Optional("." + Optional(Word(nums)))) +
+               Optional(NotAny(White()) + (function | unit | variable)))
 
     eval_field = Suppress('#') + expr + Suppress('#')
 
@@ -298,9 +305,9 @@ def make_expression():
             lambda x: parsing.get_variable(x, variables, symbols))
         | number.setParseAction(parsing.get_value))
 
+    insert_value = word_start + Literal('@') + no_white
     factop = no_white + Literal('!') + word_end
     signop = word_start + Literal('-') + no_white
-    insert_value = word_start + Literal('@') + no_white
     expop = Literal('^')
     fracop = Literal('/')
     multop1 = space.copy()
