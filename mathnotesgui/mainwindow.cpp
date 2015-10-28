@@ -101,7 +101,7 @@ void MainWindow::deleteGroup(QWidget *target)
 void MainWindow::initSubprocess()
 {
     proc = new QProcess(this);
-    proc->start("./python3 start.py -gui");
+    proc->start("python3 start.py -gui");
     connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
     connect(proc, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
 }

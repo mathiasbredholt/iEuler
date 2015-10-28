@@ -39,8 +39,8 @@ void MathRenderer::initRenderer()
 {
     // Detect dpi
     QWidget* window = QApplication::desktop()->screen();
-    const int horizontalDpi = window->logicalDpiX();
-    baseScaling = horizontalDpi / 96.0;
+    const int horizontalDpi = window->physicalDpiX();
+    baseScaling = horizontalDpi / 114.0;
 
     renderer = new QWebView();
     renderer->setZoomFactor(zoomFactor*baseScaling);
