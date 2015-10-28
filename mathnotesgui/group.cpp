@@ -15,14 +15,19 @@ Group::Group(QWidget *parent, int index) : QWidget(parent)
     layout()->addWidget(output->label);
 //    output = new QLabel(this);
 //    output->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    connect(input, SIGNAL(autoRepeating(bool)), output, SLOT(toggleRendering(bool)));
 }
 
 void Group::outputReady(int lineIndex, QString latexString)
 {
-    if (lineIndex == index)
+    if (lineIndex == index) {
         output->latexString = latexString;
-
-    MathRenderer::renderQueue.enqueue(output);
-        if (!MathRenderer::isRendering && MathRenderer::isReady) MathRenderer::render();
+        if (MathRenderer::renderQueue.isEmpty() || MathRenderer::renderQueue.head() != output){
+            MathRenderer::renderQueue.enqueue(output);
+        }
+    }
+    if (!MathRenderer::isRendering && MathRenderer::isReady){
+        MathRenderer::render();
+    }
 //    output->setPixmap(QPixmap("mathnotes.png"));
 }

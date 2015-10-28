@@ -30,7 +30,7 @@ hub_queue.Push(function () {
     Renderer.hasLoaded();
 });
 
-function render() {
+window.UpdateMath = function () {
     var tex = document.getElementById("input").innerHTML;
     hub_queue.Push(["Text", math, tex, function () {
         document.getElementById("eq").style.visibility = "visible";
@@ -38,8 +38,8 @@ function render() {
     }]);
 }
 
-window.UpdateMath = function () {
-    clearTimeout(timeout);
-    timeout = setTimeout(function() { render() }, 50);
-}
+//window.UpdateMath = function () {
+//    clearTimeout(timeout);
+//    timeout = setTimeout(function() { render() }, 50);
+//}
 </script>

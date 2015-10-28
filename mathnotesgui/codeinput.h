@@ -17,6 +17,7 @@ signals:
     void evaluateCode(CodeInput* target,QString inputString);
     void deleteGroup(QWidget *target);
     void arrowsPressed(bool upArrowPressed);
+    void autoRepeating(bool isAutoRepeating);
 
 private:
      bool eventFilter(QObject *object, QEvent *event);

@@ -221,17 +221,19 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
 
 void MainWindow::on_action100_triggered()
 {
-    MathRenderer::ZOOM_FACTOR = 1;
+    MathRenderer::zoomFactor = 1;
 }
+
+
 
 void MainWindow::on_action150_triggered()
 {
-    MathRenderer::ZOOM_FACTOR = 1.5;
+    MathRenderer::zoomFactor = 1.5;
 }
 
 void MainWindow::on_action200_triggered()
 {
-    MathRenderer::ZOOM_FACTOR = 2;
+    MathRenderer::zoomFactor = 2;
 }
 
 void MainWindow::on_actionNew_triggered()
