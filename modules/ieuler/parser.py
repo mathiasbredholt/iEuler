@@ -318,7 +318,7 @@ def make_expression():
     equals = Group(Regex(
         r'((?P<modifier>[:#])+(?P<option>[a-zA-Z]*))?=')).setResultsName(
             "equals")
-    other_equals = oneOf('== <= >= < >')
+    other_equals = oneOf('== <= >= < > ~~ ~ ~= ~== !=')
     equalop = Group(other_equals) | equals | Group(equality_kw_list)
 
     right = opAssoc.RIGHT
