@@ -11,6 +11,7 @@ class CodeInput : public QPlainTextEdit
     Q_OBJECT
 public:
     explicit CodeInput(QWidget *parent = 0);
+    void loadCommand(QString = "");
 
 signals:
     void previewCode(CodeInput* target, QString inputString);

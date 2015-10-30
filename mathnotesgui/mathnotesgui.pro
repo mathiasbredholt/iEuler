@@ -21,7 +21,12 @@ SOURCES += \
     group.cpp \
     cmdpanel.cpp \
     plotview3d.cpp \
-    mathrenderer.cpp
+    mathrenderer.cpp \
+    euler.cpp \
+    renderer.cpp \
+    mathwidget.cpp \
+    paragraph.cpp \
+    mathedit.cpp
 
 HEADERS  += \
     codeinput.h \
@@ -29,7 +34,12 @@ HEADERS  += \
     group.h \
     cmdpanel.h \
     plotview3d.h \
-    mathrenderer.h
+    mathrenderer.h \
+    euler.h \
+    renderer.h \
+    mathwidget.h \
+    paragraph.h \
+    mathedit.h
 
 FORMS    += \
     mainwindow.ui

@@ -1,6 +1,6 @@
 #include "group.h"
 
-Group::Group(QWidget *parent, int index) : QWidget(parent)
+Group::Group(QWidget *parent, int index, QString cmd) : QWidget(parent)
 {
     this->index = index;
     setFocusPolicy(Qt::NoFocus);
@@ -9,6 +9,7 @@ Group::Group(QWidget *parent, int index) : QWidget(parent)
     setLayout(new QVBoxLayout());
 
     input = new CodeInput(this);
+
     layout()->addWidget(input);
 
     output = new MathRenderer(this);
@@ -22,11 +23,11 @@ void Group::outputReady(int lineIndex, QString latexString)
 {
     if (lineIndex == index) {
         output->latexString = latexString;
-        if (MathRenderer::renderQueue.isEmpty() || MathRenderer::renderQueue.head() != output){
+        if (MathRenderer::renderQueue.empty() || MathRenderer::renderQueue.head() != output) {
             MathRenderer::renderQueue.enqueue(output);
         }
     }
-    if (!MathRenderer::isRendering && MathRenderer::isReady){
+    if (!MathRenderer::isRendering && MathRenderer::isReady && !MathRenderer::renderQueue.empty()) {
         MathRenderer::render();
     }
 //    output->setPixmap(QPixmap("mathnotes.png"));

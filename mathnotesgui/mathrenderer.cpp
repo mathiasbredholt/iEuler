@@ -15,16 +15,16 @@ bool MathRenderer::isReady = false;
 bool MathRenderer::isRendering = false;
 QQueue<MathRenderer*> MathRenderer::renderQueue;
 
-QString readFile (const QString& filename)
-{
-    QFile file(filename);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QTextStream stream(&file);
-        return stream.readAll();
-    }
-    return "";
-}
+//QString readFile (const QString& filename)
+//{
+//    QFile file(filename);
+//    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+//    {
+//        QTextStream stream(&file);
+//        return stream.readAll();
+//    }
+//    return "";
+//}
 
 MathRenderer::MathRenderer(QObject *parent) : QObject(parent)
 {
@@ -45,7 +45,8 @@ void MathRenderer::initRenderer()
     renderer = new QWebView();
     renderer->setZoomFactor(zoomFactor*baseScaling);
 
-    QString html = readFile(":/webkit/test");
+//    QString html = readFile(":/webkit/test");
+    QString html = "";
     QUrl baseUrl = QUrl::fromLocalFile(QDir::currentPath() + "/mathnotesgui/webkit/");
     renderer->setHtml(html, baseUrl);
 }
@@ -73,7 +74,6 @@ void MathRenderer::hasLoaded()
 
 void MathRenderer::hasRendered()
 {
-
     if (!renderQueue.empty()) {
         render();
     } else {
@@ -82,7 +82,6 @@ void MathRenderer::hasRendered()
         QPixmap pixmap(label->size());
         renderer->render(&pixmap);
         label->setPixmap(pixmap);
-        pixmap.save("output.png");
     }
 }
 
@@ -90,6 +89,6 @@ void MathRenderer::toggleRendering(bool disable)
 {
     isReady = !disable;
     if (!disable && !renderQueue.empty()){
-        MathRenderer::render();
+        render();
     }
 }

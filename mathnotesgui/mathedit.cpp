@@ -1,10 +1,6 @@
-#include "codeinput.h"
-#include <QDebug>
+#include "mathedit.h"
 
-#define LINE_HEIGHT 17
-#define LINE_ADD 7
-
-CodeInput::CodeInput(QWidget *parent) : QPlainTextEdit(parent)
+MathEdit::MathEdit(QWidget *parent) : QPlainTextEdit(parent)
 {
     setFocusPolicy(Qt::StrongFocus);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -13,33 +9,32 @@ CodeInput::CodeInput(QWidget *parent) : QPlainTextEdit(parent)
     installEventFilter(this);
     setTabChangesFocus(false);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-    connect(this, SIGNAL(textChanged()), this, SLOT(receivedTextInput()));
 }
 
-bool CodeInput::eventFilter(QObject *object, QEvent *e)
+
+bool MathEdit::eventFilter(QObject *object, QEvent *event)
 {
     // Fix weird disappear bug
-    if (e->type() == QEvent::Timer) return true;
+    if (event->type() == QEvent::Timer) return true;
 
     // Disable scrolling
-    else if (e->type() == QEvent::Wheel) {
-        e->ignore();
+    else if (event->type() == QEvent::Wheel) {
+        event->ignore();
         return true;
     }
     // Keyboard events
-    else if (object == this && e->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+    else if (object == this && event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
         if (keyEvent->key() == Qt::Key_Return && keyEvent->modifiers() == Qt::ShiftModifier) {
-            addNewLine();
             return true;
         }
         else if (keyEvent->key() == Qt::Key_Return) {
-            emit evaluateCode(this, toPlainText());
+            emit evaluate();
             return true;
         }
         else if (keyEvent->key() == Qt::Key_Backspace && keyEvent->modifiers() == Qt::ShiftModifier) {
-            emit deleteGroup(this->parentWidget());
+            emit deletePressed();
             return true;
         }
         else if (keyEvent->key() == Qt::Key_Up) {
@@ -56,29 +51,10 @@ bool CodeInput::eventFilter(QObject *object, QEvent *e)
         }
         emit autoRepeating(keyEvent->isAutoRepeat());
     }
-    else if (object == this && e->type() == QEvent::KeyRelease) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(e);
+
+    else if (object == this && event->type() == QEvent::KeyRelease) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
         emit autoRepeating(keyEvent->isAutoRepeat());
     }
     return false;
-}
-
-void CodeInput::addNewLine()
-{
-    textCursor().insertText("\n");
-//    setFixedHeight(LINE_ADD + blockCount() * LINE_HEIGHT);
-}
-
-void CodeInput::receivedTextInput()
-{
-    setFixedHeight(LINE_ADD + blockCount() * LINE_HEIGHT);
-    emit previewCode(this, toPlainText());
-}
-
-void CodeInput::loadCommand(QString cmd)
-{
-    if (cmd != "") {
-        setPlainText(cmd);
-        emit previewCode(this, cmd);
-    }
 }

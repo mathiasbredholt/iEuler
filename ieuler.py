@@ -3,6 +3,7 @@ import modules.ieuler.parser as parser
 import modules.latex.parser
 import mathlib as ml
 import modules.tools.plot2d as plot2d
+import modules.tools.transmit as transmit
 
 
 def conf(os):
@@ -112,8 +113,35 @@ def frink_query(query_string, proc, queue, thread):
     print(return_string)
     return return_string
 
-# def generate_latex(output_string):
-#     with open("modules/latex/preamble.tex", "r") as f:
-#         output_string = f.read().replace("%content", output_string)
-#     with open("mathnotes.tex", "w") as f:
-#         f.write(output_string)
+
+def parse_math(math_string, user_variables, evaluate):
+    return parser.parse(math_string, user_variables, evaluate, True)
+
+
+def start():
+    # Initialize UDP socket
+    transmit.init()
+
+    user_variables = {}
+    worksheet = {}
+
+    while 1:
+        # Receive data from UDP socket
+        cmd, data = transmit.receive()
+
+        if cmd == 0 or cmd == 1:  # Preview or eval
+            index = data["index"]
+            math_string = data["math_string"]
+            evaluate = cmd == 1
+
+            # Parse math string in iEuler syntax to a python representation
+            math_obj = parse_math(math_string, user_variables, evaluate)
+
+            # Convert to LaTeX
+            latex_string = modules.latex.parser.display_math(math_obj)
+
+            # Add input and output to worksheet
+            add_to_worksheet(worksheet, index, math_string, latex_string)
+
+            # Send index and latex string through UDP socket
+            transmit.send_latex(index, latex_string)

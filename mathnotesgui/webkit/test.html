@@ -1,4 +1,3 @@
-
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     extensions: ["tex2jax.js"],
@@ -16,30 +15,11 @@
 </script>
 <script type="text/javascript" src="MathJax/MathJax.js"></script>
 
-<div style="display: none" id="input"></div>
-<div style="font-size: 20px; visibility: hidden" id="eq">${}$</div>
-
+<div style="font-size: 20px;" id="input"></div>
 <script type="text/javascript">
-var hub_queue = MathJax.Hub.queue;
-var math = null;
-var last_input = "";
-var timeout;
-
-hub_queue.Push(function () {
-    math = MathJax.Hub.getAllJax("eq")[0];
-    Renderer.hasLoaded();
-});
-
 window.UpdateMath = function () {
-    var tex = document.getElementById("input").innerHTML;
-    hub_queue.Push(["Text", math, tex, function () {
-        document.getElementById("eq").style.visibility = "visible";
-        Target.hasRendered();
+    MathJax.Hub.Queue(["Typeset", MathJax.Hub, "input", function() {
+        setTimeout(function() { Renderer.onRenderComplete() }, 50);
     }]);
 }
-
-//window.UpdateMath = function () {
-//    clearTimeout(timeout);
-//    timeout = setTimeout(function() { render() }, 50);
-//}
 </script>

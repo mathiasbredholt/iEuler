@@ -6,7 +6,10 @@ MainWindow::MainWindow(QWidget *parent) :
 {    
     ui->setupUi(this);
     initSubprocess();
-    MathRenderer::initRenderer();
+//    MathRenderer::initRenderer();
+
+    euler = new Euler();
+    renderer = new Renderer();
 
 
     loadingMode = false;
@@ -42,6 +45,9 @@ void MainWindow::closeEvent(QCloseEvent *e) {
         else if (ret == QMessageBox::Discard) {
             setWindowModified(false);
         }
+    } else {
+        proc->close();
+        qDebug() << "Terminate python.";
     }
 }
 
@@ -66,7 +72,8 @@ void MainWindow::createNewTab(bool empty, QString fileName)
     setWindowTitle("iEuler - "+fileName);
 
     numberOfLines = 0;
-    if (!empty) createGroup();
+//    if (!empty) createGroup();
+    if (!empty) addNewParagraph();
 }
 
 
@@ -74,7 +81,7 @@ void MainWindow::createNewTab(bool empty, QString fileName)
 
 void MainWindow::createGroup(QString cmd)
 {
-    Group* gp = new Group(this, numberOfLines);
+    Group* gp = new Group(this, numberOfLines, cmd);
     getTabContents()->layout()->addWidget(gp);
     connect(gp->input, SIGNAL(previewCode(CodeInput*, QString)), this, SLOT(previewCode(CodeInput*, QString)));
     connect(gp->input, SIGNAL(evaluateCode(CodeInput*, QString)), this, SLOT(evaluateCode(CodeInput*, QString)));
@@ -82,8 +89,20 @@ void MainWindow::createGroup(QString cmd)
     connect(gp->input, SIGNAL(arrowsPressed(bool)), this, SLOT(arrowsPressed(bool)));
     connect(this, SIGNAL(outputReady(int, QString)), gp, SLOT(outputReady(int, QString)));
     numberOfLines++;
-    gp->input->setPlainText(cmd);
+
+    gp->input->loadCommand(cmd);
     gp->input->setFocus();
+}
+
+void MainWindow::addNewParagraph(QString mathString)
+{
+    Paragraph *paragraph = new Paragraph(this, euler, renderer, numberOfLines, mathString);
+    getTabContents()->layout()->addWidget(paragraph);
+    connect(paragraph, SIGNAL(changeFocus_triggered(bool,int)), this, SLOT(changeFocus_triggered(bool,int)));
+    connect(paragraph, SIGNAL(newLine_triggered(int)), this, SLOT(newLine_triggered(int)));
+
+    numberOfLines++;
+    paragraph->focus();
 }
 
 void MainWindow::deleteGroup(QWidget *target)
@@ -101,42 +120,52 @@ void MainWindow::deleteGroup(QWidget *target)
 void MainWindow::initSubprocess()
 {
     proc = new QProcess(this);
-    proc->start("python3 start.py -gui");
+    proc->start("python3 start.py");
     connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
     connect(proc, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
 }
 
 void MainWindow::readStandardOutput()
 {
-    while (proc->canReadLine()) {
-        QString cmdInput = QString::fromLocal8Bit(proc->readLine());
+    qDebug() << proc->readAllStandardOutput();
+//    while (proc->canReadLine()) {
+//        QString cmdInput = QString::fromLocal8Bit(proc->readLine());
+//
+////        if (!loadingMode) {
+////            // get line index and latex string from iEuler
+////            int split = cmdInput.indexOf(' ');
+////            int index = cmdInput.left(split).toInt();
+////            QString latexString = cmdInput.mid(split + 1);
+////            latexString = latexString.replace("\n", "");
 
-        if (!loadingMode) {
-            // get line index and latex string from iEuler
-            int split = cmdInput.indexOf(' ');
-            int index = cmdInput.left(split).toInt();
-            QString latexString = cmdInput.mid(split + 1);
-            latexString = latexString.replace("\n", "");
-             if (index > numberOfLines - 1) {
-                 createGroup();
-             }
-            // send signal to render math
-            emit outputReady(index, latexString);
-        } else if (cmdInput == "Done\n") {
-            loadingMode = false;
-        } else {
-            int split = cmdInput.indexOf(' ');
-    //        int index = cmdInput.left(split).toInt();
-            QString cmdString = cmdInput.mid(split + 1);
-            cmdString = cmdString.replace("\n", "");
-            createGroup(cmdString);
-        }
-    }
+////            // send signal to render math
+////            emit outputReady(index, latexString);
+
+////            if (index > numberOfLines - 1) {
+////                createGroup();
+////            }
+////        } else if (cmdInput == "Done\n") {
+////            loadingMode = false;
+////        } else {
+////            int split = cmdInput.indexOf(' ');
+//////            int index = cmdInput.left(split).toInt();
+////            QString cmdString = cmdInput.mid(split + 1);
+////            cmdString = cmdString.replace("\n", "");
+////            createGroup(cmdString);
+////        }
+//    }
 }
 
 void MainWindow::readStandardError()
 {
     qDebug() << "python error: \n" << proc->readAllStandardError();
+}
+
+void MainWindow::newLine_triggered(int index)
+{
+    if (index == numberOfLines - 1) {
+        addNewParagraph();
+    }
 }
 
 void MainWindow::previewCode(CodeInput* target, QString inputString)
@@ -202,10 +231,9 @@ void MainWindow::on_actionShow_command_panel_triggered()
     }
 }
 
-void MainWindow::arrowsPressed(bool upArrowPressed)
+void MainWindow::changeFocus_triggered(bool up, int index)
 {
-    int index = ((Group*) focusWidget()->parent())->index;
-    if (upArrowPressed) {
+    if (up) {
         if (index > 0) focusPreviousChild();
     } else {
         if (index < numberOfLines-1) focusNextChild();

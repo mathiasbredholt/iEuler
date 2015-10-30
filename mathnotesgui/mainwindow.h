@@ -23,6 +23,8 @@
 #include <QStandardPaths>
 #include <QMessageBox>
 #include <QStringList>
+#include "paragraph.h"
+#include "euler.h"
 
 
 namespace Ui {
@@ -42,10 +44,13 @@ private:
     QTabWidget *tabs;
     CmdPanel *cmdpanel;
     QProcess *proc;
+    Euler *euler;
+    Renderer *renderer;
 
     int numberOfLines;
 
     void createGroup(QString cmd = "");
+    void addNewParagraph(QString mathString = "");
     void createNewTab(bool empty = false, QString fileName = "Untitled.euler");
     void initSubprocess();
     void initRenderer();
@@ -72,9 +77,10 @@ private slots:
     void readStandardError();
     void previewCode(CodeInput *target, QString inputString);
     void evaluateCode(CodeInput *target, QString inputString);
+    void newLine_triggered(int index);
     void deleteGroup(QWidget* target);
     void on_actionShow_command_panel_triggered();
-    void arrowsPressed(bool upArrowPressed);
+    void changeFocus_triggered(bool up, int index);
     void on_action100_triggered();
     void on_action150_triggered();
     void on_action200_triggered();
@@ -83,7 +89,6 @@ private slots:
     void on_actionOpen_triggered();
     void on_actionSave_triggered();
     void on_actionExport_triggered();
-
     void onTabChange(int index);
 };
 

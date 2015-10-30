@@ -50,6 +50,10 @@ def export(worksheet):
     proc.wait()
 
 
+def display_math(input_expr):
+    return "$$ " + convert_expr(input_expr) + " $$"
+
+
 def convert_expr(input_expr, display=True):
     if type(input_expr) is ml.Fraction:
         return input_expr.to_latex(display)
@@ -66,7 +70,8 @@ def parentheses(input_expr, do=True):
 
 def convert_equality(self):
     if self.type in equalities:
-        return "{} {} {}".format(convert_expr(self.value1), equalities[self.type],
+        return "{} {} {}".format(convert_expr(self.value1),
+                                 equalities[self.type],
                                  convert_expr(self.value2))
     else:
         return "{} {} {}".format(convert_expr(self.value1), self.type,
