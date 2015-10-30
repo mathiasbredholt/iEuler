@@ -47,9 +47,9 @@ def get_variable(toks, variables, symbols={"__standard__": []}, user_variables={
     elif name in variables:
         return variables[name]["object"]()
     elif value in symbols["__standard__"]:
-        return ml.Variable(value, symbol=True, subscript=subscript)
+        return ml.Variable(value, is_symbol=True, subscript=subscript)
     elif value in symbols:
-        return ml.Variable(symbols[value], symbol=True, subscript=subscript)
+        return ml.Variable(symbols[value], is_symbol=True, subscript=subscript)
     else:
         return variables["__default__"]["object"](value, subscript=subscript)
 
