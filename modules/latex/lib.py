@@ -20,6 +20,16 @@ special_symbols = {
 
 equalities = {
     'in': "\\in",
+    '!in': "\\notin",
+    'sub': "\\subset",
+    'sube': "\\subseteq",
+    'sup': "\\supset",
+    'supe': "\\supseteq",
     '>=': "\\geq",
-    '<=': "\\leq"
+    '<=': "\\leq",
+    '==': "\\equiv",
+    '~~': "\\approx",
+    '~=': "\\simeq",
+    '~==': "\\cong",
+    '!=': "\\neq"
 }
