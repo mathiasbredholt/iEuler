@@ -29,7 +29,7 @@ void Euler::restartCore()
 
 void Euler::terminate()
 {
-    proc->terminate();
+    proc->kill();
 }
 
 void Euler::processDatagram(QByteArray datagram)
