@@ -34,46 +34,9 @@ void Euler::terminate()
 
 void Euler::processDatagram(QByteArray datagram)
 {
-    /*
-        Command reference
-        0: Preview
-            0   cmd
-            1   tab index
-            2   index MSB
-            3   index LSB
-            [4] math string
-        1: Evaluate
-            0   cmd
-            1   tab index
-            2   index MSB
-            3   index LSB
-            [4] math string
-        2: Open file
-            0   cmd
-            [1] path
-        3: Save file
-            0   cmd
-            [1] path
-        4: Render
-            0   cmd
-            1   tab index
-            2   index MSB
-            3   index LSB
-            [4] latex string
-        5: Load math string
-            0   cmd
-            1   tabIndex
-            2   index MSB
-            3   index LSB
-            [4] math string
-         6: Export pdf
-            0   cmd
-            [1] path
-    */
-
     char cmd = datagram.at(0);
 
-    if (cmd == 4) {
+    if (cmd == Euler::RENDER) {
         int tabIndex;
         int index;
         QString latexString;
@@ -86,7 +49,7 @@ void Euler::processDatagram(QByteArray datagram)
         latexString = QString::fromUtf8(datagram.remove(0, 4));
 
         emit receivedLatexString(tabIndex, index, latexString);
-    } else if (cmd == 5) {
+    } else if (cmd == Euler::MATH_STR) {
         int tabIndex;
         int index;
         QString mathString;
@@ -107,8 +70,8 @@ void Euler::sendMathString(int tabIndex, int index, QString mathString, bool eva
 {
     QByteArray datagram;
 
-    char cmd = 0;
-    if (evaluate) cmd = 1;
+    char cmd = Euler::PREVIEW;
+    if (evaluate) cmd = Euler::EVALUATE;
 
     // Control command
     datagram.append(cmd);
@@ -128,28 +91,25 @@ void Euler::sendMathString(int tabIndex, int index, QString mathString, bool eva
 void Euler::sendOpenFileRequest(QString path)
 {
     QByteArray datagram;
-    char cmd = 2;
-
-    datagram.append(cmd);
+    datagram.append(Euler::OPEN);
     datagram.append(path.toUtf8());
-
     writeDatagram(datagram);
 }
 
 void Euler::sendSaveFileRequest(QString path)
 {
     QByteArray datagram;
-    char cmd = 3;
-
-    datagram.append(cmd);
+    datagram.append(Euler::SAVE);
     datagram.append(path.toUtf8());
-
     writeDatagram(datagram);
 }
 
 void Euler::sendExportRequest(QString path)
 {
-
+    QByteArray datagram;
+    datagram.append(Euler::EXPORT);
+    datagram.append(path.toUtf8());
+    writeDatagram(datagram);
 }
 
 void Euler::readPendingDatagrams()
