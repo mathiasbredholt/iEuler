@@ -11,9 +11,12 @@ class Euler : public QObject
 public:
     explicit Euler(QObject *parent = 0);
     void sendMathString(int index, QString mathString, bool evaluate);
+    void sendOpenFileRequest(QString path);
+    void sendSaveFileRequest(QString path);
 
 signals:
     void receivedLatexString(int index, QString latexString);
+    void receivedMathString(int index, QString mathString);
 
 public slots:
 

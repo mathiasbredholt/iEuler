@@ -20,6 +20,13 @@ def send_latex(index, latex_string):
     client_socket.sendto(data, (ADDRESS, GUI_PORT))
 
 
+def send_math_string(index, math_string):
+    cmd = 5  # Load
+    data = bytes([cmd, index >> 8, index & 0xFF]) + bytes(math_string, 'utf-8')
+
+    client_socket.sendto(data, (ADDRESS, GUI_PORT))
+
+
 def receive():
     data, addr = client_socket.recvfrom(1024)
     cmd = data[0]
@@ -28,6 +35,10 @@ def receive():
         index = (data[1] << 8) + (data[2] & 0xFF)
         math_string = data[3:].decode('utf-8')
         result = {"index": index, "math_string": math_string}
+        return (cmd, result)
+    elif cmd == 2 or cmd == 3:  # Open or save
+        path = data[1:].decode('utf-8')
+        result = {"path": path}
         return (cmd, result)
     else:
         return (cmd, {})

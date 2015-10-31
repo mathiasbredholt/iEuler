@@ -41,8 +41,6 @@ void Renderer::startRendering()
         MathWidget *target = queue.dequeue();
         currentlyRendering = target;
 
-        qDebug() << target->latexString;
-
         webkit->page()->mainFrame()->findFirstElement("#input").setInnerXml(target->latexString);
         webkit->page()->mainFrame()->evaluateJavaScript("UpdateMath()");
 
@@ -66,7 +64,6 @@ void Renderer::setZoomFactor(int factor)
 void Renderer::render(MathWidget *target)
 {
     if (queue.empty() || queue.head() != target) queue.enqueue(target);
-
     if (!isRendering && canRender && !queue.empty()) startRendering();
 
 }

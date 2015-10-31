@@ -9,6 +9,9 @@ MainWindow::MainWindow(QWidget *parent) :
 //    MathRenderer::initRenderer();
 
     euler = new Euler();
+    connect(euler, SIGNAL(receivedMathString(int,QString)), this, SLOT(receivedMathString(int,QString)));
+
+
     renderer = new Renderer();
 
 
@@ -202,10 +205,14 @@ void MainWindow::openFile()
     if (path != "") {
         QFileInfo fi(path);
         createNewTab(true, fi.fileName());
-        loadingMode = true;
-        proc->write("load\n");
-        proc->write(path.toLocal8Bit()+"\n");
+
+        euler->sendOpenFileRequest(path);
+
+//        loadingMode = true;
+//        proc->write("load\n");
+//        proc->write(path.toLocal8Bit()+"\n");
     }
+
 }
 
 void MainWindow::saveFile()
@@ -213,8 +220,11 @@ void MainWindow::saveFile()
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getSaveFileName(this,
         tr("Save iEuler file"), dir, tr("Text Files (*.euler)"));
-    proc->write("save\n");
-    proc->write(path.toLocal8Bit()+"\n");
+
+    euler->sendSaveFileRequest(path);
+
+//    proc->write("save\n");
+//    proc->write(path.toLocal8Bit()+"\n");
 }
 
 void MainWindow::exportFile()
@@ -245,6 +255,11 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     if (e->key() == Qt::Key_Escape) {
         cmdpanel->hide();
     }
+}
+
+void MainWindow::receivedMathString(int index, QString mathString)
+{
+    addNewParagraph(mathString);
 }
 
 void MainWindow::on_action100_triggered()

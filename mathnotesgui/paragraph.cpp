@@ -10,18 +10,12 @@ Paragraph::Paragraph(QWidget *parent, Euler *euler, Renderer *renderer, int inde
     setFixedHeight(128);
     setLayout(new QVBoxLayout());
 
-    mathEdit = new MathEdit(this);
+    connect(euler, SIGNAL(receivedLatexString(int, QString)), this, SLOT(receivedLatexString(int, QString)));
+
+    initMathEdit();
 
     mathWidget = new MathWidget(this);
-
-    layout()->addWidget(mathEdit);
     layout()->addWidget(mathWidget);
-
-    connect(mathEdit, SIGNAL(textChanged()), this, SLOT(preview()));
-    connect(mathEdit, SIGNAL(evaluate()), this, SLOT(evaluate()));
-    connect(mathEdit, SIGNAL(arrowsPressed(bool)), this, SLOT(arrowsPressed(bool)));
-    connect(mathEdit, SIGNAL(autoRepeating(bool)), renderer, SLOT(toggleRendering(bool)));
-    connect(euler, SIGNAL(receivedLatexString(int, QString)), this, SLOT(receivedLatexString(int, QString)));
 
     mathEdit->setPlainText(mathString);
 }
@@ -31,10 +25,20 @@ void Paragraph::focus()
     mathEdit->setFocus();
 }
 
+void Paragraph::initMathEdit()
+{
+    mathEdit = new MathEdit(this);
+    connect(mathEdit, SIGNAL(textChanged()), this, SLOT(preview()));
+    connect(mathEdit, SIGNAL(evaluate()), this, SLOT(evaluate()));
+    connect(mathEdit, SIGNAL(arrowsPressed(bool)), this, SLOT(arrowsPressed(bool)));
+    connect(mathEdit, SIGNAL(autoRepeating(bool)), renderer, SLOT(toggleRendering(bool)));
+    layout()->addWidget(mathEdit);
+}
+
 void Paragraph::preview()
 {
     QString mathString = mathEdit->toPlainText();
-    euler->sendMathString(index, mathString, false);
+    if (mathString != "") euler->sendMathString(index, mathString, false);
 }
 
 void Paragraph::evaluate()
@@ -46,7 +50,10 @@ void Paragraph::evaluate()
 
 void Paragraph::receivedLatexString(int index, QString latexString)
 {
-    if (index == this->index && mathWidget->latexString != latexString) {
+    // FIX TAB PROBLEM
+    if (index == this->index) {
+        qDebug() << latexString;
+
         mathWidget->latexString = latexString;
         renderer->render(mathWidget);
     }

@@ -27,6 +27,8 @@ private:
     MathEdit *mathEdit;
     MathWidget *mathWidget;
 
+    void initMathEdit();
+
 private slots:
     void preview();
     void evaluate();

@@ -18,6 +18,16 @@ Euler::Euler(QObject *parent) : QObject(parent)
 
 void Euler::processDatagram(QByteArray datagram)
 {
+    /*
+        Command reference
+        0: Preview
+        1: Evaluate
+        2: Open file
+        3: Save file
+        4: Render
+        5: Load math string
+    */
+
     char cmd = datagram.at(0);
 
     if (cmd == 4) {
@@ -30,6 +40,16 @@ void Euler::processDatagram(QByteArray datagram)
         latexString = QString::fromUtf8(datagram.remove(0, 3));
 
         emit receivedLatexString(index, latexString);
+    } else if (cmd == 5) {
+        int index;
+        QString mathString;
+
+        index = (int) datagram.at(1) << 8;
+        index += (int) datagram.at(2) & 0xFF;
+
+        mathString = QString::fromUtf8(datagram.remove(0, 3));
+
+        emit receivedMathString(index, mathString);
     }
 
 }
@@ -37,15 +57,6 @@ void Euler::processDatagram(QByteArray datagram)
 void Euler::sendMathString(int index, QString mathString, bool evaluate)
 {
     QByteArray datagram;
-
-    /*
-        Command reference
-        0: Preview
-        1: Evaluate
-        2: Open file
-        3: Save file
-        4: Render
-    */
 
     char cmd = 0;
     if (evaluate) cmd = 1;
@@ -58,7 +69,29 @@ void Euler::sendMathString(int index, QString mathString, bool evaluate)
     datagram.append((char) index & 0xFF);
 
     // Append command
-    datagram.append(mathString);
+    datagram.append(mathString.toUtf8());
+
+    writeDatagram(datagram);
+}
+
+void Euler::sendOpenFileRequest(QString path)
+{
+    QByteArray datagram;
+    char cmd = 2;
+
+    datagram.append(cmd);
+    datagram.append(path.toUtf8());
+
+    writeDatagram(datagram);
+}
+
+void Euler::sendSaveFileRequest(QString path)
+{
+    QByteArray datagram;
+    char cmd = 3;
+
+    datagram.append(cmd);
+    datagram.append(path.toUtf8());
 
     writeDatagram(datagram);
 }

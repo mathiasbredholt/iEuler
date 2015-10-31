@@ -100,9 +100,11 @@ def load_worksheet(path, gui_mode=True):
     f = open(path, 'r')
     for i, line in enumerate(f):
         worksheet[i] = {"command": line.strip()}
-        print("{} {}".format(i, line.strip()))
+
+        transmit.send_math_string(i, line.strip())
+        # print("{} {}".format(i, line.strip()))
     f.close()
-    print("Done")
+    # print("Done")
     return worksheet
 
 
@@ -145,3 +147,7 @@ def start():
 
             # Send index and latex string through UDP socket
             transmit.send_latex(index, latex_string)
+        elif cmd == 2:  # Open worksheet
+            worksheet = load_worksheet(data["path"])
+        elif cmd == 3:  # Save worksheet
+            save_worksheet(worksheet, data["path"])
