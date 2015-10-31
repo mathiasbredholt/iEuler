@@ -95,13 +95,13 @@ def save_worksheet(worksheet, path):
     f.close()
 
 
-def load_worksheet(path, gui_mode=True):
+def load_worksheet(path, tab_index=0):
     worksheet = {}
     f = open(path, 'r')
     for i, line in enumerate(f):
         worksheet[i] = {"command": line.strip()}
 
-        transmit.send_math_string(i, line.strip())
+        transmit.send_math_string(tab_index, i, line.strip())
         # print("{} {}".format(i, line.strip()))
     f.close()
     # print("Done")
@@ -124,30 +124,34 @@ def start():
     # Initialize UDP socket
     transmit.init()
 
-    user_variables = {}
-    worksheet = {}
+    user_variables = [{}]
+    worksheet = [{}]
+    current_tab = 0
 
     while 1:
         # Receive data from UDP socket
         cmd, data = transmit.receive()
 
         if cmd == 0 or cmd == 1:  # Preview or eval
+            tab_index = data["tab_index"]
             index = data["index"]
             math_string = data["math_string"]
             evaluate = cmd == 1
 
             # Parse math string in iEuler syntax to a python representation
-            math_obj = parse_math(math_string, user_variables, evaluate)
+            math_obj = parse_math(math_string, user_variables[current_tab],
+                                  evaluate)
 
             # Convert to LaTeX
             latex_string = modules.latex.parser.display_math(math_obj)
 
             # Add input and output to worksheet
-            add_to_worksheet(worksheet, index, math_string, latex_string)
+            add_to_worksheet(worksheet[current_tab], index, math_string,
+                             latex_string)
 
             # Send index and latex string through UDP socket
-            transmit.send_latex(index, latex_string)
+            transmit.send_latex(tab_index, index, latex_string)
         elif cmd == 2:  # Open worksheet
             worksheet = load_worksheet(data["path"])
         elif cmd == 3:  # Save worksheet
-            save_worksheet(worksheet, data["path"])
+            save_worksheet(worksheet[current_tab], data["path"])

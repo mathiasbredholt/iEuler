@@ -21,40 +21,70 @@ void Euler::processDatagram(QByteArray datagram)
     /*
         Command reference
         0: Preview
+            0   cmd
+            1   tab index
+            2   index MSB
+            3   index LSB
+            [4] math string
         1: Evaluate
+            0   cmd
+            1   tab index
+            2   index MSB
+            3   index LSB
+            [4] math string
         2: Open file
+            0   cmd
+            [1] path
         3: Save file
+            0   cmd
+            [1] path
         4: Render
+            0   cmd
+            1   tab index
+            2   index MSB
+            3   index LSB
+            [4] latex string
         5: Load math string
+            0   cmd
+            1   tabIndex
+            2   index MSB
+            3   index LSB
+            [4] math string
     */
 
     char cmd = datagram.at(0);
 
     if (cmd == 4) {
+        int tabIndex;
         int index;
         QString latexString;
 
-        index = (int) datagram.at(1) << 8;
-        index += (int) datagram.at(2) & 0xFF;
+        tabIndex = (int) datagram.at(1);
 
-        latexString = QString::fromUtf8(datagram.remove(0, 3));
+        index = (int) datagram.at(2) << 8;
+        index += (int) datagram.at(3) & 0xFF;
 
-        emit receivedLatexString(index, latexString);
+        latexString = QString::fromUtf8(datagram.remove(0, 4));
+
+        emit receivedLatexString(tabIndex, index, latexString);
     } else if (cmd == 5) {
+        int tabIndex;
         int index;
         QString mathString;
 
-        index = (int) datagram.at(1) << 8;
-        index += (int) datagram.at(2) & 0xFF;
+        tabIndex = (int) datagram.at(1);
 
-        mathString = QString::fromUtf8(datagram.remove(0, 3));
+        index = (int) datagram.at(2) << 8;
+        index += (int) datagram.at(3) & 0xFF;
 
-        emit receivedMathString(index, mathString);
+        mathString = QString::fromUtf8(datagram.remove(0, 4));
+
+        emit receivedMathString(tabIndex, index, mathString);
     }
 
 }
 
-void Euler::sendMathString(int index, QString mathString, bool evaluate)
+void Euler::sendMathString(int tabIndex, int index, QString mathString, bool evaluate)
 {
     QByteArray datagram;
 
@@ -63,6 +93,8 @@ void Euler::sendMathString(int index, QString mathString, bool evaluate)
 
     // Control command
     datagram.append(cmd);
+
+    datagram.append((char) tabIndex);
 
     // Encode line index to datagram
     datagram.append((char) index >> 8);

@@ -19,7 +19,7 @@
 <script type="text/javascript">
 window.UpdateMath = function () {
     MathJax.Hub.Queue(["Typeset", MathJax.Hub, "input", function() {
-        setTimeout(function() { Renderer.onRenderComplete() }, 50);
+        Renderer.onRenderComplete();
     }]);
 }
 </script>

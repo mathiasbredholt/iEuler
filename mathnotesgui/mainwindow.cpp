@@ -9,7 +9,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //    MathRenderer::initRenderer();
 
     euler = new Euler();
-    connect(euler, SIGNAL(receivedMathString(int,QString)), this, SLOT(receivedMathString(int,QString)));
+    connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
 
 
     renderer = new Renderer();
@@ -99,7 +99,13 @@ void MainWindow::createGroup(QString cmd)
 
 void MainWindow::addNewParagraph(QString mathString)
 {
-    Paragraph *paragraph = new Paragraph(this, euler, renderer, numberOfLines, mathString);
+    Paragraph *paragraph = new Paragraph(this,
+                                         euler,
+                                         renderer,
+                                         tabs->currentIndex(),
+                                         numberOfLines,
+                                         mathString);
+
     getTabContents()->layout()->addWidget(paragraph);
     connect(paragraph, SIGNAL(changeFocus_triggered(bool,int)), this, SLOT(changeFocus_triggered(bool,int)));
     connect(paragraph, SIGNAL(newLine_triggered(int)), this, SLOT(newLine_triggered(int)));
@@ -257,7 +263,7 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void MainWindow::receivedMathString(int index, QString mathString)
+void MainWindow::receivedMathString(int tabIndex, int index, QString mathString)
 {
     addNewParagraph(mathString);
 }

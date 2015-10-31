@@ -1,16 +1,22 @@
 #include "paragraph.h"
 
-Paragraph::Paragraph(QWidget *parent, Euler *euler, Renderer *renderer, int index, QString mathString) : QWidget(parent)
+Paragraph::Paragraph(QWidget *parent,
+                     Euler *euler,
+                     Renderer *renderer,
+                     int tabIndex,
+                     int index,
+                     QString mathString) :QWidget(parent)
 {
     this->euler = euler;
     this->renderer = renderer;
+    this->tabIndex = tabIndex;
     this->index = index;
 
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
     setFixedHeight(128);
     setLayout(new QVBoxLayout());
 
-    connect(euler, SIGNAL(receivedLatexString(int, QString)), this, SLOT(receivedLatexString(int, QString)));
+    connect(euler, SIGNAL(receivedLatexString(int, int, QString)), this, SLOT(receivedLatexString(int, int, QString)));
 
     initMathEdit();
 
@@ -38,22 +44,19 @@ void Paragraph::initMathEdit()
 void Paragraph::preview()
 {
     QString mathString = mathEdit->toPlainText();
-    if (mathString != "") euler->sendMathString(index, mathString, false);
+    if (mathString != "") euler->sendMathString(tabIndex, index, mathString, false);
 }
 
 void Paragraph::evaluate()
 {
     QString mathString = mathEdit->toPlainText();
-    euler->sendMathString(index, mathString, true);
+    euler->sendMathString(tabIndex, index, mathString, true);
     emit newLine_triggered(index);
 }
 
-void Paragraph::receivedLatexString(int index, QString latexString)
+void Paragraph::receivedLatexString(int tabIndex, int index, QString latexString)
 {
-    // FIX TAB PROBLEM
-    if (index == this->index) {
-        qDebug() << latexString;
-
+    if (tabIndex == this->tabIndex && index == this->index && mathWidget->latexString != latexString) {
         mathWidget->latexString = latexString;
         renderer->render(mathWidget);
     }

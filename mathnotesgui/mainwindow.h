@@ -73,7 +73,7 @@ signals:
     void outputReady(int lineIndex, QString latexString);
 
 private slots:
-    void receivedMathString(int index, QString mathString);
+    void receivedMathString(int tabIndex, int index, QString mathString);
 
     void readStandardOutput();
     void readStandardError();

@@ -89,14 +89,15 @@ void Renderer::onLoadComplete()
 
 void Renderer::onRenderComplete()
 {
-    if (queue.empty()) {
+    if (queue.empty() || queue.head() != currentlyRendering) {
 
         // Convert the rendered output to bitmap and assign it to target
         currentlyRendering->setPixmap(createPixmap(currentlyRendering->size()));
 
         isRendering = false;
+    }
 
-    } else {
+    if (!queue.empty() && canRender){
         startRendering();
     }
 

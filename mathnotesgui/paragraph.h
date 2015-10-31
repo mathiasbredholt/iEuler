@@ -13,7 +13,13 @@ class Paragraph : public QWidget
 {
     Q_OBJECT
 public:
-    explicit Paragraph(QWidget *parent = 0, Euler *euler = 0, Renderer *renderer = 0, int index = 0, QString mathString = "");
+    explicit Paragraph(QWidget *parent = 0,
+                       Euler *euler = 0,
+                       Renderer *renderer = 0,
+                       int tabIndex = 0,
+                       int index = 0,
+                       QString mathString = "");
+    int tabIndex;
     int index;
     void focus();
 
@@ -32,7 +38,7 @@ private:
 private slots:
     void preview();
     void evaluate();
-    void receivedLatexString(int index, QString latexString);
+    void receivedLatexString(int tabIndex, int index, QString latexString);
     void arrowsPressed(bool upArrowPressed);
 };
 
