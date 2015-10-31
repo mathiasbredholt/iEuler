@@ -129,16 +129,17 @@ void MainWindow::deleteGroup(QWidget *target)
 void MainWindow::initSubprocess()
 {
     proc = new QProcess(this);
-    proc->start("python3 start.py");
+    proc->start("python3 -u start.py"); // -u disables output buffering
     connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
     connect(proc, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
 }
 
 void MainWindow::readStandardOutput()
 {
-    qDebug() << proc->readAllStandardOutput();
-//    while (proc->canReadLine()) {
-//        QString cmdInput = QString::fromLocal8Bit(proc->readLine());
+    while (proc->canReadLine()) {
+        qDebug() << "python: " << QString::fromLocal8Bit(proc->readLine());
+    }
+//    qDebug() << proc->readAllStandardOutput();
 //
 ////        if (!loadingMode) {
 ////            // get line index and latex string from iEuler
@@ -167,7 +168,11 @@ void MainWindow::readStandardOutput()
 
 void MainWindow::readStandardError()
 {
-    qDebug() << "python error: \n" << proc->readAllStandardError();
+    qDebug() << "python error:";
+    QString error = proc->readAllStandardError();
+    QStringList errorList = error.split("\n");
+    for (int i = 0; i < errorList.size(); ++i)
+        qDebug() << errorList.at(i);
 }
 
 void MainWindow::newLine_triggered(int index)
