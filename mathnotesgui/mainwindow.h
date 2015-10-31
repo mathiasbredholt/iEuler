@@ -3,26 +3,15 @@
 
 #include <QMainWindow>
 #include "ui_mainwindow.h"
-#include "codeinput.h"
-#include "group.h"
-#include <QSizePolicy>
-#include <QProcess>
-#include<QtCore/QFile>
-#include<QtCore/QTextStream>
-#include <QProcess>
-#include <QThread>
-#include <QLabel>
-#include <QObject>
-#include "cmdpanel.h"
 #include <QDebug>
-#include "mathrenderer.h"
 #include <QTabWidget>
 #include <QScrollArea>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QMessageBox>
-#include <QStringList>
+
+#include "cmdpanel.h"
 #include "paragraph.h"
 #include "euler.h"
 
@@ -43,16 +32,13 @@ private:
     Ui::MainWindow *ui;
     QTabWidget *tabs;
     CmdPanel *cmdpanel;
-    QProcess *proc;
     Euler *euler;
     Renderer *renderer;
 
     int numberOfLines;
 
-    void createGroup(QString cmd = "");
     void addNewParagraph(QString mathString = "");
     void createNewTab(bool empty = false, QString fileName = "Untitled.euler");
-    void initSubprocess();
     void initRenderer();
 
     void openFile();
@@ -63,9 +49,6 @@ private:
 
     void closeEvent(QCloseEvent *event);
 
-    bool loadingMode;
-
-
 protected:
     void keyPressEvent(QKeyEvent *);
 
@@ -75,12 +58,9 @@ signals:
 private slots:
     void receivedMathString(int tabIndex, int index, QString mathString);
 
-    void readStandardOutput();
-    void readStandardError();
-    void previewCode(CodeInput *target, QString inputString);
-    void evaluateCode(CodeInput *target, QString inputString);
     void newLine_triggered(int index);
-    void deleteGroup(QWidget* target);
+    void deleteLine_triggered(Paragraph *target);
+
     void on_actionShow_command_panel_triggered();
     void changeFocus_triggered(bool up, int index);
     void on_action100_triggered();

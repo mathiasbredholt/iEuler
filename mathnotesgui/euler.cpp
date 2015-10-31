@@ -5,15 +5,31 @@
 
 Euler::Euler(QObject *parent) : QObject(parent)
 {
-    // Start iEuler
-//    proc = new QProcess(this);
-//    proc->start("python3 start.py -gui");
+//     Start iEuler
+    proc = new QProcess(this);
+    proc->start("python3 start.py");
+    connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
+    connect(proc, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
 
     // Init socket
     socket = new QUdpSocket(this);
     socket->bind(QHostAddress::LocalHost, GUI_PORT);
 
     connect(socket, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
+}
+
+void Euler::restartCore()
+{
+    terminate();
+    proc = new QProcess(this);
+    proc->start("python3 start.py");
+    connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
+    connect(proc, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
+}
+
+void Euler::terminate()
+{
+    proc->terminate();
 }
 
 void Euler::processDatagram(QByteArray datagram)
@@ -50,6 +66,9 @@ void Euler::processDatagram(QByteArray datagram)
             2   index MSB
             3   index LSB
             [4] math string
+         6: Export pdf
+            0   cmd
+            [1] path
     */
 
     char cmd = datagram.at(0);
@@ -128,6 +147,11 @@ void Euler::sendSaveFileRequest(QString path)
     writeDatagram(datagram);
 }
 
+void Euler::sendExportRequest(QString path)
+{
+
+}
+
 void Euler::readPendingDatagrams()
 {
     while (socket->hasPendingDatagrams()) {
@@ -146,4 +170,24 @@ void Euler::writeDatagram(QByteArray datagram)
     quint16 port = EULER_PORT;
     socket->flush();
     socket->writeDatagram(datagram, QHostAddress::LocalHost, port);
+}
+
+void Euler::readStandardOutput()
+{
+
+}
+
+void Euler::readStandardError()
+{
+    QString err = proc->readAllStandardError();
+    qDebug() << "python error: \n" << err;
+    QMessageBox msgBox;
+    msgBox.setText("The iEuler core has crashed.");
+    msgBox.setInformativeText("Restart?");
+    msgBox.setStandardButtons(QMessageBox::Ignore | QMessageBox::Reset);
+    msgBox.setDefaultButton(QMessageBox::Reset);
+    if (err.contains("TypeError")) {
+        int ret = msgBox.exec();
+        if (ret == QMessageBox::Reset) restartCore();
+    }
 }

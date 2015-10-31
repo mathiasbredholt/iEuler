@@ -25,6 +25,7 @@ public:
 
 signals:
     void newLine_triggered(int index);
+    void deleteLine_triggered(Paragraph *target);
     void changeFocus_triggered(bool up, int index);
 
 private:
@@ -40,6 +41,7 @@ private slots:
     void evaluate();
     void receivedLatexString(int tabIndex, int index, QString latexString);
     void arrowsPressed(bool upArrowPressed);
+    void deletePressed();
 };
 
 #endif // PARAGRAPH_H

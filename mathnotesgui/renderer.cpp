@@ -56,7 +56,7 @@ QPixmap Renderer::createPixmap(QSize size)
     return pixmap;
 }
 
-void Renderer::setZoomFactor(int factor)
+void Renderer::setZoomFactor(double factor)
 {
     webkit->setZoomFactor(factor*baseScaling);
 }
