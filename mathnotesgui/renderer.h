@@ -22,7 +22,7 @@ public:
 
     qreal zoomFactor;
 
-    void setZoomFactor(int factor);
+    void setZoomFactor(double factor);
     void render(MathWidget *target);
 
 public slots:

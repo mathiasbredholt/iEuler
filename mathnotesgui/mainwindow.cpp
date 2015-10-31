@@ -5,17 +5,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {    
     ui->setupUi(this);
-    initSubprocess();
-//    MathRenderer::initRenderer();
 
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
 
-
     renderer = new Renderer();
-
-
-    loadingMode = false;
 
     // Create tabs
     tabs = new QTabWidget(this);
@@ -49,7 +43,7 @@ void MainWindow::closeEvent(QCloseEvent *e) {
             setWindowModified(false);
         }
     } else {
-        proc->close();
+        euler->terminate();
         qDebug() << "Terminate python.";
     }
 }
@@ -75,27 +69,9 @@ void MainWindow::createNewTab(bool empty, QString fileName)
     setWindowTitle("iEuler - "+fileName);
 
     numberOfLines = 0;
-//    if (!empty) createGroup();
     if (!empty) addNewParagraph();
 }
 
-
-// Groups
-
-void MainWindow::createGroup(QString cmd)
-{
-    Group* gp = new Group(this, numberOfLines, cmd);
-    getTabContents()->layout()->addWidget(gp);
-    connect(gp->input, SIGNAL(previewCode(CodeInput*, QString)), this, SLOT(previewCode(CodeInput*, QString)));
-    connect(gp->input, SIGNAL(evaluateCode(CodeInput*, QString)), this, SLOT(evaluateCode(CodeInput*, QString)));
-    connect(gp->input, SIGNAL(deleteGroup(QWidget*)), this, SLOT(deleteGroup(QWidget*)));
-    connect(gp->input, SIGNAL(arrowsPressed(bool)), this, SLOT(arrowsPressed(bool)));
-    connect(this, SIGNAL(outputReady(int, QString)), gp, SLOT(outputReady(int, QString)));
-    numberOfLines++;
-
-    gp->input->loadCommand(cmd);
-    gp->input->setFocus();
-}
 
 void MainWindow::addNewParagraph(QString mathString)
 {
@@ -109,70 +85,10 @@ void MainWindow::addNewParagraph(QString mathString)
     getTabContents()->layout()->addWidget(paragraph);
     connect(paragraph, SIGNAL(changeFocus_triggered(bool,int)), this, SLOT(changeFocus_triggered(bool,int)));
     connect(paragraph, SIGNAL(newLine_triggered(int)), this, SLOT(newLine_triggered(int)));
+    connect(paragraph, SIGNAL(deleteLine_triggered(Paragraph*)), this, SLOT(deleteLine_triggered(Paragraph*)));
 
     numberOfLines++;
     paragraph->focus();
-}
-
-void MainWindow::deleteGroup(QWidget *target)
-{
-    if (numberOfLines > 1) {
-        focusPreviousChild();
-         getTabContents()->layout()->removeWidget(target);
-        delete target;
-        numberOfLines--;
-    }
-}
-
-// IO
-
-void MainWindow::initSubprocess()
-{
-    proc = new QProcess(this);
-    proc->start("python3 -u start.py"); // -u disables output buffering
-    connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
-    connect(proc, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
-}
-
-void MainWindow::readStandardOutput()
-{
-    while (proc->canReadLine()) {
-        qDebug() << "python: " << QString::fromLocal8Bit(proc->readLine());
-    }
-//    qDebug() << proc->readAllStandardOutput();
-//
-////        if (!loadingMode) {
-////            // get line index and latex string from iEuler
-////            int split = cmdInput.indexOf(' ');
-////            int index = cmdInput.left(split).toInt();
-////            QString latexString = cmdInput.mid(split + 1);
-////            latexString = latexString.replace("\n", "");
-
-////            // send signal to render math
-////            emit outputReady(index, latexString);
-
-////            if (index > numberOfLines - 1) {
-////                createGroup();
-////            }
-////        } else if (cmdInput == "Done\n") {
-////            loadingMode = false;
-////        } else {
-////            int split = cmdInput.indexOf(' ');
-//////            int index = cmdInput.left(split).toInt();
-////            QString cmdString = cmdInput.mid(split + 1);
-////            cmdString = cmdString.replace("\n", "");
-////            createGroup(cmdString);
-////        }
-//    }
-}
-
-void MainWindow::readStandardError()
-{
-    qDebug() << "python error:";
-    QString error = proc->readAllStandardError();
-    QStringList errorList = error.split("\n");
-    for (int i = 0; i < errorList.size(); ++i)
-        qDebug() << errorList.at(i);
 }
 
 void MainWindow::newLine_triggered(int index)
@@ -182,29 +98,16 @@ void MainWindow::newLine_triggered(int index)
     }
 }
 
-void MainWindow::previewCode(CodeInput* target, QString inputString)
+void MainWindow::deleteLine_triggered(Paragraph *target)
 {
-    QString index = QString::number(((Group*) target->parent())->index);
-    inputString = inputString.replace('\n',' ');
-
-    proc->write(index.toLatin1()+"\n");
-    proc->write("preview\n");
-    proc->write(inputString.toLatin1()+"\n");
-//    setWindowModified(true);
-}
-
-void MainWindow::evaluateCode(CodeInput* target, QString inputString)
-{
-    QString index = QString::number(((Group*) target->parent())->index);
-    inputString = inputString.replace('\n',' ');
-
-    proc->write(index.toLocal8Bit()+"\n");
-    proc->write("evaluate\n");
-    proc->write(inputString.toLocal8Bit()+"\n");
-    if (((Group*) target->parent())->index == numberOfLines-1) {
-        createGroup();
+    if (numberOfLines > 1) {
+        focusPreviousChild();
+        getTabContents()->layout()->removeWidget(target);
+        delete target;
+        numberOfLines--;
     }
 }
+
 
 // File I/O
 
@@ -218,10 +121,6 @@ void MainWindow::openFile()
         createNewTab(true, fi.fileName());
 
         euler->sendOpenFileRequest(path);
-
-//        loadingMode = true;
-//        proc->write("load\n");
-//        proc->write(path.toLocal8Bit()+"\n");
     }
 
 }
@@ -232,15 +131,20 @@ void MainWindow::saveFile()
     QString path = QFileDialog::getSaveFileName(this,
         tr("Save iEuler file"), dir, tr("Text Files (*.euler)"));
 
-    euler->sendSaveFileRequest(path);
-
-//    proc->write("save\n");
-//    proc->write(path.toLocal8Bit()+"\n");
+    if (path != "") {
+        euler->sendSaveFileRequest(path);
+    }
 }
 
 void MainWindow::exportFile()
 {
-    proc->write("export\n");
+    QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
+    QString path = QFileDialog::getSaveFileName(this,
+        tr("Export PDF file"), dir, tr("PDF Files (*.pdf)"));
+
+    if (path != "") {
+        euler->sendExportRequest(path);
+    }
 }
 
 void MainWindow::on_actionShow_command_panel_triggered()
@@ -275,19 +179,17 @@ void MainWindow::receivedMathString(int tabIndex, int index, QString mathString)
 
 void MainWindow::on_action100_triggered()
 {
-    MathRenderer::zoomFactor = 1;
+    renderer->setZoomFactor(1);
 }
-
-
 
 void MainWindow::on_action150_triggered()
 {
-    MathRenderer::zoomFactor = 1.5;
+    renderer->setZoomFactor(1.5);
 }
 
 void MainWindow::on_action200_triggered()
 {
-    MathRenderer::zoomFactor = 2;
+    renderer->setZoomFactor(2);
 }
 
 void MainWindow::on_actionNew_triggered()
@@ -325,4 +227,9 @@ void MainWindow::on_actionExport_triggered()
 void MainWindow::onTabChange(int index)
 {
     setWindowTitle("iEuler - "+tabs->tabText(index));
+}
+
+void MainWindow::on_actionRestart_core_triggered()
+{
+    euler->restartCore();
 }

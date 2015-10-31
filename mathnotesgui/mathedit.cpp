@@ -9,6 +9,8 @@ MathEdit::MathEdit(QWidget *parent) : QPlainTextEdit(parent)
     installEventFilter(this);
     setTabChangesFocus(false);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+//    setFixedHeight(LINE_ADD + blockCount() * LINE_HEIGHT);
 }
 
 

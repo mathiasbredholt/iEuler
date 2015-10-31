@@ -15,13 +15,10 @@ TEMPLATE = app
 
 
 SOURCES += \
-    codeinput.cpp \
     main.cpp \
     mainwindow.cpp \
-    group.cpp \
     cmdpanel.cpp \
     plotview3d.cpp \
-    mathrenderer.cpp \
     euler.cpp \
     renderer.cpp \
     mathwidget.cpp \
@@ -29,12 +26,9 @@ SOURCES += \
     mathedit.cpp
 
 HEADERS  += \
-    codeinput.h \
     mainwindow.h \
-    group.h \
     cmdpanel.h \
     plotview3d.h \
-    mathrenderer.h \
     euler.h \
     renderer.h \
     mathwidget.h \

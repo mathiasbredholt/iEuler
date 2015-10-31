@@ -37,6 +37,7 @@ void Paragraph::initMathEdit()
     connect(mathEdit, SIGNAL(textChanged()), this, SLOT(preview()));
     connect(mathEdit, SIGNAL(evaluate()), this, SLOT(evaluate()));
     connect(mathEdit, SIGNAL(arrowsPressed(bool)), this, SLOT(arrowsPressed(bool)));
+    connect(mathEdit, SIGNAL(deletePressed()), this, SLOT(deletePressed()));
     connect(mathEdit, SIGNAL(autoRepeating(bool)), renderer, SLOT(toggleRendering(bool)));
     layout()->addWidget(mathEdit);
 }
@@ -65,4 +66,9 @@ void Paragraph::receivedLatexString(int tabIndex, int index, QString latexString
 void Paragraph::arrowsPressed(bool upArrowPressed)
 {
     emit changeFocus_triggered(upArrowPressed, index);
+}
+
+void Paragraph::deletePressed()
+{
+    emit deleteLine_triggered(this);
 }
