@@ -228,3 +228,8 @@ void MainWindow::onTabChange(int index)
 {
     setWindowTitle("iEuler - "+tabs->tabText(index));
 }
+
+void MainWindow::on_actionRestart_core_triggered()
+{
+    euler->restartCore();
+}

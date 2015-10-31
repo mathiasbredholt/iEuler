@@ -7,9 +7,9 @@ Euler::Euler(QObject *parent) : QObject(parent)
 {
 //     Start iEuler
     proc = new QProcess(this);
-    proc->start("python3 start.py");
     connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
     connect(proc, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
+    proc->start("python3 -u start.py");
 
     // Init socket
     socket = new QUdpSocket(this);
@@ -22,14 +22,14 @@ void Euler::restartCore()
 {
     terminate();
     proc = new QProcess(this);
-    proc->start("python3 start.py");
     connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
     connect(proc, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
+    proc->start("python3 -u start.py");
 }
 
 void Euler::terminate()
 {
-    proc->terminate();
+    proc->kill();
 }
 
 void Euler::processDatagram(QByteArray datagram)
@@ -134,20 +134,27 @@ void Euler::writeDatagram(QByteArray datagram)
 
 void Euler::readStandardOutput()
 {
-
+    while (proc->canReadLine()) {
+        qDebug() << "python: " << QString::fromLocal8Bit(proc->readLine());
+    }
 }
 
 void Euler::readStandardError()
 {
-    QString err = proc->readAllStandardError();
-    qDebug() << "python error: \n" << err;
+    // Print error message
+    qDebug() << "python error:";
+    QString error = proc->readAllStandardError();
+    QStringList errorList = error.split("\n");
+    for (int i = 0; i < errorList.size(); ++i)
+        qDebug() << errorList.at(i);
+
     QMessageBox msgBox;
     msgBox.setText("The iEuler core has crashed.");
     msgBox.setInformativeText("Restart?");
     msgBox.setStandardButtons(QMessageBox::Ignore | QMessageBox::Reset);
     msgBox.setDefaultButton(QMessageBox::Reset);
-    if (err.contains("TypeError")) {
-        int ret = msgBox.exec();
-        if (ret == QMessageBox::Reset) restartCore();
-    }
+//    if (error.contains("TypeError")) {
+    int ret = msgBox.exec();
+    if (ret == QMessageBox::Reset) restartCore();
+//    }
 }

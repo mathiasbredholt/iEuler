@@ -128,7 +128,10 @@ def start():
     worksheet = [{}]
     current_tab = 0
 
-    while 1:
+    parser.init()
+    modules.latex.parser.init()
+
+    while True:
         # Receive data from UDP socket
         cmd, data = transmit.receive()
 

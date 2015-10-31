@@ -72,6 +72,7 @@ private slots:
     void on_actionSave_triggered();
     void on_actionExport_triggered();
     void onTabChange(int index);
+    void on_actionRestart_core_triggered();
 };
 
 #endif // MAINWINDOW_H
