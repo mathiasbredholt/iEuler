@@ -1,4 +1,4 @@
-# frink module for mathnotes
+# frink module for iEuler
 import modules.tools.procio as procio
 
 

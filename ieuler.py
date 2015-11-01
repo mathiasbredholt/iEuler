@@ -1,6 +1,8 @@
 import json
 import modules.ieuler.parser as parser
-import modules.latex.parser
+import modules.ieuler.generator as generator
+import modules.latex.generator
+import modules.latex.process
 import mathlib as ml
 import modules.tools.plot2d as plot2d
 import modules.tools.transmit as transmit
@@ -33,7 +35,7 @@ def run(argv=None):
     user_variables = {}
 
     parser.init()
-    modules.latex.parser.init()
+    modules.latex.process.init()
 
     if not gui_mode:
         print("Welcome to iEuler v0.1!")
@@ -52,7 +54,7 @@ def run(argv=None):
                 worksheet = load_worksheet(path)
                 prompt = None
             elif inp == "export":
-                modules.latex.parser.export(worksheet)
+                modules.latex.process.export(worksheet)
             else:
                 index = int(inp)
                 evaluate = "evaluate" in input("")
@@ -69,8 +71,8 @@ def run(argv=None):
 def console_send_result(command, user_variables):
     result = parser.parse(command, user_variables, True, False)
     print(result)
-    print("latex: {}".format(modules.latex.parser.convert_expr(result)))
-    print(parser.generate(result))
+    print("latex: {}".format(modules.latex.generator.convert_expr(result)))
+    print(generator.generate(result))
 
 
 def gui_send_result(index, command, user_variables, evaluate, worksheet):
@@ -79,7 +81,7 @@ def gui_send_result(index, command, user_variables, evaluate, worksheet):
     if type(result) is ml.Plot:
         plot2d.plot(result)
 
-    latex = modules.latex.parser.convert_expr(result)
+    latex = modules.latex.generator.convert_expr(result)
     add_to_worksheet(worksheet, index, command, latex)
     print('{} {}'.format(index, latex))
 
@@ -129,7 +131,7 @@ def start():
     current_tab = 0
 
     parser.init()
-    modules.latex.parser.init()
+    modules.latex.process.init()
 
     while True:
         # Receive data from UDP socket
@@ -146,7 +148,7 @@ def start():
                                   evaluate)
 
             # Convert to LaTeX
-            latex_string = modules.latex.parser.display_math(math_obj)
+            latex_string = modules.latex.generator.display_math(math_obj)
 
             # Add input and output to worksheet
             add_to_worksheet(worksheet[current_tab], index, math_string,

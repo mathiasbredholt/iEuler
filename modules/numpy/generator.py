@@ -1,4 +1,4 @@
-# Command line interface for mathnotes
+# Command line interface for iEuler
 import mathlib as ml
 import math
 
@@ -11,7 +11,7 @@ def set_plot_variables(variables):
 
 
 # generates string from mathlib operators
-def parse(input_expr):
+def generate(input_expr):
     return convert_expr(input_expr)
 
 
