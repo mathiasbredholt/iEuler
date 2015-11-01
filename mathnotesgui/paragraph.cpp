@@ -45,7 +45,7 @@ void Paragraph::initMathEdit()
 void Paragraph::preview()
 {
     QString mathString = mathEdit->toPlainText();
-    if (mathString != "") euler->sendMathString(tabIndex, index, mathString, false);
+    euler->sendMathString(tabIndex, index, mathString, false);
 }
 
 void Paragraph::evaluate()

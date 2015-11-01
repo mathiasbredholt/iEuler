@@ -8,6 +8,8 @@ def display_math(input_expr):
 
 
 def convert_expr(input_expr, display=True):
+    if type(input_expr) is ml.Empty:
+        return ""
     if type(input_expr) is ml.Fraction:
         return input_expr.to_latex(display)
     return input_expr.to_latex()

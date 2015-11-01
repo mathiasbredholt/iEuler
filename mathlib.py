@@ -2,6 +2,17 @@
 # contains all datatypes
 
 
+class Empty:
+
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return "Empty"
+
+    __repr__ = __str__
+
+
 class Equality:
 
     def __init__(self, type, value1, value2, assignment=False, hidden=False):

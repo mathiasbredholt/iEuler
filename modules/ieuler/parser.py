@@ -188,6 +188,8 @@ def parse(text, vars, eval=True, gui=False):
     gui_mode = gui
     evaluate = eval
     user_variables = vars
+    if text == "":
+        return ml.Empty()
     try:
         return expression.parseString(text)[0]
     except ParseException:
