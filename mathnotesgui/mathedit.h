@@ -11,6 +11,11 @@ class MathEdit : public QPlainTextEdit
     Q_OBJECT
 public:
     explicit MathEdit(QWidget *parent = 0);
+    int mathEditMode;
+    void setMode(int mathEditMode);
+
+    static const int MATHMODE = 0;
+    static const int TEXTMODE = 1;
 
 signals:
     void evaluate();

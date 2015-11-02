@@ -38,8 +38,9 @@ private:
     int getScreenDPI();
     void initMathJax();
     void startRendering();
+    QSize getSize();
     QQueue<MathWidget*> queue;
-    QPixmap createPixmap(QSize size);
+    QPixmap createPixmap();
     MathWidget *currentlyRendering;
 
 signals:

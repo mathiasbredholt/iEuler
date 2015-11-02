@@ -49,10 +49,15 @@ void Renderer::startRendering()
     }
 }
 
-QPixmap Renderer::createPixmap(QSize size)
+QPixmap Renderer::createPixmap()
 {
-    QPixmap pixmap(size);
-    webkit->render(&pixmap);
+    QWebElement div = webkit->page()->mainFrame()->findFirstElement("#input");
+    QString widthCSS = div.styleProperty("width", QWebElement::ComputedStyle);
+    QString heightCSS = div.styleProperty("height", QWebElement::ComputedStyle);
+    int w = widthCSS.left(widthCSS.indexOf("px")).toInt() - 34;
+    int h = heightCSS.left(heightCSS.indexOf("px")).toInt() + 4;
+    QPixmap pixmap(QSize(w, h));
+    webkit->render(&pixmap, QPoint(0, -18));
     return pixmap;
 }
 
@@ -92,7 +97,7 @@ void Renderer::onRenderComplete()
     if (queue.empty() || queue.head() != currentlyRendering) {
 
         // Convert the rendered output to bitmap and assign it to target
-        currentlyRendering->setPixmap(createPixmap(currentlyRendering->size()));
+        currentlyRendering->setPixmap(createPixmap());
 
         isRendering = false;
     }
