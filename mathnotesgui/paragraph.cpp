@@ -12,8 +12,8 @@ Paragraph::Paragraph(QWidget *parent,
     this->tabIndex = tabIndex;
     this->index = index;
 
-    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    setFixedHeight(128);
+//    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+//    setFixedHeight(128);
     setLayout(new QVBoxLayout());
 
     connect(euler, SIGNAL(receivedLatexString(int, int, QString)), this, SLOT(receivedLatexString(int, int, QString)));
@@ -45,6 +45,11 @@ void Paragraph::initMathEdit()
 void Paragraph::preview()
 {
     QString mathString = mathEdit->toPlainText();
+    if (mathString.indexOf('%') == 0) {
+        mathEdit->setMode(MathEdit::TEXTMODE);
+    } else {
+        mathEdit->setMode(MathEdit::MATHMODE);
+    }
     euler->sendMathString(tabIndex, index, mathString, false);
 }
 
