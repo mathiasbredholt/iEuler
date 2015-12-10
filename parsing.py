@@ -1,5 +1,25 @@
 import re
 import mathlib as ml
+from functools import reduce
+from pyparsing import Keyword, White, NotAny, alphas, alphas8bit, nums
+
+
+letters = alphas + alphas8bit
+
+chars = letters + nums
+
+space = White(' ')
+
+word_start = NotAny(chars)
+
+word_end = NotAny(chars)
+
+no_white = NotAny(White())
+
+
+def make_keyword_list(list):
+    # ['x', 'y'] -> Keyword('x') | Keyword('y')
+    return reduce(lambda x, y: x | y, map(Keyword, list))
 
 
 def get_value(toks):

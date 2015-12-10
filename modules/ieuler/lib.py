@@ -1,5 +1,7 @@
 import mathlib as ml
 
+text_fields = '_'
+
 decorator_keywords = ['hat',
                       'bar',
                       'ul',

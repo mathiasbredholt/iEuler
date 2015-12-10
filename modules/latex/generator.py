@@ -10,6 +10,18 @@ def display_math(input_expr):
     return "$$ " + convert_expr(input_expr) + " $$"
 
 
+def generate(input_expr, display=True, delimiters=True):
+    result = convert_expr(input_expr, display)
+    if not delimiters or type(input_expr) in [tl.Paragraph, tl.Text]:
+        return result
+    elif display:
+        return "$$ " + result + " $$"
+    else:
+        return "$ " + result + " $"
+
+    result = input_expr.to_latex()
+
+
 def convert_expr(input_expr, display=True):
     if type(input_expr) is ml.Empty:
         return ""
@@ -39,7 +51,7 @@ def convert_equality(self):
 def convert_paragraph(self):
     result = ""
     for x in self.blocks:
-        result += convert_expr(x)
+        result += convert_expr(x, display=False)
     return result
 
 

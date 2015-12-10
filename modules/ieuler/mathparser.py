@@ -1,8 +1,7 @@
 
 import mathlib as ml
-import parsing as parsing
+import parsing
 from modules.ieuler.lib import *
-from functools import reduce
 import re
 from pyparsing import *
 import modules.maple.process as mProcess
@@ -24,16 +23,6 @@ def set_eval(val):
 def set_user_variables(vars):
     global user_variables
     user_variables = vars
-
-
-def make_keyword_list(list):
-    # ['x', 'y'] -> Keyword('x') | Keyword('y')
-    return reduce(lambda x, y: x | y, map(Keyword, list))
-
-
-def make_literal_list(list):
-    # ['x', 'y'] -> Keyword('x') | Keyword('y')
-    return reduce(lambda x, y: x | y, map(Literal, list))
 
 
 def get_variable_value(toks):
@@ -90,95 +79,86 @@ def assign_variable(variable, value):
 
 def evaluate_expression(expr, convert=True):
     if evaluate:
-        return mProcess.evaluate(expr, __settings__["maple"], gui_mode, convert)
+        print(expr)
+        print(gui_mode)
+        print(convert)
+        return mProcess.evaluate(expr, gui_mode, convert)
     return expr
 
 
-def make_expression():
+ParserElement.setDefaultWhitespaceChars(' \t')
 
-    ParserElement.setDefaultWhitespaceChars(' \t')
+deco_kw_list = parsing.make_keyword_list(decorator_keywords)
+equality_kw_list = parsing.make_keyword_list(equality_keywords)
+units_list = oneOf(units)
+unit_prefixes_list = oneOf(unit_prefixes)
 
-    deco_kw_list = make_keyword_list(decorator_keywords)
-    equality_kw_list = make_keyword_list(equality_keywords)
-    units_list = oneOf(units)
-    unit_prefixes_list = oneOf(unit_prefixes)
-    letters = alphas  # + alphas8bit
-    chars = letters + nums
-    space = White(' ')
-    word_start = NotAny(chars)
-    word_end = NotAny(chars)
-    no_white = NotAny(White())
+expression = Forward()
 
-    expr = Forward()
+unit = Suppress(Literal('_') + parsing.no_white) + (units_list + NotAny(parsing.no_white + Word(parsing.chars)) | (
+    Optional(unit_prefixes_list + parsing.no_white) + units_list +
+    NotAny(parsing.no_white + Word(parsing.chars)))) + NotAny(parsing.no_white + Literal('_'))
 
-    unit = (units_list + NotAny(no_white + Word(chars)) | (
-        Optional(unit_prefixes_list + no_white) + units_list +
-        NotAny(no_white + Word(chars)))) + NotAny(no_white + Literal('_'))
+name = NotAny(deco_kw_list | equality_kw_list | Keyword('cross')) + Word(
+    parsing.letters, parsing.chars)
 
-    name = NotAny(deco_kw_list | equality_kw_list | Keyword('cross')) + Word(
-        letters, chars)
+variable = Forward()
+number = Forward()
+variable << name + Optional(parsing.no_white +
+                            Literal('_') + parsing.no_white + (variable | number))
 
-    variable = Forward()
-    number = Forward()
-    variable << Suppress(Optional(Literal('_') + no_white)) + name + \
-        Optional(no_white + Literal('_') + no_white + (variable | number))
+function = Combine(name + Suppress("(")) + \
+    delimitedList(expression, delim=',') + Suppress(")")
 
-    function = Combine(name + Suppress("(")) + \
-        delimitedList(expr, delim=',') + Suppress(")")
+number << (Combine(Word(nums) + Optional("." + Optional(Word(nums)))) +
+           Optional(NotAny(White()) + (function | unit | variable)))
 
-    number << (Combine(Word(nums) + Optional("." + Optional(Word(nums)))) +
-               Optional(NotAny(White()) + (function | unit | variable)))
+eval_field = Suppress('#') + expression + Suppress('#')
 
-    eval_field = Suppress('#') + expr + Suppress('#')
+eval_direct_field = Suppress('$') + expression + Suppress('$')
 
-    eval_direct_field = Suppress('$') + expr + Suppress('$')
+operand = (
+    eval_field.setParseAction(lambda x: evaluate_expression(x[0]))
+    | eval_direct_field.setParseAction(lambda x: evaluate_expression(x[0], False))
+    | function.setParseAction(lambda x: parsing.get_function(x, functions))
+    | unit.setParseAction(lambda x: parsing.get_unit(x, user_variables))
+    | variable.setParseAction(
+        lambda x: parsing.get_variable(x, variables, symbols))
+    | number.setParseAction(parsing.get_value))
 
-    operand = (
-        eval_field.setParseAction(lambda x: evaluate_expression(x[0]))
-        | eval_direct_field.setParseAction(lambda x: evaluate_expression(x[0], False))
-        | function.setParseAction(lambda x: parsing.get_function(x, functions))
-        | unit.setParseAction(lambda x: parsing.get_unit(x, user_variables))
-        | variable.setParseAction(
-            lambda x: parsing.get_variable(x, variables, symbols))
-        | number.setParseAction(parsing.get_value))
+insert_value = parsing.word_start + Literal('@') + parsing.no_white
+factop = parsing.no_white + Literal('!') + parsing.word_end
+signop = parsing.word_start + Literal('-') + parsing.no_white
+expop = Literal('^')
+fracop = Literal('/')
+multop1 = parsing.space.copy()
+multop2 = Literal('*')
+crossop = Keyword('cross')
+rangeop = Literal('..')
+plusop = oneOf('+ -')
+equals = Group(Regex(
+    r'((?P<modifier>[:#])+(?P<option>[a-zA-Z]*))?=')).setResultsName(
+        "equals")
+other_equals = oneOf('== <= >= < > ~~ ~ ~= ~== !=')
+equalop = Group(other_equals) | equals | Group(equality_kw_list)
 
-    insert_value = word_start + Literal('@') + no_white
-    factop = no_white + Literal('!') + word_end
-    signop = word_start + Literal('-') + no_white
-    expop = Literal('^')
-    fracop = Literal('/')
-    multop1 = space.copy()
-    multop2 = Literal('*')
-    crossop = Keyword('cross')
-    rangeop = Literal('..')
-    plusop = oneOf('+ -')
-    equals = Group(Regex(
-        r'((?P<modifier>[:#])+(?P<option>[a-zA-Z]*))?=')).setResultsName(
-            "equals")
-    other_equals = oneOf('== <= >= < > ~~ ~ ~= ~== !=')
-    equalop = Group(other_equals) | equals | Group(equality_kw_list)
-
-    right = opAssoc.RIGHT
-    left = opAssoc.LEFT
-    expr << infixNotation(operand, [
-        (insert_value, 1, right, get_variable_value),
-        (factop, 1, left, parsing.get_factorial_op),
-        (deco_kw_list, 1, right, get_decorator),
-        (signop, 1, right, parsing.get_minus_op),
-        (expop, 2, right, parsing.get_pow_op),
-        (fracop, 2, left, parsing.get_div_op),
-        (crossop, 2, left, parsing.get_cross_op),
-        (multop1, 2, left, parsing.get_mul_op),
-        (multop2, 2, left, parsing.get_mul_op),
-        (plusop, 2, left, parsing.get_add_op),
-        (rangeop, 2, left, parsing.get_range_op),
-        (equalop, 2, left, get_equality_op)
-    ])
-    expr.parseWithTabs()
-    return expr
-
-
-expression = make_expression()
+right = opAssoc.RIGHT
+left = opAssoc.LEFT
+expression << infixNotation(operand, [
+    (insert_value, 1, right, get_variable_value),
+    (factop, 1, left, parsing.get_factorial_op),
+    (deco_kw_list, 1, right, get_decorator),
+    (signop, 1, right, parsing.get_minus_op),
+    (expop, 2, right, parsing.get_pow_op),
+    (fracop, 2, left, parsing.get_div_op),
+    (crossop, 2, left, parsing.get_cross_op),
+    (multop1, 2, left, parsing.get_mul_op),
+    (multop2, 2, left, parsing.get_mul_op),
+    (plusop, 2, left, parsing.get_add_op),
+    (rangeop, 2, left, parsing.get_range_op),
+    (equalop, 2, left, get_equality_op)
+])
+expression.parseWithTabs()
 
 
 def parse(text):

@@ -3,6 +3,7 @@ import modules.ieuler.parser as parser
 import modules.ieuler.generator as generator
 import modules.latex.generator
 import modules.latex.process
+import modules.maple.process
 import mathlib as ml
 import modules.tools.plot2d as plot2d
 import modules.tools.transmit as transmit
@@ -27,45 +28,30 @@ def conf(os):
 
 
 def run(argv=None):
+
+    user_variables = [{}]
+    worksheet = [{}]
+    current_tab = 0
+
+    read_settings()
+
     gui_mode = False
-    if argv and "-gui" in argv:
-        gui_mode = True
-        worksheet = {}
 
-    user_variables = {}
-
-    parser.init()
-    modules.latex.process.init()
+    # parser.init()
+    # modules.latex.process.init()
 
     if not gui_mode:
         print("Welcome to iEuler v0.1!")
 
     while True:
-
-        do_save = False
-        if gui_mode:
-            inp = input("")
-            if inp == "save":
-                path = input("")
-                save_worksheet(worksheet, path)
-                prompt = None
-            elif inp == "load":
-                path = input("")
-                worksheet = load_worksheet(path)
-                prompt = None
-            elif inp == "export":
-                modules.latex.process.export(worksheet)
-            else:
-                index = int(inp)
-                evaluate = "evaluate" in input("")
-                command = input("")
-                if command:
-                    gui_send_result(
-                        index, command, user_variables, evaluate, worksheet)
-
-        else:
-            command = input("iEuler> ")
-            console_send_result(command, user_variables)
+        # Parse math string in iEuler syntax to a python representation
+        math_string = input("iEuler> ")
+        math_obj = parse_math(math_string, user_variables[0], True)
+        print(math_obj)
+        # Convert to LaTeX
+        latex_string = modules.latex.generator.generate(math_obj)
+        print("latex: {}".format(latex_string))
+        print(modules.ieuler.generator.generate(math_obj))
 
 
 def console_send_result(command, user_variables):
@@ -122,6 +108,13 @@ def parse_math(math_string, user_variables, evaluate):
     return parser.parse(math_string, user_variables, evaluate, True)
 
 
+def read_settings():
+    with open('settings.conf', 'r') as f:
+        settings = json.load(f)
+    modules.maple.process.set_path(settings["maple"])
+    modules.latex.process.set_path(settings["pdflatex"])
+
+
 def start():
     # Initialize UDP socket
     transmit.init()
@@ -130,8 +123,7 @@ def start():
     worksheet = [{}]
     current_tab = 0
 
-    parser.init()
-    modules.latex.process.init()
+    read_settings()
 
     while True:
         # Receive data from UDP socket
@@ -146,9 +138,9 @@ def start():
             # Parse math string in iEuler syntax to a python representation
             math_obj = parse_math(math_string, user_variables[current_tab],
                                   evaluate)
-
+            print(math_obj)
             # Convert to LaTeX
-            latex_string = modules.latex.generator.display_math(math_obj)
+            latex_string = modules.latex.generator.generate(math_obj)
 
             # Add input and output to worksheet
             add_to_worksheet(worksheet[current_tab], index, math_string,
