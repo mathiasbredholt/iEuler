@@ -3,14 +3,12 @@ import modules.tools.procio as procio
 import modules.latex.generator as generator
 import json
 
-__settings__ = None
+path = None
 
 
-def init():
-    global __settings__
-
-    with open('settings.conf', 'r') as f:
-        __settings__ = json.load(f)["pdflatex"]
+def set_path(p):
+    global path
+    path = p
 
 
 # generates LaTeX string from mathlib operators
@@ -22,7 +20,7 @@ def generate_preview(input_expr):
         f.write(output_string)
 
     proc, queue, thread = procio.run(
-        __settings__ +
+        path +
         " -interaction=batchmode -fmt pdflatex -shell-escape mathnotes.tex",
         False)
     proc.wait()
@@ -44,6 +42,6 @@ def export(worksheet):
         f.write(output_string)
 
     proc, queue, thread = procio.run(
-        __settings__ + " -interaction=batchmode -fmt pdflatex output.tex",
+        path + " -interaction=batchmode -fmt pdflatex output.tex",
         False)
     proc.wait()

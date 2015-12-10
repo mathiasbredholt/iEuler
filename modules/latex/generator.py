@@ -1,9 +1,24 @@
 import mathlib as ml
+import textlib as tl
 from modules.latex.lib import *
 
 
 def display_math(input_expr):
+    if type(input_expr) is tl.Paragraph:
+        return convert_expr(input_expr)
     return "$$ " + convert_expr(input_expr) + " $$"
+
+
+def generate(input_expr, display=True, delimiters=True):
+    result = convert_expr(input_expr, display)
+    if not delimiters or type(input_expr) in [tl.Paragraph, tl.Text]:
+        return result
+    elif display:
+        return "$$ " + result + " $$"
+    else:
+        return "$ " + result + " $"
+
+    result = input_expr.to_latex()
 
 
 def convert_expr(input_expr, display=True):
@@ -30,6 +45,17 @@ def convert_equality(self):
     else:
         return "{} {} {}".format(convert_expr(self.value1), self.type,
                                  convert_expr(self.value2))
+
+
+def convert_paragraph(self):
+    result = ""
+    for x in self.blocks:
+        result += convert_expr(x, display=False)
+    return result
+
+
+def convert_text(self):
+    return self.text
 
 
 def convert_value(self):
@@ -189,6 +215,8 @@ def convert_range(self):
                                                      convert_expr(self.value2))
 
 # Extending mathlib classes with to_latex method for duck typing
+tl.Paragraph.to_latex = convert_paragraph
+tl.Text.to_latex = convert_text
 ml.MathValue.to_latex = convert_value
 ml.Equality.to_latex = convert_equality
 ml.Function.to_latex = convert_function

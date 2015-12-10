@@ -8,21 +8,30 @@ import modules.maple.generator as generator
 #################
 
 maple_proc = None
+path = None
 
 
-def evaluate(expr, settings, gui_mode=False, convert=True):
+def evaluate(expr, gui_mode=False, convert=True):
     global maple_proc
+    print(maple_proc)
     if maple_proc is None:
         # if not gui_mode:
         # print("Starting Maple...")
         # Spawn Maple subprocess.
         # Returns instance of process, queue and thread for
         # asynchronous I/O
-        maple_proc = init(settings)
+        maple_proc = init()
+    print("did init")
     return query(expr, *maple_proc, convert=convert)
 
 
-def init(path):
+def set_path(p):
+    global path
+    path = p
+
+
+def init():
+    print("path: {}".format(path))
     shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" ".format(path)
     return procio.run(shell_cmd)
 
