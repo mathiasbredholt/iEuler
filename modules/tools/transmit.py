@@ -4,6 +4,14 @@ ADDRESS = 'localhost'
 EULER_PORT = 41000
 GUI_PORT = 42000
 
+PREVIEW = 0
+EVALUATE = 1
+OPEN = 2
+SAVE = 3
+RENDER = 4
+MATH_STR = 5
+EXPORT = 6
+
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 
@@ -13,16 +21,14 @@ def init():
 
 
 def send_latex(tab_index, index, latex_string):
-    cmd = 4  # Render
-    data = bytes([cmd, tab_index, index >> 8, index & 0xFF]) + bytes(
+    data = bytes([RENDER, tab_index, index >> 8, index & 0xFF]) + bytes(
         latex_string, 'utf-8')
 
     client_socket.sendto(data, (ADDRESS, GUI_PORT))
 
 
 def send_math_string(tab_index, index, math_string):
-    cmd = 5  # Load
-    data = bytes([cmd, tab_index, index >> 8, index & 0xFF]) + bytes(
+    data = bytes([MATH_STR, tab_index, index >> 8, index & 0xFF]) + bytes(
         math_string, 'utf-8')
 
     client_socket.sendto(data, (ADDRESS, GUI_PORT))
@@ -32,7 +38,7 @@ def receive():
     data, addr = client_socket.recvfrom(1024)
     cmd = data[0]
 
-    if cmd == 0 or cmd == 1:  # Preview or eval
+    if cmd == PREVIEW or cmd == EVALUATE:
         tab_index = data[1]
         index = (data[2] << 8) + (data[3] & 0xFF)
         math_string = data[4:].decode('utf-8')
@@ -42,7 +48,7 @@ def receive():
             "math_string": math_string
         }
         return (cmd, result)
-    elif cmd == 2 or cmd == 3:  # Open or save
+    elif cmd == OPEN or cmd == SAVE:
         path = data[1:].decode('utf-8')
         result = {"path": path}
         return (cmd, result)

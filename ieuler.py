@@ -137,7 +137,7 @@ def start():
         # Receive data from UDP socket
         cmd, data = transmit.receive()
 
-        if cmd == 0 or cmd == 1:  # Preview or eval
+        if cmd == transmit.PREVIEW or cmd == transmit.EVALUATE:
             tab_index = data["tab_index"]
             index = data["index"]
             math_string = data["math_string"]
@@ -156,7 +156,7 @@ def start():
 
             # Send index and latex string through UDP socket
             transmit.send_latex(tab_index, index, latex_string)
-        elif cmd == 2:  # Open worksheet
+        elif cmd == transmit.OPEN:  # Open worksheet
             worksheet = load_worksheet(data["path"])
-        elif cmd == 3:  # Save worksheet
+        elif cmd == transmit.SAVE:  # Save worksheet
             save_worksheet(worksheet[current_tab], data["path"])

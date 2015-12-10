@@ -1,4 +1,3 @@
-
 import mathlib as ml
 from modules.latex.lib import *
 
@@ -166,12 +165,12 @@ def convert_root(self):
 
 
 def convert_integral(self):
-    if self.range_from is None:
+    if self.variable is None:
         return "\\displaystyle \\int {}\\;d {} ".format(
             convert_expr(self.value), convert_expr(self.variable))
     else:
         return "\\displaystyle \\int_{{{}}}^{{{}}} {}\\;d {} ".format(
-            convert_expr(self.range_from), convert_expr(self.range_to),
+            convert_expr(self.variable), convert_expr(self.variable),
             convert_expr(self.value), convert_expr(self.variable))
 
 

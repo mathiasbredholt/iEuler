@@ -1,12 +1,16 @@
 #ifndef CMDPANEL_H
 #define CMDPANEL_H
 
-#include <QFrame>
+#include <QWidget>
 #include <QLineEdit>
 #include <QVBoxLayout>
-#include <QLabel>
+#include <QEvent>
+#include <QKeyEvent>
+#include <QDebug>
 
-class CmdPanel : public QFrame
+#include "cmdpanelitem.h"
+
+class CmdPanel : public QWidget
 {
     Q_OBJECT
 public:
@@ -14,6 +18,9 @@ public:
 
 private:
     QLineEdit *cmdline;
+    int focusIndex;
+    int itemCount;
+    bool eventFilter(QObject *object, QEvent *event);
 
 signals:
 
