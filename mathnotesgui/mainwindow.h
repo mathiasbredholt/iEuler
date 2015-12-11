@@ -34,6 +34,7 @@ private:
     CmdPanel *cmdpanel;
     Euler *euler;
     Renderer *renderer;
+    QPalette pal;
 
     int numberOfLines;
 

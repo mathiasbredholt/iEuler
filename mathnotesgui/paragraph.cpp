@@ -12,6 +12,9 @@ Paragraph::Paragraph(QWidget *parent,
     this->tabIndex = tabIndex;
     this->index = index;
 
+    setPalette(parent->palette());
+    setFont(parent->font());
+
 //    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 //    setFixedHeight(128);
     setLayout(new QVBoxLayout());

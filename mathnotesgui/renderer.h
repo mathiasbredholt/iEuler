@@ -4,6 +4,7 @@
 #include <QApplication>
 #include <QDesktopWidget>
 
+#include <QWidget>
 #include <QWebView>
 #include <QWebFrame>
 #include <QWebElement>
@@ -18,7 +19,7 @@ class Renderer : public QObject
 {
     Q_OBJECT
 public:
-    explicit Renderer(QObject *parent = 0);
+    explicit Renderer(QWidget *parent = 0);
 
     qreal zoomFactor;
 

@@ -3,18 +3,27 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
-{    
+{
     ui->setupUi(this);
+
+    pal = palette();
+    pal.setColor(QPalette::Base, QColor("#333"));
+    pal.setColor(QPalette::Background, QColor("#333"));
+    pal.setColor(QPalette::Text, QColor("#FFF"));
+    setPalette(pal);
+
+    setFont(QFont("Monaco", 14));
 
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
 
-    renderer = new Renderer();
+    renderer = new Renderer(this);
 
     // Create tabs
     tabs = new QTabWidget(this);
     tabs->setDocumentMode(true);
     tabs->setTabsClosable(true);
+    tabs->setFont(QFont("Monaco", 12));
     tabs->setMovable(true);
     ui->container->layout()->addWidget(tabs);
     createNewTab();
@@ -55,7 +64,7 @@ void MainWindow::createNewTab(bool empty, QString fileName)
     QFrame *contents = new QFrame();
     contents->setLayout(new QVBoxLayout());
     contents->layout()->setAlignment(Qt::AlignTop);
-    contents->setBackgroundRole(QPalette::Light);
+    contents->setPalette(pal);
     contents->setFocusPolicy(Qt::NoFocus);
 
     QScrollArea *scrollArea = new QScrollArea();

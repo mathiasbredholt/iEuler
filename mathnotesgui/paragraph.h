@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
+#include <QDebug>
 
 #include "mathedit.h"
 #include "mathwidget.h"

@@ -14,9 +14,10 @@ QString readFile (const QString& filename)
     return "";
 }
 
-Renderer::Renderer(QObject *parent) : QObject(parent)
-{   
+Renderer::Renderer(QWidget *parent) : QObject(parent)
+{
     webkit = new QWebView();
+    webkit->setPalette(parent->palette());
 
     // Setup zoom levels
     baseScaling = getScreenDPI() / WEBKIT_DPI;
