@@ -26,6 +26,8 @@ Paragraph::Paragraph(QWidget *parent,
     mathWidget = new MathWidget(this);
 //    layout()->addWidget(mathWidget);
 
+    layout()->addWidget(renderer->webengine);
+
     mathEdit->setPlainText(mathString);
 }
 

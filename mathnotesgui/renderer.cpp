@@ -16,8 +16,11 @@ QString readFile (const QString& filename)
 
 Renderer::Renderer(QWidget *parent) : QObject(parent)
 {
-    webengine = new QWebEngineView(parent);
-//    webengine->setPalette(parent->palette());
+    QString html = readFile(":/mathjax.html");
+    QUrl baseUrl = QUrl::fromLocalFile(QDir::currentPath() + "/mathnotesgui/webkit/");
+    webengine = new QWebEngineView();
+    webengine->setPalette(parent->palette());
+    webengine->setHtml(html, baseUrl);
     // Setup zoom levels
 //    baseScaling = getScreenDPI() / webengine_DPI;
 //    webengine->setZoomFactor(DEFAULT_ZOOM_FACTOR*baseScaling);
@@ -26,7 +29,7 @@ Renderer::Renderer(QWidget *parent) : QObject(parent)
 //    hasLoaded = false;
     canRender = true;
 
-    webengine->load(QUrl("qrc:/mathjax.html"));
+
 }
 
 void Renderer::startRendering()
@@ -77,7 +80,8 @@ void Renderer::setZoomFactor(double factor)
 
 void Renderer::render(MathWidget *target)
 {
-    webengine->page()->runJavaScript("getElementById('input').innerHTML = "+target->latexString+";");
+    qDebug() << target->latexString;
+    webengine->page()->runJavaScript("document.getElementById('input').innerHTML = String.raw`"+target->latexString+"` ");
     webengine->page()->runJavaScript("MathJax.Hub.Queue(['Typeset', MathJax.Hub, 'input']);");
 //    if (queue.empty() || queue.head() != target) queue.enqueue(target);
 //    if (!isRendering && canRender && !queue.empty()) startRendering();
