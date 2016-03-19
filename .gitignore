@@ -5,7 +5,7 @@
 __pycache__/
 *.py[cod]
 mathnotes.tex
-mathnotesgui/build
+build*
 *.png
 *.user
 mathnotesgui/mathnotesgui.pro.user.00aa10a
