@@ -20,16 +20,6 @@ def set_eval(val):
     evaluate = val
 
 
-def set_ans(val):
-    global ans
-    ans = val
-
-
-def get_ans(toks):
-    print(toks)
-    return 0
-
-
 def set_user_variables(vars):
     global user_variables
     user_variables = vars
@@ -139,7 +129,6 @@ operand = (
         lambda x: parsing.get_variable(x, variables, symbols))
     | number.setParseAction(parsing.get_value))
 
-ansop = Literal('ans') + Optional(Word(nums))
 insert_value = parsing.word_start + Literal('@') + parsing.no_white
 factop = parsing.no_white + Literal('!') + parsing.word_end
 signop = parsing.word_start + Literal('-') + parsing.no_white
@@ -159,7 +148,7 @@ equalop = Group(other_equals) | equals | Group(equality_kw_list)
 right = opAssoc.RIGHT
 left = opAssoc.LEFT
 expression << infixNotation(operand, [
-    (ansop, 1, right, get_ans), (insert_value, 1, right, get_variable_value),
+    (insert_value, 1, right, get_variable_value),
     (factop, 1, left, parsing.get_factorial_op),
     (deco_kw_list, 1, right, get_decorator),
     (signop, 1, right, parsing.get_minus_op),

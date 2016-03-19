@@ -105,8 +105,8 @@ def frink_query(query_string, proc, queue, thread):
     return return_string
 
 
-def parse_math(math_string, ans, user_variables, evaluate):
-    return parser.parse(math_string, ans, user_variables, evaluate, True)
+def parse_math(math_string, user_variables, evaluate):
+    return parser.parse(math_string, user_variables, evaluate, True)
 
 
 def read_settings():
@@ -122,7 +122,6 @@ def start():
 
     user_variables = [{}]
     worksheet = [{}]
-    ans = []
     current_tab = 0
 
     read_settings()
@@ -138,18 +137,19 @@ def start():
             evaluate = cmd == 1
 
             # Parse math string in iEuler syntax to a python representation
-            math_obj = parse_math(math_string, ans,
+            math_obj = parse_math(math_string,
                                   user_variables[current_tab], evaluate)
-            print(math_obj)
+
+            # Save output for back reference
+            if evaluate:
+                user_variables[current_tab]["ans"] = math_obj
+
             # Convert to LaTeX
             latex_string = modules.latex.generator.generate(math_obj)
 
             # Add input and output to worksheet
             add_to_worksheet(worksheet[current_tab], index, math_string,
                              latex_string)
-
-            # Add output to ans for back reference
-            ans.append(math_obj)
 
             # Send index and latex string through UDP socket
             transmit.send_latex(tab_index, index, latex_string)
