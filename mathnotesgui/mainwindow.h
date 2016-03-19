@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include "ui_mainwindow.h"
+//#include "ui_mainwindow.h"
 #include <QDebug>
 #include <QTabWidget>
 #include <QScrollArea>
@@ -17,11 +17,6 @@
 #include "paragraph.h"
 #include "euler.h"
 
-
-namespace Ui {
-class MainWindow;
-}
-
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -31,7 +26,8 @@ public:
     ~MainWindow();
 
 private:
-    Ui::MainWindow *ui;
+//    Ui::MainWindow *ui;
+    QWidget *container;
     QTabWidget *tabs;
     CmdPanel *cmdpanel;
     Euler *euler;
