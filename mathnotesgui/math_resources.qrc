@@ -1,6 +1,5 @@
 <RCC>
-    <qresource prefix="/webkit">
-        <file alias="test">webkit/test.html</file>
+    <qresource prefix="/">
+        <file>mathjax.html</file>
     </qresource>
-    <qresource prefix="/"/>
 </RCC>

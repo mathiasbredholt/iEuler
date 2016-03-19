@@ -10,6 +10,8 @@
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QMessageBox>
+#include <QtWebEngineWidgets>
+#include <QWebEngineView>
 
 #include "cmdpanel.h"
 #include "paragraph.h"

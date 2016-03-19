@@ -6,31 +6,36 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    pal = palette();
-    pal.setColor(QPalette::Base, QColor("#333"));
-    pal.setColor(QPalette::Background, QColor("#333"));
-    pal.setColor(QPalette::Text, QColor("#FFF"));
-    setPalette(pal);
+//    pal = palette();
+//    pal.setColor(QPalette::Base, QColor("#333"));
+//    pal.setColor(QPalette::Background, QColor("#333"));
+//    pal.setColor(QPalette::Text, QColor("#FFF"));
+//    setPalette(pal);
 
     setFont(QFont("Monaco", 14));
 
-    euler = new Euler();
-    connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
+//    euler = new Euler();
+//    connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
 
-    renderer = new Renderer(this);
+//    renderer = new Renderer(this);
 
     // Create tabs
-    tabs = new QTabWidget(this);
-    tabs->setDocumentMode(true);
-    tabs->setTabsClosable(true);
-    tabs->setStyleSheet("QTabWidget { left: 5px; border: none; background: #FFF; /* move to the right by 5px */ } QTabBar::tab { font: Monaco; color: white; background: #666; } QTabBar::tab:selected { background: #444 }");
-    tabs->setMovable(true);
-    ui->container->layout()->addWidget(tabs);
-    createNewTab();
+//    tabs = new QTabWidget(this);
+//    tabs->setDocumentMode(true);
+//    tabs->setTabsClosable(true);
+//    tabs->setStyleSheet("QTabWidget { left: 5px; border: none; background: #FFF; /* move to the right by 5px */ } QTabBar::tab { font: Monaco; color: white; background: #666; } QTabBar::tab:selected { background: #444 }");
+//    tabs->setMovable(true);
+//    ui->container->layout()->addWidget(tabs);
+//    createNewTab();
+
+    QWebEngineView *view = new QWebEngineView(this);
+    layout()->addWidget(view);
+    view->setHtml("<h1> asdfsadfasdfasdf</h1>");
+
 
     // Create Command panel
-    cmdpanel = new CmdPanel(this);
-    ui->container->layout()->addWidget(cmdpanel);
+//    cmdpanel = new CmdPanel(this);
+//    ui->container->layout()->addWidget(cmdpanel);
 }
 
 MainWindow::~MainWindow()
