@@ -5,9 +5,8 @@
 #include <QDesktopWidget>
 
 #include <QWidget>
-#include <QWebView>
-#include <QWebFrame>
-#include <QWebElement>
+#include <QtWebEngineWidgets>
+#include <QWebEngineView>
 
 #include <QQueue>
 #include <QPixmap>
@@ -20,6 +19,7 @@ class Renderer : public QObject
     Q_OBJECT
 public:
     explicit Renderer(QWidget *parent = 0);
+    QWebEngineView *webengine;
 
     qreal zoomFactor;
 
@@ -32,12 +32,10 @@ public slots:
     void toggleRendering(bool disable);
 
 private:
-    QWebView *webkit;
     qreal baseScaling;
     bool isRendering;
     bool canRender;
     int getScreenDPI();
-    void initMathJax();
     void startRendering();
     QSize getSize();
     QQueue<MathWidget*> queue;

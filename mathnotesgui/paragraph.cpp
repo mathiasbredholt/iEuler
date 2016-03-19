@@ -24,7 +24,9 @@ Paragraph::Paragraph(QWidget *parent,
     initMathEdit();
 
     mathWidget = new MathWidget(this);
-    layout()->addWidget(mathWidget);
+//    layout()->addWidget(mathWidget);
+
+    layout()->addWidget(renderer->webengine);
 
     mathEdit->setPlainText(mathString);
 }
@@ -65,10 +67,10 @@ void Paragraph::evaluate()
 
 void Paragraph::receivedLatexString(int tabIndex, int index, QString latexString)
 {
-    if (tabIndex == this->tabIndex && index == this->index && mathWidget->latexString != latexString) {
+//    if (tabIndex == this->tabIndex && index == this->index && mathWidget->latexString != latexString) {
         mathWidget->latexString = latexString;
         renderer->render(mathWidget);
-    }
+//    }
 }
 
 void Paragraph::arrowsPressed(bool upArrowPressed)

@@ -39,6 +39,7 @@
 */
 
 #include <QObject>
+#include <QDebug>
 #include <QProcess>
 #include <QUdpSocket>
 #include <QMessageBox>

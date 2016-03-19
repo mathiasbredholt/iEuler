@@ -1,4 +1,3 @@
-
 from modules.ieuler.lib import *
 import modules.ieuler.mathparser as math
 import modules.ieuler.textparser as text
@@ -6,10 +5,11 @@ import json
 from pyparsing import ParseException
 
 
-def parse(string, vars, eval=True, gui=False):
+def parse(string, ans, vars, eval=True, gui=False):
     math.set_gui(gui)
     math.set_eval(eval)
     math.set_user_variables(vars)
+    math.set_ans(ans)
     if string == "":
         return ml.Empty()
     try:
