@@ -25,6 +25,7 @@ void Euler::restartCore()
     connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
     connect(proc, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
     proc->start("python3 -u start.py");
+    hasCrashed = false;
 }
 
 void Euler::terminate()
@@ -149,13 +150,16 @@ void Euler::readStandardError()
     for (int i = 0; i < errorList.size(); ++i)
         qDebug() << errorList.at(i);
 
-    QMessageBox msgBox;
-    msgBox.setText("The iEuler core has crashed.");
-    msgBox.setInformativeText("Restart?");
-    msgBox.setStandardButtons(QMessageBox::Ignore | QMessageBox::Reset);
-    msgBox.setDefaultButton(QMessageBox::Reset);
-//    if (error.contains("TypeError")) {
-    int ret = msgBox.exec();
-    if (ret == QMessageBox::Reset) restartCore();
-//    }
+    if (!hasCrashed) {
+        QMessageBox msgBox;
+        msgBox.setText("The iEuler core has crashed.");
+        msgBox.setInformativeText("Restart?");
+        msgBox.setStandardButtons(QMessageBox::Ignore | QMessageBox::Reset);
+        msgBox.setDefaultButton(QMessageBox::Reset);
+
+        int ret = msgBox.exec();
+        if (ret == QMessageBox::Reset) restartCore();
+    }
+
+    hasCrashed = true;
 }

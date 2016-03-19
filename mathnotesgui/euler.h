@@ -64,6 +64,8 @@ public:
     static const char MATH_STR = 5;
     static const char EXPORT   = 6;
 
+    bool hasCrashed = false;
+
 signals:
     void receivedLatexString(int tabIndex, int index, QString latexString);
     void receivedMathString(int tabIndex, int index, QString mathString);
