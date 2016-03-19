@@ -2,4 +2,5 @@
     <qresource prefix="/webkit">
         <file alias="test">webkit/test.html</file>
     </qresource>
+    <qresource prefix="/"/>
 </RCC>

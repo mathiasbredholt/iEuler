@@ -16,7 +16,7 @@ QString readFile (const QString& filename)
 
 Renderer::Renderer(QWidget *parent) : QObject(parent)
 {
-    webkit = new QWebView();
+    webkit = new QWebEngineView();
     webkit->setPalette(parent->palette());
 
     // Setup zoom levels
@@ -39,11 +39,12 @@ void Renderer::startRendering()
         qFatal("Renderer called without rendering job.");
 
     } else {
+        QString js;
         MathWidget *target = queue.dequeue();
         currentlyRendering = target;
 
-        webkit->page()->mainFrame()->findFirstElement("#input").setInnerXml(target->latexString);
-        webkit->page()->mainFrame()->evaluateJavaScript("UpdateMath()");
+        js = QString("getElementById('input').innerHTML = str").replace("str", target->latexString);
+        webkit->page()->runJavaScript(js);
 
         isRendering = true;
 
@@ -52,9 +53,19 @@ void Renderer::startRendering()
 
 QPixmap Renderer::createPixmap()
 {
-    QWebElement div = webkit->page()->mainFrame()->findFirstElement("#input");
-    QString widthCSS = div.styleProperty("width", QWebElement::ComputedStyle);
-    QString heightCSS = div.styleProperty("height", QWebElement::ComputedStyle);
+    QWebEnginePage *page = webkit->page();
+    QString widthCSS = QString("0px");
+    QString heightCSS = QString("0px");
+
+    page->runJavaScript("getComputedStyle(getElementById('input')).style.getPropertyValue('width')",
+                       [](const QVariant &v) {
+        widthCSS = v.toString();
+    });
+    page->runJavaScript("getComputedStyle(getElementById('input')).style.getPropertyValue('height')",
+                       [](const QVariant &v) {
+        heightCSS = v.toString();
+    });
+
     int w = widthCSS.left(widthCSS.indexOf("px")).toInt() - 34;
     int h = heightCSS.left(heightCSS.indexOf("px")).toInt() + 4;
     QPixmap pixmap(QSize(w, h));

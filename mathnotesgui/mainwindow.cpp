@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent) :
     tabs = new QTabWidget(this);
     tabs->setDocumentMode(true);
     tabs->setTabsClosable(true);
-    tabs->setFont(QFont("Monaco", 12));
+    tabs->setStyleSheet("QTabWidget { left: 5px; border: none; background: #FFF; /* move to the right by 5px */ } QTabBar::tab { font: Monaco; color: white; background: #666; } QTabBar::tab:selected { background: #444 }");
     tabs->setMovable(true);
     ui->container->layout()->addWidget(tabs);
     createNewTab();

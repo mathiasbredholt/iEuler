@@ -5,9 +5,10 @@
 #include <QDesktopWidget>
 
 #include <QWidget>
-#include <QWebView>
-#include <QWebFrame>
-#include <QWebElement>
+#include <QtWebEngineWidgets>
+
+#include <QWebEnginePage>
+#include <QWebEngineView>
 
 #include <QQueue>
 #include <QPixmap>
@@ -32,7 +33,7 @@ public slots:
     void toggleRendering(bool disable);
 
 private:
-    QWebView *webkit;
+    QWebEngineView *webkit;
     qreal baseScaling;
     bool isRendering;
     bool canRender;

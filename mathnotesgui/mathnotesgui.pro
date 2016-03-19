@@ -5,8 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
-QT       += webkit
-QT       += webkitwidgets
+QT       += webenginewidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -41,4 +40,7 @@ FORMS    += \
     mainwindow.ui
 
 RESOURCES += \
-    math_resources.qrc
+    math_resources.qrc \
+    gui_resources.qrc
+
+DISTFILES +=
