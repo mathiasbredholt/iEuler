@@ -34,36 +34,37 @@ void Euler::terminate()
 
 void Euler::processDatagram(QByteArray datagram)
 {
-    char cmd = datagram.at(0);
+    if (datagram.size()>0) {
+        char cmd = datagram.at(0);
 
-    if (cmd == Euler::RENDER) {
-        int tabIndex;
-        int index;
-        QString latexString;
+        if (cmd == Euler::RENDER) {
+            int tabIndex;
+            int index;
+            QString latexString;
 
-        tabIndex = (int) datagram.at(1);
+            tabIndex = (int) datagram.at(1);
 
-        index = (int) datagram.at(2) << 8;
-        index += (int) datagram.at(3) & 0xFF;
+            index = (int) datagram.at(2) << 8;
+            index += (int) datagram.at(3) & 0xFF;
 
-        latexString = QString::fromUtf8(datagram.remove(0, 4));
+            latexString = QString::fromUtf8(datagram.remove(0, 4));
 
-        emit receivedLatexString(tabIndex, index, latexString);
-    } else if (cmd == Euler::MATH_STR) {
-        int tabIndex;
-        int index;
-        QString mathString;
+            emit receivedLatexString(tabIndex, index, latexString);
+        } else if (cmd == Euler::MATH_STR) {
+            int tabIndex;
+            int index;
+            QString mathString;
 
-        tabIndex = (int) datagram.at(1);
+            tabIndex = (int) datagram.at(1);
 
-        index = (int) datagram.at(2) << 8;
-        index += (int) datagram.at(3) & 0xFF;
+            index = (int) datagram.at(2) << 8;
+            index += (int) datagram.at(3) & 0xFF;
 
-        mathString = QString::fromUtf8(datagram.remove(0, 4));
+            mathString = QString::fromUtf8(datagram.remove(0, 4));
 
-        emit receivedMathString(tabIndex, index, mathString);
+            emit receivedMathString(tabIndex, index, mathString);
+        }
     }
-
 }
 
 void Euler::sendMathString(int tabIndex, int index, QString mathString, bool evaluate)
