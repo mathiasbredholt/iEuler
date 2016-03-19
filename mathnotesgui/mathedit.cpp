@@ -5,8 +5,11 @@ MathEdit::MathEdit(QWidget *parent) : QPlainTextEdit(parent)
     mathEditMode = MATHMODE;
     setFocusPolicy(Qt::StrongFocus);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    setFixedHeight(24);
-    setStyleSheet("QPlainTextEdit { border: none; background: #EEE; font-size: 14px;  }");
+    setFixedHeight(28);
+    setStyleSheet("QPlainTextEdit { border: none; }");
+    setBackgroundRole(QPalette::Dark);
+    setFont(parent->font());
+    setPalette(parent->palette());
     installEventFilter(this);
     setTabChangesFocus(false);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);

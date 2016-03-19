@@ -1,4 +1,3 @@
-
 import mathlib as ml
 import parsing
 from modules.ieuler.lib import *
@@ -6,6 +5,7 @@ import re
 from pyparsing import *
 import modules.maple.process as mProcess
 import modules.tools.plot2d as plot2d
+import ieuler
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
@@ -18,6 +18,16 @@ def set_gui(val):
 def set_eval(val):
     global evaluate
     evaluate = val
+
+
+def set_ans(val):
+    global ans
+    ans = val
+
+
+def get_ans(toks):
+    print(toks)
+    return 0
 
 
 def set_user_variables(vars):
@@ -95,17 +105,19 @@ unit_prefixes_list = oneOf(unit_prefixes)
 
 expression = Forward()
 
-unit = Suppress(Literal('_') + parsing.no_white) + (units_list + NotAny(parsing.no_white + Word(parsing.chars)) | (
-    Optional(unit_prefixes_list + parsing.no_white) + units_list +
-    NotAny(parsing.no_white + Word(parsing.chars)))) + NotAny(parsing.no_white + Literal('_'))
+unit = Suppress(Literal('_') + parsing.no_white) + (
+    units_list + NotAny(parsing.no_white + Word(parsing.chars)) | (
+        Optional(unit_prefixes_list + parsing.no_white) + units_list +
+        NotAny(parsing.no_white + Word(parsing.chars)))
+) + NotAny(parsing.no_white + Literal('_'))
 
 name = NotAny(deco_kw_list | equality_kw_list | Keyword('cross')) + Word(
     parsing.letters, parsing.chars)
 
 variable = Forward()
 number = Forward()
-variable << name + Optional(parsing.no_white +
-                            Literal('_') + parsing.no_white + (variable | number))
+variable << name + Optional(parsing.no_white + Literal('_') + parsing.no_white
+                            + (variable | number))
 
 function = Combine(name + Suppress("(")) + \
     delimitedList(expression, delim=',') + Suppress(")")
@@ -119,13 +131,15 @@ eval_direct_field = Suppress('$') + expression + Suppress('$')
 
 operand = (
     eval_field.setParseAction(lambda x: evaluate_expression(x[0]))
-    | eval_direct_field.setParseAction(lambda x: evaluate_expression(x[0], False))
+    | eval_direct_field.setParseAction(
+        lambda x: evaluate_expression(x[0], False))
     | function.setParseAction(lambda x: parsing.get_function(x, functions))
     | unit.setParseAction(lambda x: parsing.get_unit(x, user_variables))
     | variable.setParseAction(
         lambda x: parsing.get_variable(x, variables, symbols))
     | number.setParseAction(parsing.get_value))
 
+ansop = Literal('ans') + Optional(Word(nums))
 insert_value = parsing.word_start + Literal('@') + parsing.no_white
 factop = parsing.no_white + Literal('!') + parsing.word_end
 signop = parsing.word_start + Literal('-') + parsing.no_white
@@ -145,7 +159,7 @@ equalop = Group(other_equals) | equals | Group(equality_kw_list)
 right = opAssoc.RIGHT
 left = opAssoc.LEFT
 expression << infixNotation(operand, [
-    (insert_value, 1, right, get_variable_value),
+    (ansop, 1, right, get_ans), (insert_value, 1, right, get_variable_value),
     (factop, 1, left, parsing.get_factorial_op),
     (deco_kw_list, 1, right, get_decorator),
     (signop, 1, right, parsing.get_minus_op),

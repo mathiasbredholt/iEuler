@@ -10,6 +10,8 @@
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QMessageBox>
+#include <QtWebEngineWidgets>
+#include <QWebEngineView>
 
 #include "cmdpanel.h"
 #include "paragraph.h"
@@ -34,6 +36,7 @@ private:
     CmdPanel *cmdpanel;
     Euler *euler;
     Renderer *renderer;
+    QPalette pal;
 
     int numberOfLines;
 
