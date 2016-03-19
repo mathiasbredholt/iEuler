@@ -59,11 +59,11 @@ QPixmap Renderer::createPixmap()
 
     page->runJavaScript("getComputedStyle(getElementById('input')).style.getPropertyValue('width')",
                        [](const QVariant &v) {
-        widthCSS = v.toString();
+//        widthCSS = v.toString();
     });
     page->runJavaScript("getComputedStyle(getElementById('input')).style.getPropertyValue('height')",
                        [](const QVariant &v) {
-        heightCSS = v.toString();
+//        heightCSS = v.toString();
     });
 
     int w = widthCSS.left(widthCSS.indexOf("px")).toInt() - 34;
@@ -94,8 +94,8 @@ void Renderer::initMathJax()
 {
     QString html = readFile(":/webkit/test");
     QUrl baseUrl = QUrl::fromLocalFile(QDir::currentPath() + "/mathnotesgui/webkit/");
-    webkit->page()->mainFrame()->addToJavaScriptWindowObject("Renderer", this);
-    webkit->setHtml(html, baseUrl);
+//    webkit->page()->mainFrame()->addToJavaScriptWindowObject("Renderer", this);
+//    webkit->setHtml(html, baseUrl);
 }
 
 void Renderer::onLoadComplete()
