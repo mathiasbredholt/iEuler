@@ -23,7 +23,8 @@ SOURCES += \
     mathwidget.cpp \
     paragraph.cpp \
     mathedit.cpp \
-    cmdpanelitem.cpp
+    cmdpanelitem.cpp \
+    util.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -34,7 +35,8 @@ HEADERS  += \
     mathwidget.h \
     paragraph.h \
     mathedit.h \
-    cmdpanelitem.h
+    cmdpanelitem.h \
+    util.h
 
 FORMS    += \
     mainwindow.ui
