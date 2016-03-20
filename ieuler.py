@@ -84,7 +84,7 @@ def save_workspace(workspace, path):
         for key in workspace[tab]["user_input"]:
             f.write(workspace[tab][key]["command"] + "\n")
     f.close()
-    f = open(path + "b", 'w')
+    f = open(path + "c", 'w')
     pickle.dump(workspace, f)
     f.close()
 
