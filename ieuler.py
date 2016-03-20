@@ -122,7 +122,7 @@ def start():
 
     user_variables = [{}]
     worksheet = [{}]
-    current_tab = 0
+    history = [[]]
 
     read_settings()
 
@@ -138,17 +138,13 @@ def start():
 
             # Parse math string in iEuler syntax to a python representation
             math_obj = parse_math(math_string,
-                                  user_variables[current_tab], evaluate)
-
-            # Save output for back reference
-            if evaluate:
-                user_variables[current_tab]["ans"] = math_obj
+                                  user_variables[tab_index], evaluate)
 
             # Convert to LaTeX
             latex_string = modules.latex.generator.generate(math_obj)
 
             # Add input and output to worksheet
-            add_to_worksheet(worksheet[current_tab], index, math_string,
+            add_to_worksheet(worksheet[tab_index], index, math_string,
                              latex_string)
 
             # Send index and latex string through UDP socket
@@ -156,4 +152,4 @@ def start():
         elif cmd == transmit.OPEN:  # Open worksheet
             worksheet = load_worksheet(data["path"])
         elif cmd == transmit.SAVE:  # Save worksheet
-            save_worksheet(worksheet[current_tab], data["path"])
+            save_worksheet(worksheet[tab_index], data["path"])
