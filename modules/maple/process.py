@@ -11,7 +11,7 @@ maple_proc = None
 path = None
 
 
-def evaluate(expr, gui_mode=False, convert=True):
+def evaluate(expr, convert=True):
     global maple_proc
     print(maple_proc)
     if maple_proc is None:

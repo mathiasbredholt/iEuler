@@ -23,7 +23,6 @@ Renderer::Renderer(QWidget *parent) : QObject(parent)
     webengine->setHtml(html, baseUrl);
     // Setup zoom levels
 //    setZoomFactor((int) dpi() / webengine_DPI * 100);
-
     isRendering = false;
 //    hasLoaded = false;
     canRender = true;

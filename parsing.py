@@ -92,6 +92,14 @@ def get_matrix(toks, delimiters):
     return ml.Matrix(values, len(values[0]), len(values))
 
 
+def get_ans(toks, workspace):
+    i = int(toks[1]) if len(toks) > 1 else 1
+    value = workspace["user_output"][workspace["index"] - i] if workspace["index"] - \
+        i in workspace["user_output"].keys() else ml.Empty()
+    return ml.Ans(value, ml.Number(str(i)))
+    # return ml.Empty()
+
+
 def get_unit(toks, variables):
     # print("get_unit toks: {}".format(toks))
     if type(toks[0]) is ml.Number:

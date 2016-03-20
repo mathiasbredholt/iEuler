@@ -9,26 +9,13 @@ import modules.tools.plot2d as plot2d
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
 
-def set_gui(val):
-    global gui_mode
-    gui_mode = val
-
-
-def set_eval(val):
-    global evaluate
-    evaluate = val
-
-
-def set_user_variables(vars):
-    global user_variables
-    user_variables = vars
-
-
 def get_variable_value(toks):
     var, op = parsing.parse_unary_operator(toks)
     if type(var) is ml.Variable:
         if var.value in user_variables:
             return user_variables[var.value]
+    if type(var) is ml.Ans:
+        return var.value
     return var
 
 
@@ -42,7 +29,8 @@ def get_decorator(toks):
 
 def get_equality_op(toks):
     t = toks[0]
-    value1, value2, op = parsing.parse_binary_operator(toks, get_equality_op)
+    value1, value2, op = parsing.parse_binary_operator(
+        toks, get_equality_op)
     hidden = False
     assignment = False
     if "equals" in t:
@@ -79,9 +67,8 @@ def assign_variable(variable, value):
 def evaluate_expression(expr, convert=True):
     if evaluate:
         print(expr)
-        print(gui_mode)
         print(convert)
-        return mProcess.evaluate(expr, gui_mode, convert)
+        return mProcess.evaluate(expr, convert)
     return expr
 
 
@@ -91,6 +78,7 @@ deco_kw_list = parsing.make_keyword_list(decorator_keywords)
 equality_kw_list = parsing.make_keyword_list(equality_keywords)
 units_list = oneOf(units)
 unit_prefixes_list = oneOf(unit_prefixes)
+
 
 expression = Forward()
 
@@ -105,6 +93,9 @@ name = NotAny(deco_kw_list | equality_kw_list | Keyword('cross')) + Word(
 
 variable = Forward()
 number = Forward()
+
+ans = Literal('ans') + Optional(~White() + Word(nums))
+
 variable << name + Optional(parsing.no_white + Literal('_') + parsing.no_white
                             + (variable | number))
 
@@ -127,6 +118,7 @@ operand = (
         lambda x: evaluate_expression(x[0], False))
     | function.setParseAction(lambda x: parsing.get_function(x, functions))
     | unit.setParseAction(lambda x: parsing.get_unit(x, user_variables))
+    | ans.setParseAction(lambda x: parsing.get_ans(x, workspace))
     | variable.setParseAction(
         lambda x: parsing.get_variable(x, variables, symbols))
     | matrix.setParseAction(lambda x: parsing.get_matrix(x, matrix_delimiters))
@@ -168,5 +160,10 @@ expression << infixNotation(operand, [
 expression.parseWithTabs()
 
 
-def parse(text):
+def parse(text, worksp):
+    # print(workspace)
+    global workspace
+    global user_variables
+    workspace = worksp
+    user_variables = worksp["user_variables"]
     return expression.parseString(text)[0]

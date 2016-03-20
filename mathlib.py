@@ -3,6 +3,7 @@
 
 
 class Empty:
+
     def __init__(self):
         pass
 
@@ -13,6 +14,7 @@ class Empty:
 
 
 class Equality:
+
     def __init__(self, type, value1, value2, assignment=False, hidden=False):
         self.type = type
         self.value1 = value1
@@ -35,6 +37,7 @@ class Equality:
 
 
 class MathValue:
+
     def get_value(self):
         return self.value
 
@@ -59,6 +62,7 @@ class MathValue:
 
 
 class Number(MathValue):
+
     def __init__(self, value):
         self.value = value
         self.decorators = []
@@ -70,6 +74,7 @@ class Number(MathValue):
 
 
 class Matrix(MathValue):
+
     def __init__(self, values, width, height):
         self.value = values
         self.width = width
@@ -83,6 +88,7 @@ class Matrix(MathValue):
 
 
 class Complex(MathValue):
+
     def __init__(self, realpart, imagpart):
         self.r = realpart
         self.i = imagpart
@@ -96,6 +102,7 @@ class Complex(MathValue):
 
 
 class Variable(MathValue):
+
     def __init__(self, value, is_symbol=False, decs=[], subscript=None):
         self.value = value
         self.decorators = decs
@@ -115,7 +122,21 @@ class Variable(MathValue):
     __repr__ = __str__
 
 
+class Ans(MathValue):
+
+    def __init__(self, value, index):
+        self.value = value
+        self.index = index
+
+    def __str__(self):
+        return "Ans(index: {}, value: {})".format(
+            self.index, self.value)
+
+    __repr__ = __str__
+
+
 class Unit(MathValue):
+
     def __init__(self, unit, prefix=""):
         self.value = unit
         self.prefix = prefix
@@ -131,6 +152,7 @@ class Unit(MathValue):
 
 
 class Function(MathValue):
+
     def __init__(self, name, *args):
         self.value = args
         self.name = name
@@ -143,6 +165,7 @@ class Function(MathValue):
 
 
 class Plot(MathValue):
+
     def __init__(self, value):
         self.value = value
         self.decorators = []
@@ -154,6 +177,7 @@ class Plot(MathValue):
 
 
 class MathUnaryOperator:
+
     def __init__(self, value):
         self.value = value
 
@@ -181,6 +205,7 @@ class MathUnaryOperator:
 
 
 class Minus(MathUnaryOperator):
+
     def __str__(self):
         return "Minus({})".format(self.value)
 
@@ -188,6 +213,7 @@ class Minus(MathUnaryOperator):
 
 
 class Factorial(MathUnaryOperator):
+
     def __str__(self):
         return "Factorial({})".format(self.value)
 
@@ -195,6 +221,7 @@ class Factorial(MathUnaryOperator):
 
 
 class MathOperator:
+
     def __init__(self, value1, value2):
         self.value1 = value1
         self.value2 = value2
@@ -225,6 +252,7 @@ class MathOperator:
 
 
 class AddOp(MathOperator):
+
     def is_vector(self):
         return self.value1.is_vector() or self.value2.is_vector()
 
@@ -235,6 +263,7 @@ class AddOp(MathOperator):
 
 
 class SubOp(MathOperator):
+
     def is_vector(self):
         return self.value1.is_vector() or self.value2.is_vector()
 
@@ -245,6 +274,7 @@ class SubOp(MathOperator):
 
 
 class MulOp(MathOperator):
+
     def is_vector(self):
         return self.value1.is_vector() != self.value2.is_vector()
 
@@ -258,6 +288,7 @@ class MulOp(MathOperator):
 
 
 class CrossOp(MathOperator):
+
     def is_vector(self):
         return True
 
@@ -268,6 +299,7 @@ class CrossOp(MathOperator):
 
 
 class Fraction(MathOperator):
+
     def is_vector(self):
         return self.value1.is_vector()
 
@@ -278,6 +310,7 @@ class Fraction(MathOperator):
 
 
 class Root(MathOperator):
+
     def is_vector(self):
         return False
 
@@ -288,6 +321,7 @@ class Root(MathOperator):
 
 
 class Power(MathOperator):
+
     def is_vector(self):
         return False
 
@@ -298,6 +332,7 @@ class Power(MathOperator):
 
 
 class Range(MathOperator):
+
     def is_vector(self):
         return False
 
@@ -310,6 +345,7 @@ class Range(MathOperator):
 
 
 class Integral:
+
     def is_vector(self):
         return self.value.is_vector()
 
@@ -327,6 +363,7 @@ class Integral:
 
 
 class Derivative:
+
     def is_vector(self):
         return self.value.is_vector()
 
@@ -345,6 +382,7 @@ class Derivative:
 
 
 class Sum:
+
     def is_vector(self):
         return self.value.is_vector()
 

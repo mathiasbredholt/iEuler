@@ -77,6 +77,10 @@ def convert_matrix(self):
 def convert_value(self):
     if type(self) is ml.Unit:
         result = "\\mathrm{{{}}}".format(self.prefix + self.value)
+    elif type(self) is ml.Ans:
+        result = "ans{}".format(
+            "_{" + convert_expr(self.index) + "}" if int(self.index.value) > 1 else "")
+        return result
     elif type(self) is ml.Variable:
         if self.is_symbol:
             if self.value in special_symbols:
