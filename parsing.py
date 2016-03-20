@@ -76,8 +76,8 @@ def get_variable(toks, variables, symbols={"__standard__": []}, user_variables={
 
 def get_ans(toks, workspace):
     i = int(toks[1]) if len(toks) > 1 else 1
-    value = workspace["user_input"][workspace["index"] - i] if workspace["index"] - \
-        i in workspace["user_input"].keys() else ml.Empty()
+    value = workspace["user_output"][workspace["index"] - i] if workspace["index"] - \
+        i in workspace["user_output"].keys() else ml.Empty()
     return ml.Ans(value, ml.Number(str(i)))
     # return ml.Empty()
 

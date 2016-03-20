@@ -80,27 +80,21 @@ def add_to_workspace(workspace, index, command, latex):
 
 def save_workspace(workspace, path):
     f = open(path, 'w')
-    for tab in workspace:
-        for key in workspace[tab]["user_input"]:
-            f.write(workspace[tab][key]["command"] + "\n")
+    for key, value in workspace["user_input"].items():
+        f.write(value + "\n")
     f.close()
-    f = open(path + "c", 'w')
+    f = open(path + "c", 'wb')
     pickle.dump(workspace, f)
     f.close()
 
 
 def load_workspace(path, tab_index=0):
-    workspace = {}
-    f = open(path, 'r')
-    # for i, line in enumerate(f):
-    #     workspace[0]["user_input"][i] = {"command": line.strip()}
-
-    #     transmit.send_math_string(tab_index, i, line.strip())
-    #     # print("{} {}".format(i, line.strip()))
-    # f.close()
+    f = open(path, 'rb')
     workspace = pickle.load(f)
     f.close
-    # print("Done")
+    for key, value in workspace["user_input"].items():
+        # tab["user_input"][i] = {"command": line.strip()}
+        transmit.send_math_string(tab_index, key, value)
     return workspace
 
 
@@ -127,9 +121,11 @@ def start():
     # Initialize UDP socket
     transmit.init()
 
+    tab_index = 0
     workspace = [{}]
     workspace[0]["user_variables"] = {}
     workspace[0]["user_input"] = {}
+    workspace[0]["user_output"] = {}
 
     read_settings()
 
@@ -151,12 +147,13 @@ def start():
             latex_string = modules.latex.generator.generate(math_obj)
 
             # Add math object to workspace
-            workspace[tab_index]["user_input"][index] = math_obj
+            workspace[tab_index]["user_input"][index] = math_string
+            workspace[tab_index]["user_output"][index] = latex_string
             workspace[tab_index]["index"] = index
 
             # Send index and latex string through UDP socket
             transmit.send_latex(tab_index, index, latex_string)
         elif cmd == transmit.OPEN:  # Open workspace
-            workspace = load_workspace(data["path"])
+            workspace.append(load_workspace(data["path"], tab_index + 1))
         elif cmd == transmit.SAVE:  # Save workspace
-            save_workspace(workspace, data["path"])
+            save_workspace(workspace[tab_index], data["path"])

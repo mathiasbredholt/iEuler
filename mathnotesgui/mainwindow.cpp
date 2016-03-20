@@ -157,7 +157,7 @@ void MainWindow::openFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getOpenFileName(this,
-        tr("Open iEuler file"), dir, tr("Text Files (*.euler)"));
+        tr("Open iEuler file"), dir, tr("iEuler files (*.eulerc)"));
     if (path != "") {
         QFileInfo fi(path);
         createNewTab(true, fi.fileName());
