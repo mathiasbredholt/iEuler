@@ -22,8 +22,8 @@ Renderer::Renderer(QWidget *parent) : QObject(parent)
     webengine->setPalette(parent->palette());
     webengine->setHtml(html, baseUrl);
     // Setup zoom levels
-    baseScaling = getScreenDPI() / webengine_DPI;
-    setZoomFactor(DEFAULT_ZOOM_FACTOR*baseScaling);
+//    baseScaling = getScreenDPI() / webengine_DPI;
+//    setZoomFactor(DEFAULT_ZOOM_FACTOR*baseScaling);
 
     isRendering = false;
 //    hasLoaded = false;

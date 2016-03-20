@@ -105,8 +105,8 @@ def frink_query(query_string, proc, queue, thread):
     return return_string
 
 
-def parse_math(math_string, user_variables, evaluate):
-    return parser.parse(math_string, user_variables, evaluate, True)
+def parse_math(math_string, workspace, evaluate):
+    return parser.parse(math_string, workspace, evaluate)
 
 
 def read_settings():
@@ -120,9 +120,8 @@ def start():
     # Initialize UDP socket
     transmit.init()
 
-    user_variables = [{}]
-    worksheet = [{}]
-    history = [[]]
+    workspace = [{}]
+    workspace[0]["user_variables"] = {}
 
     read_settings()
 
@@ -137,19 +136,23 @@ def start():
             evaluate = cmd == 1
 
             # Parse math string in iEuler syntax to a python representation
-            math_obj = parse_math(math_string,
-                                  user_variables[tab_index], evaluate)
+            math_obj = parse_math(math_string, workspace[tab_index], evaluate)
 
             # Convert to LaTeX
             latex_string = modules.latex.generator.generate(math_obj)
 
-            # Add input and output to worksheet
-            add_to_worksheet(worksheet[tab_index], index, math_string,
-                             latex_string)
+            # Add input and output to workspace
+            # add_to_worksheet(worksheet[tab_index], index, math_string,
+            #                  latex_string)
+
+            # Add math object to workspace
+            workspace[tab_index][index] = math_obj
+            workspace[tab_index]["index"] = index
 
             # Send index and latex string through UDP socket
             transmit.send_latex(tab_index, index, latex_string)
         elif cmd == transmit.OPEN:  # Open worksheet
             worksheet = load_worksheet(data["path"])
         elif cmd == transmit.SAVE:  # Save worksheet
-            save_worksheet(worksheet[tab_index], data["path"])
+            # save_worksheet(worksheet[tab_index], data["path"])
+            pass

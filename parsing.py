@@ -74,6 +74,17 @@ def get_variable(toks, variables, symbols={"__standard__": []}, user_variables={
         return variables["__default__"]["object"](value, subscript=subscript)
 
 
+def get_ans(toks, workspace):
+    if toks[1] is not None:
+        t = int(toks[1])
+        if workspace[workspace["index"] - t] is not None:
+            return workspace[workspace["index"] - t]
+    # else:
+    #     if workspace[int(toks[1]) - 1] is not None:
+    #         return workspace[toks[1] - 1]
+    return ml.Empty()
+
+
 def get_unit(toks, variables):
     # print("get_unit toks: {}".format(toks))
     if toks[0] in variables:
