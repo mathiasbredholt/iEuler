@@ -80,7 +80,6 @@ void Renderer::setZoomFactor(double factor)
 
 void Renderer::render(MathWidget *target)
 {
-    qDebug() << target->latexString;
     webengine->page()->runJavaScript("document.getElementById('input').innerHTML = String.raw`"+target->latexString+"` ");
     webengine->page()->runJavaScript("MathJax.Hub.Queue(['Typeset', MathJax.Hub, 'input']);");
 //    if (queue.empty() || queue.head() != target) queue.enqueue(target);
