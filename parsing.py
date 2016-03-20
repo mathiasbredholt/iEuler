@@ -74,6 +74,24 @@ def get_variable(toks, variables, symbols={"__standard__": []}, user_variables={
         return variables["__default__"]["object"](value, subscript=subscript)
 
 
+def get_matrix(toks, delimiters):
+    values = [[toks[0]]]
+    row = 0
+    for i in range(1, len(toks), 2):
+        if toks[i] in delimiters["vertical"]:
+            row += 1
+            values += [[toks[i + 1]]]
+        elif toks[i] in delimiters["horizontal"]:
+            # print("values: {}, toks[i+1]: {}".format(values, toks[i + 1]))
+            values[row] += [toks[i + 1]]
+        else:
+            # error
+            print("invalid delimiter")
+    # TODO: Check for irregularity
+
+    return ml.Matrix(values, len(values[0]), len(values))
+
+
 def get_ans(toks, workspace):
     i = int(toks[1]) if len(toks) > 1 else 1
     value = workspace["user_output"][workspace["index"] - i] if workspace["index"] - \
@@ -84,6 +102,8 @@ def get_ans(toks, workspace):
 
 def get_unit(toks, variables):
     # print("get_unit toks: {}".format(toks))
+    if type(toks[0]) is ml.Number:
+        return ml.MulOp(toks[0], get_unit(toks[1:], variables))
     if toks[0] in variables:
         return ml.Variable(toks[0])
     if len(toks) > 1:

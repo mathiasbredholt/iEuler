@@ -58,6 +58,22 @@ def convert_text(self):
     return self.text
 
 
+def convert_matrix(self):
+    result = "\\begin{{{}}}\n\t".format("bmatrix")
+    max_len = max([len(convert_expr(item))
+                   for row in self.value for item in row])
+    for rows in range(0, len(self.value)):
+        for cols in range(0, len(self.value[rows])):
+            if cols > 0:
+                result += "& "
+            val = convert_expr(self.value[rows][cols])
+            white = (max_len - len(val) + 1) // 2
+            result += val + " " * white
+        result += "\\\\\n\t" if rows < len(self.value) - 1 else "\n"
+    result += "\\end{{{}}}\n\t".format("bmatrix")
+    return result
+
+
 def convert_value(self):
     if type(self) is ml.Unit:
         result = "\\mathrm{{{}}}".format(self.prefix + self.value)
@@ -222,6 +238,7 @@ def convert_range(self):
 tl.Paragraph.to_latex = convert_paragraph
 tl.Text.to_latex = convert_text
 ml.MathValue.to_latex = convert_value
+ml.Matrix.to_latex = convert_matrix
 ml.Equality.to_latex = convert_equality
 ml.Function.to_latex = convert_function
 ml.Minus.to_latex = convert_minus

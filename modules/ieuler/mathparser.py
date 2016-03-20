@@ -5,7 +5,6 @@ import re
 from pyparsing import *
 import modules.maple.process as mProcess
 import modules.tools.plot2d as plot2d
-import ieuler
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
@@ -73,7 +72,7 @@ def evaluate_expression(expr, convert=True):
     return expr
 
 
-ParserElement.setDefaultWhitespaceChars(' \t')
+ParserElement.setDefaultWhitespaceChars(' ')
 
 deco_kw_list = parsing.make_keyword_list(decorator_keywords)
 equality_kw_list = parsing.make_keyword_list(equality_keywords)
@@ -83,11 +82,11 @@ unit_prefixes_list = oneOf(unit_prefixes)
 
 expression = Forward()
 
-unit = Suppress(Literal('_') + parsing.no_white) + (
+unit = Optional(Word(nums).setParseAction(parsing.get_value)) + Suppress(Literal(unit_escape_character) + parsing.no_white) + (
     units_list + NotAny(parsing.no_white + Word(parsing.chars)) | (
         Optional(unit_prefixes_list + parsing.no_white) + units_list +
         NotAny(parsing.no_white + Word(parsing.chars)))
-) + NotAny(parsing.no_white + Literal('_'))
+) + NotAny(parsing.no_white + Literal(unit_escape_character))
 
 name = NotAny(deco_kw_list | equality_kw_list | Keyword('cross')) + Word(
     parsing.letters, parsing.chars)
@@ -102,6 +101,9 @@ variable << name + Optional(parsing.no_white + Literal('_') + parsing.no_white
 
 function = Combine(name + Suppress("(")) + \
     delimitedList(expression, delim=',') + Suppress(")")
+
+matrix = Suppress(oneOf(matrix_delimiters["start"]) + Optional(White())) + expression + ZeroOrMore(oneOf(matrix_delimiters[
+    "horizontal"] + matrix_delimiters["vertical"]) + NotAny(oneOf(matrix_delimiters["end"])) + expression) + Suppress(Optional(White()) + oneOf(matrix_delimiters["end"]))
 
 number << (Combine(Word(nums) + Optional("." + Optional(Word(nums)))) +
            Optional(NotAny(White()) + (function | unit | variable)))
@@ -119,7 +121,9 @@ operand = (
     | ans.setParseAction(lambda x: parsing.get_ans(x, workspace))
     | variable.setParseAction(
         lambda x: parsing.get_variable(x, variables, symbols))
-    | number.setParseAction(parsing.get_value))
+    | matrix.setParseAction(lambda x: parsing.get_matrix(x, matrix_delimiters))
+    | number.setParseAction(parsing.get_value)
+)
 
 insert_value = parsing.word_start + Literal('@') + parsing.no_white
 factop = parsing.no_white + Literal('!') + parsing.word_end
