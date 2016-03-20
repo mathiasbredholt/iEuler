@@ -14,6 +14,8 @@ units = ['V', 'A', 'J', 'm', 's', 'K', 'W', 'H', 'F', 'T', 'g', 'Hz', 'N',
 unit_prefixes = ['y', 'z', 'a', 'f', 'p', 'n', 'μ', 'm', 'c', 'd', 'da', 'h',
                  'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y']
 
+unit_escape_character = '.'
+
 matrix_delimiters = {
     "start": ['<', '['],
     "end": ['>', ']'],

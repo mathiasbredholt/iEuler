@@ -81,6 +81,8 @@ def get_matrix(toks):
 
 def get_unit(toks, variables):
     # print("get_unit toks: {}".format(toks))
+    if type(toks[0]) is ml.Number:
+        return ml.MulOp(toks[0], get_unit(toks[1:], variables))
     if toks[0] in variables:
         return ml.Variable(toks[0])
     if len(toks) > 1:

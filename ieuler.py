@@ -140,6 +140,8 @@ def start():
             math_obj = parse_math(math_string,
                                   user_variables[tab_index], evaluate)
 
+            print(math_obj)
+
             # Convert to LaTeX
             latex_string = modules.latex.generator.generate(math_obj)
 

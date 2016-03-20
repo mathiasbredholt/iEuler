@@ -5,7 +5,6 @@ import re
 from pyparsing import *
 import modules.maple.process as mProcess
 import modules.tools.plot2d as plot2d
-import ieuler
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
@@ -95,11 +94,11 @@ unit_prefixes_list = oneOf(unit_prefixes)
 
 expression = Forward()
 
-unit = Suppress(Literal('_') + parsing.no_white) + (
+unit = Optional(Word(nums).setParseAction(parsing.get_value)) + Suppress(Literal(unit_escape_character) + parsing.no_white) + (
     units_list + NotAny(parsing.no_white + Word(parsing.chars)) | (
         Optional(unit_prefixes_list + parsing.no_white) + units_list +
         NotAny(parsing.no_white + Word(parsing.chars)))
-) + NotAny(parsing.no_white + Literal('_'))
+) + NotAny(parsing.no_white + Literal(unit_escape_character))
 
 name = NotAny(deco_kw_list | equality_kw_list | Keyword('cross')) + Word(
     parsing.letters, parsing.chars)
