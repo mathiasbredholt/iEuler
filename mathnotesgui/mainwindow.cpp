@@ -3,10 +3,23 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    int dpiX = QApplication::desktop()->screen()->physicalDpiX();
-    setMinimumSize(dpiX*8, dpiX*5);
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
+    setMinimumSize(ptX(600), ptY(600));
 
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+
+    // Open menu
+    QAction *openAct = new QAction(tr("&Open"), this);
+    openAct->setShortcut(QKeySequence(tr("Ctrl+O")));
+    connect(openAct, SIGNAL(triggered(bool)), this, SLOT(on_actionOpen_triggered()));
+    fileMenu->addAction(openAct);
+
+    // Save menu
+    QAction *saveAct = new QAction(tr("&Save"), this);
+    saveAct->setShortcut(QKeySequence(tr("Ctrl+S")));
+    connect(saveAct, SIGNAL(triggered(bool)), this, SLOT(on_actionSave_triggered()));
+    fileMenu->addAction(saveAct);
 
     // Close menu
     QAction *closeAct = new QAction(tr("&Close"), this);
