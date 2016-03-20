@@ -89,7 +89,6 @@ def load_worksheet(path, tab_index=0):
     f = open(path, 'r')
     for i, line in enumerate(f):
         worksheet[i] = {"command": line.strip()}
-
         transmit.send_math_string(tab_index, i, line.strip())
         # print("{} {}".format(i, line.strip()))
     f.close()
