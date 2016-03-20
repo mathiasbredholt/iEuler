@@ -75,14 +75,11 @@ def get_variable(toks, variables, symbols={"__standard__": []}, user_variables={
 
 
 def get_ans(toks, workspace):
-    if toks[1] is not None:
-        t = int(toks[1])
-        if workspace[workspace["index"] - t] is not None:
-            return workspace[workspace["index"] - t]
-    # else:
-    #     if workspace[int(toks[1]) - 1] is not None:
-    #         return workspace[toks[1] - 1]
-    return ml.Empty()
+    i = int(toks[1]) if len(toks) > 1 else 1
+    value = workspace["user_input"][workspace["index"] - i] if workspace["index"] - \
+        i in workspace["user_input"].keys() else ml.Empty()
+    return ml.Ans(value, ml.Number(str(i)))
+    # return ml.Empty()
 
 
 def get_unit(toks, variables):

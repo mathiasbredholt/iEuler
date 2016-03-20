@@ -1,4 +1,5 @@
 import json
+import pickle
 import modules.ieuler.parser as parser
 import modules.ieuler.generator as generator
 import modules.latex.generator
@@ -30,7 +31,7 @@ def conf(os):
 def run(argv=None):
 
     user_variables = [{}]
-    worksheet = [{}]
+    workspace = [{}]
     ans = []
     current_tab = 0
 
@@ -62,39 +63,45 @@ def console_send_result(command, user_variables):
     print(generator.generate(result))
 
 
-def gui_send_result(index, command, user_variables, evaluate, worksheet):
+def gui_send_result(index, command, user_variables, evaluate, workspace):
     result = parser.parse(command, user_variables, evaluate, True)
 
     if type(result) is ml.Plot:
         plot2d.plot(result)
 
     latex = modules.latex.generator.convert_expr(result)
-    add_to_worksheet(worksheet, index, command, latex)
+    add_to_workspace(workspace, index, command, latex)
     print('{} {}'.format(index, latex))
 
 
-def add_to_worksheet(worksheet, index, command, latex):
-    worksheet[index] = {"command": command, "latex": latex}
+def add_to_workspace(workspace, index, command, latex):
+    workspace[index] = {"command": command, "latex": latex}
 
 
-def save_worksheet(worksheet, path):
+def save_workspace(workspace, path):
     f = open(path, 'w')
-    for key in worksheet:
-        f.write(worksheet[key]["command"] + "\n")
+    for tab in workspace:
+        for key in workspace[tab]["user_input"]:
+            f.write(workspace[tab][key]["command"] + "\n")
+    f.close()
+    f = open(path + "b", 'w')
+    pickle.dump(workspace, f)
     f.close()
 
 
-def load_worksheet(path, tab_index=0):
-    worksheet = {}
+def load_workspace(path, tab_index=0):
+    workspace = {}
     f = open(path, 'r')
-    for i, line in enumerate(f):
-        worksheet[i] = {"command": line.strip()}
+    # for i, line in enumerate(f):
+    #     workspace[0]["user_input"][i] = {"command": line.strip()}
 
-        transmit.send_math_string(tab_index, i, line.strip())
-        # print("{} {}".format(i, line.strip()))
-    f.close()
+    #     transmit.send_math_string(tab_index, i, line.strip())
+    #     # print("{} {}".format(i, line.strip()))
+    # f.close()
+    workspace = pickle.load(f)
+    f.close
     # print("Done")
-    return worksheet
+    return workspace
 
 
 def frink_query(query_string, proc, queue, thread):
@@ -122,6 +129,7 @@ def start():
 
     workspace = [{}]
     workspace[0]["user_variables"] = {}
+    workspace[0]["user_input"] = {}
 
     read_settings()
 
@@ -137,22 +145,18 @@ def start():
 
             # Parse math string in iEuler syntax to a python representation
             math_obj = parse_math(math_string, workspace[tab_index], evaluate)
+            # print(math_obj)
 
             # Convert to LaTeX
             latex_string = modules.latex.generator.generate(math_obj)
 
-            # Add input and output to workspace
-            # add_to_worksheet(worksheet[tab_index], index, math_string,
-            #                  latex_string)
-
             # Add math object to workspace
-            workspace[tab_index][index] = math_obj
+            workspace[tab_index]["user_input"][index] = math_obj
             workspace[tab_index]["index"] = index
 
             # Send index and latex string through UDP socket
             transmit.send_latex(tab_index, index, latex_string)
-        elif cmd == transmit.OPEN:  # Open worksheet
-            worksheet = load_worksheet(data["path"])
-        elif cmd == transmit.SAVE:  # Save worksheet
-            # save_worksheet(worksheet[tab_index], data["path"])
-            pass
+        elif cmd == transmit.OPEN:  # Open workspace
+            workspace = load_workspace(data["path"])
+        elif cmd == transmit.SAVE:  # Save workspace
+            save_workspace(workspace, data["path"])

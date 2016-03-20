@@ -15,6 +15,8 @@ def get_variable_value(toks):
     if type(var) is ml.Variable:
         if var.value in user_variables:
             return user_variables[var.value]
+    if type(var) is ml.Ans:
+        return var.value
     return var
 
 
@@ -93,7 +95,7 @@ name = NotAny(deco_kw_list | equality_kw_list | Keyword('cross')) + Word(
 variable = Forward()
 number = Forward()
 
-ans = Literal('ans') + Optional(parsing.no_white + Word(nums))
+ans = Literal('ans') + Optional(~White() + Word(nums))
 
 variable << name + Optional(parsing.no_white + Literal('_') + parsing.no_white
                             + (variable | number))
