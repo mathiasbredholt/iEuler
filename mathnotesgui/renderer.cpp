@@ -1,7 +1,7 @@
 #include "renderer.h"
 
-//#define webengine_DPI 114.0
-//#define DEFAULT_ZOOM_FACTOR 1
+#define webengine_DPI 114.0
+#define DEFAULT_ZOOM_FACTOR 1
 
 QString readFile (const QString& filename)
 {
@@ -22,8 +22,8 @@ Renderer::Renderer(QWidget *parent) : QObject(parent)
     webengine->setPalette(parent->palette());
     webengine->setHtml(html, baseUrl);
     // Setup zoom levels
-//    baseScaling = getScreenDPI() / webengine_DPI;
-//    webengine->setZoomFactor(DEFAULT_ZOOM_FACTOR*baseScaling);
+    baseScaling = getScreenDPI() / webengine_DPI;
+    setZoomFactor(DEFAULT_ZOOM_FACTOR*baseScaling);
 
     isRendering = false;
 //    hasLoaded = false;
@@ -53,9 +53,9 @@ void Renderer::startRendering()
 
 QPixmap Renderer::createPixmap()
 {
-    QWebEnginePage *page = webengine->page();
-    QString widthCSS = QString("0px");
-    QString heightCSS = QString("0px");
+//    QWebEnginePage *page = webengine->page();
+//    QString widthCSS = QString("0px");
+//    QString heightCSS = QString("0px");
 
 //    page->runJavaScript("getComputedStyle(getElementById('input')).style.getPropertyValue('width')",
 //                       [](const QVariant &v) {
@@ -66,10 +66,10 @@ QPixmap Renderer::createPixmap()
 //        heightCSS = v.toString();
 //    });
 
-    int w = widthCSS.left(widthCSS.indexOf("px")).toInt() - 34;
-    int h = heightCSS.left(heightCSS.indexOf("px")).toInt() + 4;
-    QPixmap pixmap(QSize(w, h));
-    webengine->render(&pixmap, QPoint(0, -18));
+//    int w = widthCSS.left(widthCSS.indexOf("px")).toInt() - 34;
+//    int h = heightCSS.left(heightCSS.indexOf("px")).toInt() + 4;
+    QPixmap pixmap(QSize(0, 0));
+//    webengine->render(&pixmap, QPoint(0, -18));
     return pixmap;
 }
 
@@ -80,7 +80,6 @@ void Renderer::setZoomFactor(double factor)
 
 void Renderer::render(MathWidget *target)
 {
-    qDebug() << target->latexString;
     webengine->page()->runJavaScript("document.getElementById('input').innerHTML = String.raw`"+target->latexString+"` ");
     webengine->page()->runJavaScript("MathJax.Hub.Queue(['Typeset', MathJax.Hub, 'input']);");
 //    if (queue.empty() || queue.head() != target) queue.enqueue(target);

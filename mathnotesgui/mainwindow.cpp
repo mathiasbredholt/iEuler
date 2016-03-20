@@ -1,10 +1,25 @@
 #include "mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::MainWindow)
+    QMainWindow(parent)
 {
-    ui->setupUi(this);
+    int dpiX = QApplication::desktop()->screen()->physicalDpiX();
+    setMinimumSize(dpiX*8, dpiX*5);
+
+    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+
+    // Close menu
+    QAction *closeAct = new QAction(tr("&Close"), this);
+    closeAct->setShortcut(QKeySequence(tr("Ctrl+W")));
+    connect(closeAct, &QAction::triggered, this, &MainWindow::close);
+    connect(closeAct, SIGNAL(triggered(bool)), this, SLOT(on_actionClose_triggered()));
+    fileMenu->addAction(closeAct);
+
+    // Restart core
+    QAction *coreAct = new QAction(tr("&Restart core"), this);
+    coreAct->setShortcut(QKeySequence(tr("Ctrl+R")));
+    connect(coreAct, SIGNAL(triggered(bool)), this, SLOT(on_actionRestart_core_triggered()));
+    fileMenu->addAction(coreAct);
 
     pal = palette();
     pal.setColor(QPalette::Base, QColor("#333"));
@@ -12,7 +27,12 @@ MainWindow::MainWindow(QWidget *parent) :
     pal.setColor(QPalette::Text, QColor("#FFF"));
     setPalette(pal);
 
-    setFont(QFont("Monaco", 14));
+    setFont(QFont("Monaco", 12));
+
+    container = new QWidget(this);
+    container->setLayout(new QVBoxLayout());
+    container->layout()->setMargin(0);
+    setCentralWidget(container);
 
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
@@ -25,17 +45,17 @@ MainWindow::MainWindow(QWidget *parent) :
     tabs->setTabsClosable(true);
     tabs->setStyleSheet("QTabWidget { left: 5px; border: none; background: #FFF; /* move to the right by 5px */ } QTabBar::tab { font: Monaco; color: white; background: #666; } QTabBar::tab:selected { background: #444 }");
     tabs->setMovable(true);
-    ui->container->layout()->addWidget(tabs);
+    container->layout()->addWidget(tabs);
     createNewTab();
 
 //     Create Command panel
     cmdpanel = new CmdPanel(this);
-    ui->container->layout()->addWidget(cmdpanel);
+    container->layout()->addWidget(cmdpanel);
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+//    delete ui;
 }
 
 void MainWindow::closeEvent(QCloseEvent *e) {
