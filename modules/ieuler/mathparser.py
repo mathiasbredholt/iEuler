@@ -85,7 +85,7 @@ def evaluate_expression(expr, convert=True):
     return expr
 
 
-ParserElement.setDefaultWhitespaceChars(' \t')
+ParserElement.setDefaultWhitespaceChars(' ')
 
 deco_kw_list = parsing.make_keyword_list(decorator_keywords)
 equality_kw_list = parsing.make_keyword_list(equality_keywords)
@@ -111,8 +111,8 @@ variable << name + Optional(parsing.no_white + Literal('_') + parsing.no_white
 function = Combine(name + Suppress("(")) + \
     delimitedList(expression, delim=',') + Suppress(")")
 
-matrix = Suppress(oneOf(matrix_delimiters["start"])) + expression + ZeroOrMore(oneOf(matrix_delimiters[
-    "horizontal"] + matrix_delimiters["vertical"]) + expression) + Suppress(oneOf(matrix_delimiters["end"]))
+matrix = Suppress(oneOf(matrix_delimiters["start"]) + Optional(White())) + expression + ZeroOrMore(oneOf(matrix_delimiters[
+    "horizontal"] + matrix_delimiters["vertical"]) + NotAny(oneOf(matrix_delimiters["end"])) + expression) + Suppress(Optional(White()) + oneOf(matrix_delimiters["end"]))
 
 number << (Combine(Word(nums) + Optional("." + Optional(Word(nums)))) +
            Optional(NotAny(White()) + (function | unit | variable)))
@@ -129,7 +129,7 @@ operand = (
     | unit.setParseAction(lambda x: parsing.get_unit(x, user_variables))
     | variable.setParseAction(
         lambda x: parsing.get_variable(x, variables, symbols))
-    | matrix.setParseAction(parsing.get_matrix)
+    | matrix.setParseAction(lambda x: parsing.get_matrix(x, matrix_delimiters))
     | number.setParseAction(parsing.get_value)
 )
 

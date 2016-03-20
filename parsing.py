@@ -74,9 +74,22 @@ def get_variable(toks, variables, symbols={"__standard__": []}, user_variables={
         return variables["__default__"]["object"](value, subscript=subscript)
 
 
-def get_matrix(toks):
-    print(toks)
-    return ml.Matrix([1], 1, 1)
+def get_matrix(toks, delimiters):
+    values = [[toks[0]]]
+    row = 0
+    for i in range(1, len(toks), 2):
+        if toks[i] in delimiters["vertical"]:
+            row += 1
+            values += [[toks[i + 1]]]
+        elif toks[i] in delimiters["horizontal"]:
+            # print("values: {}, toks[i+1]: {}".format(values, toks[i + 1]))
+            values[row] += [toks[i + 1]]
+        else:
+            # error
+            print("invalid delimiter")
+    # TODO: Check for irregularity
+
+    return ml.Matrix(values, len(values[0]), len(values))
 
 
 def get_unit(toks, variables):
