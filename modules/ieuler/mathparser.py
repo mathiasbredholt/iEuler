@@ -122,6 +122,9 @@ variable << name + Optional(parsing.no_white + Literal('_') + parsing.no_white
 function = Combine(name + Suppress("(")) + \
     delimitedList(expression, delim=',') + Suppress(")")
 
+matrix = Suppress(oneOf(matrix_delimiters["start"])) + expression + ZeroOrMore(oneOf(matrix_delimiters[
+    "horizontal"] + matrix_delimiters["vertical"]) + expression) + Suppress(oneOf(matrix_delimiters["end"]))
+
 number << (Combine(Word(nums) + Optional("." + Optional(Word(nums)))) +
            Optional(NotAny(White()) + (function | unit | variable)))
 
@@ -137,7 +140,9 @@ operand = (
     | unit.setParseAction(lambda x: parsing.get_unit(x, user_variables))
     | variable.setParseAction(
         lambda x: parsing.get_variable(x, variables, symbols))
-    | number.setParseAction(parsing.get_value))
+    | matrix.setParseAction(parsing.get_matrix)
+    | number.setParseAction(parsing.get_value)
+)
 
 ansop = Literal('ans') + Optional(Word(nums))
 insert_value = parsing.word_start + Literal('@') + parsing.no_white

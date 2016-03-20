@@ -74,6 +74,11 @@ def get_variable(toks, variables, symbols={"__standard__": []}, user_variables={
         return variables["__default__"]["object"](value, subscript=subscript)
 
 
+def get_matrix(toks):
+    print(toks)
+    return ml.Matrix([1], 1, 1)
+
+
 def get_unit(toks, variables):
     # print("get_unit toks: {}".format(toks))
     if toks[0] in variables:

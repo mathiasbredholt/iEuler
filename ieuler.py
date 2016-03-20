@@ -140,6 +140,7 @@ def start():
             # Parse math string in iEuler syntax to a python representation
             math_obj = parse_math(math_string, ans,
                                   user_variables[current_tab], evaluate)
+            print("object:")
             print(math_obj)
             # Convert to LaTeX
             latex_string = modules.latex.generator.generate(math_obj)
