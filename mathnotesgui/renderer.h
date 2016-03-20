@@ -11,8 +11,10 @@
 #include <QQueue>
 #include <QPixmap>
 #include <QDir>
+#include <QDebug>
 
 #include "mathwidget.h"
+#include "util.h"
 
 class Renderer : public QObject
 {
@@ -23,7 +25,7 @@ public:
 
     qreal zoomFactor;
 
-    void setZoomFactor(double factor);
+    void setZoomFactor(int factor);
     void render(MathWidget *target);
 
 public slots:

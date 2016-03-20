@@ -16,6 +16,7 @@
 #include "cmdpanel.h"
 #include "paragraph.h"
 #include "euler.h"
+#include "util.h"
 
 class MainWindow : public QMainWindow
 {
