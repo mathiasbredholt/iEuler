@@ -1,6 +1,6 @@
 #include "renderer.h"
 
-#define webengine_DPI 114.0
+#define webengine_DPI 96.0
 #define DEFAULT_ZOOM_FACTOR 1
 
 QString readFile (const QString& filename)
@@ -22,8 +22,7 @@ Renderer::Renderer(QWidget *parent) : QObject(parent)
     webengine->setPalette(parent->palette());
     webengine->setHtml(html, baseUrl);
     // Setup zoom levels
-    baseScaling = getScreenDPI() / webengine_DPI;
-    setZoomFactor(DEFAULT_ZOOM_FACTOR*baseScaling);
+//    setZoomFactor((int) dpi() / webengine_DPI * 100);
 
     isRendering = false;
 //    hasLoaded = false;
@@ -73,14 +72,13 @@ QPixmap Renderer::createPixmap()
     return pixmap;
 }
 
-void Renderer::setZoomFactor(double factor)
+void Renderer::setZoomFactor(int factor)
 {
-    webengine->setZoomFactor(factor*baseScaling);
+//    webengine->page()->runJavaScript("MathJax.Hub.Config({'SVG': { scale: " + factor + " } });");
 }
 
 void Renderer::render(MathWidget *target)
 {
-    qDebug() << target->latexString;
     webengine->page()->runJavaScript("document.getElementById('input').innerHTML = String.raw`"+target->latexString+"` ");
     webengine->page()->runJavaScript("MathJax.Hub.Queue(['Typeset', MathJax.Hub, 'input']);");
 //    if (queue.empty() || queue.head() != target) queue.enqueue(target);

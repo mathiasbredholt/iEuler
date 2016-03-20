@@ -3,8 +3,9 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    int dpiX = QApplication::desktop()->screen()->physicalDpiX();
-    setMinimumSize(dpiX*8, dpiX*5);
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
+    setMinimumSize(ptX(600), ptY(600));
 
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
 
