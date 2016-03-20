@@ -5,6 +5,7 @@
 #define LINE_ADD 7
 
 #include <QPlainTextEdit>
+#include "util.h"
 
 class MathEdit : public QPlainTextEdit
 {

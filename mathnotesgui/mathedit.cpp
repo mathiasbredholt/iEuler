@@ -5,7 +5,7 @@ MathEdit::MathEdit(QWidget *parent) : QPlainTextEdit(parent)
     mathEditMode = MATHMODE;
     setFocusPolicy(Qt::StrongFocus);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    setFixedHeight(28);
+    setFixedHeight(ptY(20));
     setStyleSheet("QPlainTextEdit { border: none; }");
     setBackgroundRole(QPalette::Dark);
     setFont(parent->font());
