@@ -14,9 +14,9 @@ def generate(input_expr, display=True, delimiters=True):
     if not delimiters or type(input_expr) in [tl.Paragraph, tl.Text]:
         return result
     elif display:
-        return "$$ " + result + " $$"
+        return result  # Change display math system
     else:
-        return "$ " + result + " $"
+        return result  # Change display math system
 
     result = input_expr.to_latex()
 

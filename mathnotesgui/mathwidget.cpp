@@ -2,6 +2,6 @@
 
 MathWidget::MathWidget(QWidget *parent) : QLabel(parent)
 {
-    setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 
 }

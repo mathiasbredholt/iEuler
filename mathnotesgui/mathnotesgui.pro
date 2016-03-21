@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += webchannel
 QT       += webenginewidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -42,7 +43,6 @@ FORMS    += \
     mainwindow.ui
 
 RESOURCES += \
-    math_resources.qrc \
-    gui_resources.qrc
+    katex.qrc
 
 DISTFILES +=
