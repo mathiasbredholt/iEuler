@@ -57,7 +57,9 @@ void Renderer::setZoomFactor(int factor)
 void Renderer::render(MathWidget *target)
 {
     if (queue.empty() || queue.head() != target) queue.enqueue(target);
-    if (!isRendering && canRender && !queue.empty()) startRendering();
+    if (!isRendering && !queue.empty()) startRendering();
+
+//    if (!isRendering && canRender && !queue.empty()) startRendering();
 }
 
 int Renderer::getScreenDPI()
@@ -69,11 +71,12 @@ void Renderer::onRenderComplete(int outputWidth, int outputHeight)
 {
     if (queue.empty() || queue.head() != currentlyRendering) {
         // Convert the rendered output to bitmap and assign it to target
-        currentlyRendering->setPixmap(createPixmap(webengine->width(), outputHeight));
+        currentlyRendering->setPixmap(createPixmap(windowWidth * 0.9, outputHeight));
         isRendering = false;
     }
 
-    if (!queue.empty() && canRender){
+//    if (!queue.empty() && canRender) {
+    if (!queue.empty()){
         startRendering();
     }
 

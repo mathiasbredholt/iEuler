@@ -13,7 +13,7 @@ MathEdit::MathEdit(QWidget *parent) : QPlainTextEdit(parent)
     setTabChangesFocus(false);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    setFixedHeight(ptY(LINE_ADD + blockCount() * LINE_HEIGHT));
+    updateHeight();
 }
 
 void MathEdit::setMode(int mathEditMode)
@@ -71,14 +71,17 @@ bool MathEdit::eventFilter(QObject *object, QEvent *event)
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
         if (keyEvent->key() == Qt::Key_Return) {
-            setFixedHeight(ptY(LINE_ADD + blockCount() * LINE_HEIGHT));
             return false;
         }
         else if (keyEvent->key() == Qt::Key_Backspace) {
-            setFixedHeight(ptY(LINE_ADD + blockCount() * LINE_HEIGHT));
             return false;
         }
         emit autoRepeating(keyEvent->isAutoRepeat());
     }
     return false;
+}
+
+void MathEdit::updateHeight()
+{
+    setFixedHeight(ptY(LINE_ADD + blockCount() * LINE_HEIGHT));
 }

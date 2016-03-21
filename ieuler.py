@@ -143,8 +143,6 @@ def start():
             math_obj = parse_math(math_string, workspace[tab_index], evaluate)
             # print(math_obj)
 
-            print(math_obj)
-
             # Convert to LaTeX
             latex_string = modules.latex.generator.generate(math_obj)
 
