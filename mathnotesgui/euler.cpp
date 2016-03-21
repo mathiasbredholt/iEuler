@@ -151,6 +151,7 @@ void Euler::readStandardError()
         qDebug() << errorList.at(i);
 
     if (!hasCrashed) {
+        hasCrashed = true;
         QMessageBox msgBox;
         msgBox.setText("The iEuler core has crashed.");
         msgBox.setInformativeText("Restart?");
@@ -161,5 +162,4 @@ void Euler::readStandardError()
         if (ret == QMessageBox::Reset) restartCore();
     }
 
-    hasCrashed = true;
 }

@@ -5,7 +5,6 @@ MathEdit::MathEdit(QWidget *parent) : QPlainTextEdit(parent)
     mathEditMode = MATHMODE;
     setFocusPolicy(Qt::StrongFocus);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    setFixedHeight(ptY(20));
     setStyleSheet("QPlainTextEdit { border: none; }");
     setBackgroundRole(QPalette::Dark);
     setFont(parent->font());
@@ -14,7 +13,7 @@ MathEdit::MathEdit(QWidget *parent) : QPlainTextEdit(parent)
     setTabChangesFocus(false);
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
-    //    setFixedHeight(LINE_ADD + blockCount() * LINE_HEIGHT);
+    setFixedHeight(ptY(LINE_ADD + blockCount() * LINE_HEIGHT));
 }
 
 void MathEdit::setMode(int mathEditMode)
@@ -46,9 +45,6 @@ bool MathEdit::eventFilter(QObject *object, QEvent *event)
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
         if (keyEvent->key() == Qt::Key_Return && keyEvent->modifiers() == Qt::ShiftModifier) {
-            return true;
-        }
-        else if (keyEvent->key() == Qt::Key_Return) {
             emit evaluate();
             return true;
         }
@@ -73,6 +69,15 @@ bool MathEdit::eventFilter(QObject *object, QEvent *event)
 
     else if (object == this && event->type() == QEvent::KeyRelease) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+
+        if (keyEvent->key() == Qt::Key_Return) {
+            setFixedHeight(ptY(LINE_ADD + blockCount() * LINE_HEIGHT));
+            return false;
+        }
+        else if (keyEvent->key() == Qt::Key_Backspace) {
+            setFixedHeight(ptY(LINE_ADD + blockCount() * LINE_HEIGHT));
+            return false;
+        }
         emit autoRepeating(keyEvent->isAutoRepeat());
     }
     return false;

@@ -25,3 +25,14 @@ int dpi()
 {
     return QApplication::screens().at(0)->logicalDotsPerInch();
 }
+
+QString readFile (const QString& filename)
+{
+    QFile file(filename);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+        QTextStream stream(&file);
+        return stream.readAll();
+    }
+    return "";
+}

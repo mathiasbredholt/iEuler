@@ -7,6 +7,7 @@
 #include <QWidget>
 #include <QtWebEngineWidgets>
 #include <QWebEngineView>
+#include <QWebChannel>
 
 #include <QQueue>
 #include <QPixmap>
@@ -29,9 +30,9 @@ public:
     void render(MathWidget *target);
 
 public slots:
-    void onLoadComplete();
-    void onRenderComplete();
     void toggleRendering(bool disable);
+    void onRenderComplete(int outputWidth, int outputHeight);
+
 
 private:
     qreal baseScaling;
@@ -41,11 +42,9 @@ private:
     void startRendering();
     QSize getSize();
     QQueue<MathWidget*> queue;
-    QPixmap createPixmap();
+    QPixmap createPixmap(int width, int height);
     MathWidget *currentlyRendering;
-
-signals:
-
+    QWebChannel *channel;
 };
 
 #endif // RENDERER_H
