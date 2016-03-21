@@ -1,7 +1,7 @@
 #ifndef MATHEDIT_H
 #define MATHEDIT_H
 
-#define LINE_HEIGHT 17
+#define LINE_HEIGHT 20
 #define LINE_ADD 7
 
 #include <QPlainTextEdit>

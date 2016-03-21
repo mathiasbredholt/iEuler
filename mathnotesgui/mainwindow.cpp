@@ -35,9 +35,15 @@ MainWindow::MainWindow(QWidget *parent) :
     fileMenu->addAction(coreAct);
 
     pal = palette();
-    pal.setColor(QPalette::Base, QColor("#333"));
-    pal.setColor(QPalette::Background, QColor("#333"));
-    pal.setColor(QPalette::Text, QColor("#FFF"));
+//    Dark theme
+//    pal.setColor(QPalette::Base, QColor("#333"));
+//    pal.setColor(QPalette::Background, QColor("#333"));
+//    pal.setColor(QPalette::Text, QColor("#FFF"));
+
+    pal.setColor(QPalette::Base, QColor("#FFF"));
+    pal.setColor(QPalette::Background, QColor("#FFF"));
+    pal.setColor(QPalette::Text, QColor("#000"));
+
     setPalette(pal);
 
     setFont(QFont("Monaco", 12));
@@ -50,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
 
-    renderer = new Renderer(this);
+    renderer = new Renderer();
 
 //     Create/ tabs
     tabs = new QTabWidget(this);

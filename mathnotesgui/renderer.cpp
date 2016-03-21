@@ -3,30 +3,26 @@
 #define webengine_DPI 96.0
 #define DEFAULT_ZOOM_FACTOR 1
 
-QString readFile (const QString& filename)
-{
-    QFile file(filename);
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-        QTextStream stream(&file);
-        return stream.readAll();
-    }
-    return "";
-}
-
 Renderer::Renderer(QWidget *parent) : QObject(parent)
 {
-    QString html = readFile(":/mathjax.html");
+    QString html = readFile(":/katex.html");
+//    QString html = readFile(":/mathjax.html");
+
     QUrl baseUrl = QUrl::fromLocalFile(QDir::currentPath() + "/mathnotesgui/webkit/");
     webengine = new QWebEngineView();
-    webengine->setPalette(parent->palette());
+    webengine->show();
+
+    channel = new QWebChannel(webengine->page());
+    channel->registerObject(QStringLiteral("jshelper"), this);
+    webengine->page()->setWebChannel(channel);
+
     webengine->setHtml(html, baseUrl);
+
     // Setup zoom levels
 //    setZoomFactor((int) dpi() / webengine_DPI * 100);
     isRendering = false;
 //    hasLoaded = false;
     canRender = true;
-
 
 }
 
@@ -41,33 +37,15 @@ void Renderer::startRendering()
         MathWidget *target = queue.dequeue();
         currentlyRendering = target;
 
-        js = QString("getElementById('input').innerHTML = str").replace("str", target->latexString);
-        webengine->page()->runJavaScript(js);
-
+        webengine->page()->runJavaScript("doRender(String.raw`"+target->latexString+"`);");
         isRendering = true;
-
     }
 }
 
-QPixmap Renderer::createPixmap()
+QPixmap Renderer::createPixmap(int width, int height)
 {
-//    QWebEnginePage *page = webengine->page();
-//    QString widthCSS = QString("0px");
-//    QString heightCSS = QString("0px");
-
-//    page->runJavaScript("getComputedStyle(getElementById('input')).style.getPropertyValue('width')",
-//                       [](const QVariant &v) {
-//        widthCSS = v.toString();
-//    });
-//    page->runJavaScript("getComputedStyle(getElementById('input')).style.getPropertyValue('height')",
-//                       [](const QVariant &v) {
-//        heightCSS = v.toString();
-//    });
-
-//    int w = widthCSS.left(widthCSS.indexOf("px")).toInt() - 34;
-//    int h = heightCSS.left(heightCSS.indexOf("px")).toInt() + 4;
-    QPixmap pixmap(QSize(0, 0));
-//    webengine->render(&pixmap, QPoint(0, -18));
+    QPixmap pixmap(QSize(width, height*1.75));
+    webengine->render(&pixmap, QPoint(0, 0));
     return pixmap;
 }
 
@@ -78,11 +56,8 @@ void Renderer::setZoomFactor(int factor)
 
 void Renderer::render(MathWidget *target)
 {
-    webengine->page()->runJavaScript("document.getElementById('input').innerHTML = String.raw`"+target->latexString+"` ");
-    webengine->page()->runJavaScript("MathJax.Hub.Queue(['Typeset', MathJax.Hub, 'input']);");
-//    if (queue.empty() || queue.head() != target) queue.enqueue(target);
-//    if (!isRendering && canRender && !queue.empty()) startRendering();
-
+    if (queue.empty() || queue.head() != target) queue.enqueue(target);
+    if (!isRendering && canRender && !queue.empty()) startRendering();
 }
 
 int Renderer::getScreenDPI()
@@ -90,19 +65,11 @@ int Renderer::getScreenDPI()
     return QApplication::desktop()->screen()->physicalDpiX();
 }
 
-void Renderer::onLoadComplete()
-{
-    canRender = true;
-    if (!queue.empty()) startRendering();
-}
-
-void Renderer::onRenderComplete()
+void Renderer::onRenderComplete(int outputWidth, int outputHeight)
 {
     if (queue.empty() || queue.head() != currentlyRendering) {
-
         // Convert the rendered output to bitmap and assign it to target
-        currentlyRendering->setPixmap(createPixmap());
-
+        currentlyRendering->setPixmap(createPixmap(webengine->width(), outputHeight));
         isRendering = false;
     }
 
