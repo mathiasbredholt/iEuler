@@ -211,13 +211,17 @@ def convert_root(self):
 
 
 def convert_integral(self):
-    if self.variable is None:
+    if self.is_definite:
+        return "\\displaystyle \\int_{{{}}}^{{{}}} {}\\;d {} ".format(
+            convert_expr(self.range.value1), convert_expr(self.range.value2),
+            convert_expr(self.value), convert_expr(self.variable))
+    elif not self.variable is None:
+        print(type(self.variable))
+        print(self.variable)
         return "\\displaystyle \\int {}\\;d {} ".format(
             convert_expr(self.value), convert_expr(self.variable))
     else:
-        return "\\displaystyle \\int_{{{}}}^{{{}}} {}\\;d {} ".format(
-            convert_expr(self.variable), convert_expr(self.variable),
-            convert_expr(self.value), convert_expr(self.variable))
+        return "\\displaystyle \\int {}".format(convert_expr(self.value))
 
 
 def convert_derivative(self):

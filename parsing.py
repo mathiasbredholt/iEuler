@@ -145,6 +145,10 @@ def get_add_op(toks):
 
 def get_range_op(toks):
     value1, value2, op = parse_binary_operator(toks, get_range_op)
+    print(toks)
+    print(value1)
+    print(value2)
+    print(op)
     return ml.Range(value1, value2)
 
 
