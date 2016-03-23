@@ -23,11 +23,7 @@ class Equality:
         self.hidden = hidden
 
     def get_first(self):
-        if type(self.value1) is Equality:
-            return self.value1.get_first()
-        else:
-            # value1 is a value
-            return self.value1
+        return self.value1.get_first()
 
     def __str__(self):
         return "Equality(type:'{}', {}, {})".format(self.type, self.value1,
@@ -44,7 +40,13 @@ class MathValue:
     def get_decorators(self):
         return self.decorators
 
-    def is_vector(self):
+    def get_first(self):
+        return self
+
+    def get_last(self):
+        return self
+
+    def is_matrix(self):
         return type(self) is Matrix or 'vec' in self.decorators
 
     def add_decorator(self, dec):
@@ -75,11 +77,15 @@ class Number(MathValue):
 
 class Matrix(MathValue):
 
-    def __init__(self, values, width, height):
+    def __init__(self, values):
         self.value = values
-        self.width = width
-        self.height = height
         self.decorators = []
+
+    def height(self):
+        return len(self.value)
+
+    def width(self):
+        return len(self.value[0])
 
     def __str__(self):
         return "Matrix({})".format(self.value)
@@ -195,8 +201,8 @@ class MathUnaryOperator:
     def get_last(self):
         return get_first(self)
 
-    def is_vector(self):
-        return self.value.is_vector()
+    def is_matrix(self):
+        return self.value.is_matrix()
 
     def __str__(self):
         return "MathUnaryOperator({},{})".format(self.value1, self.value2)
@@ -230,20 +236,20 @@ class MathOperator:
         return False
 
     def get_first(self):
-        if not self.value1.get_value():
-            # value1 is an operator
-            return self.value1.get_first()
-        else:
-            # value1 is a value
-            return self.value1
+        return self.value1.get_first()
+        # if not self.value1.get_value():
+        #     # value1 is an operator
+        # else:
+        #     # value1 is a value
+        #     return self.value1
 
     def get_last(self):
-        if not self.value2.get_value():
-            # value2 is an operator
-            return self.value2.get_last()
-        else:
-            # value2 is a value
-            return self.value2
+        return self.value2.get_last()
+        # if not self.value2.get_value():
+        #     # value2 is an operator
+        # else:
+        #     # value2 is a value
+        #     return self.value2
 
     def __str__(self):
         return "MathOperator({},{})".format(self.value1, self.value2)
@@ -253,8 +259,8 @@ class MathOperator:
 
 class AddOp(MathOperator):
 
-    def is_vector(self):
-        return self.value1.is_vector() or self.value2.is_vector()
+    def is_matrix(self):
+        return self.value1.is_matrix() or self.value2.is_matrix()
 
     def __str__(self):
         return "AddOp({},{})".format(self.value1, self.value2)
@@ -264,8 +270,8 @@ class AddOp(MathOperator):
 
 class SubOp(MathOperator):
 
-    def is_vector(self):
-        return self.value1.is_vector() or self.value2.is_vector()
+    def is_matrix(self):
+        return self.value1.is_matrix() or self.value2.is_matrix()
 
     def __str__(self):
         return "SubOp({},{})".format(self.value1, self.value2)
@@ -275,11 +281,11 @@ class SubOp(MathOperator):
 
 class MulOp(MathOperator):
 
-    def is_vector(self):
-        return self.value1.is_vector() != self.value2.is_vector()
+    def is_matrix(self):
+        return self.value1.is_matrix() != self.value2.is_matrix()
 
     def is_dot(self):
-        return self.value1.is_vector() and self.value2.is_vector()
+        return self.value1.get_last().is_matrix() and self.value2.get_first().is_matrix()
 
     def __str__(self):
         return "MulOp({},{})".format(self.value1, self.value2)
@@ -289,7 +295,7 @@ class MulOp(MathOperator):
 
 class CrossOp(MathOperator):
 
-    def is_vector(self):
+    def is_matrix(self):
         return True
 
     def __str__(self):
@@ -300,8 +306,8 @@ class CrossOp(MathOperator):
 
 class Fraction(MathOperator):
 
-    def is_vector(self):
-        return self.value1.is_vector()
+    def is_matrix(self):
+        return self.value1.is_matrix()
 
     def __str__(self):
         return "Fraction({},{})".format(self.value1, self.value2)
@@ -311,7 +317,7 @@ class Fraction(MathOperator):
 
 class Root(MathOperator):
 
-    def is_vector(self):
+    def is_matrix(self):
         return False
 
     def __str__(self):
@@ -322,7 +328,7 @@ class Root(MathOperator):
 
 class Power(MathOperator):
 
-    def is_vector(self):
+    def is_matrix(self):
         return False
 
     def __str__(self):
@@ -333,7 +339,7 @@ class Power(MathOperator):
 
 class Range(MathOperator):
 
-    def is_vector(self):
+    def is_matrix(self):
         return False
 
     def __str__(self):
@@ -346,8 +352,8 @@ class Range(MathOperator):
 
 class Integral:
 
-    def is_vector(self):
-        return self.value.is_vector()
+    def is_matrix(self):
+        return self.value.is_matrix()
 
     def __init__(self, value, variable):
         self.value = value
@@ -364,8 +370,8 @@ class Integral:
 
 class Derivative:
 
-    def is_vector(self):
-        return self.value.is_vector()
+    def is_matrix(self):
+        return self.value.is_matrix()
 
     def __init__(self, value, variable, nth=Number("1")):
         self.value = value
@@ -383,8 +389,8 @@ class Derivative:
 
 class Sum:
 
-    def is_vector(self):
-        return self.value.is_vector()
+    def is_matrix(self):
+        return self.value.is_matrix()
 
     def __init__(self, value, variable):
         self.value = value
