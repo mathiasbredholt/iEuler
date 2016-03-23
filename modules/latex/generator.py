@@ -216,8 +216,6 @@ def convert_integral(self):
             convert_expr(self.range.value1), convert_expr(self.range.value2),
             convert_expr(self.value), convert_expr(self.variable))
     elif not self.variable is None:
-        print(type(self.variable))
-        print(self.variable)
         return "\\displaystyle \\int {}\\;d {} ".format(
             convert_expr(self.value), convert_expr(self.variable))
     else:
@@ -234,9 +232,32 @@ def convert_derivative(self):
             convert_expr(self.nth), convert_expr(self.value))
 
 
+def convert_sum(self):
+    if self.has_limits:
+        return "\\displaystyle \\sum_{{{}}}^{{{}}} {}".format(
+            convert_expr(ml.Equality('=', self.variable, self.range.value1)), convert_expr(
+                self.range.value2),
+            convert_expr(self.value))
+    elif not self.variable is None:
+        return "\\displaystyle \\sum_{{{}}} {}".format(
+            convert_expr(self.variable), convert_expr(self.value))
+    else:
+        return "\\displaystyle \\sum {}".format(convert_expr(self.value))
+
+
+def convert_limit(self):
+    if self.has_limit:
+        return "\\displaystyle \\lim_{{{}}} {}".format(convert_expr(self.variable) + ' \\rightarrow ' + convert_expr(self.limit), convert_expr(self.value))
+    elif not self.variable is None:
+        return "\\displaystyle \\lim_{{{}}} {}".format(
+            convert_expr(self.variable), convert_expr(self.value))
+    else:
+        return "\\displaystyle \\lim {}".format(convert_expr(self.value))
+
+
 def convert_range(self):
-    return "\left[ \, {} \, ; {} \, \\right]".format(convert_expr(self.value1),
-                                                     convert_expr(self.value2))
+    return "\\left[ \\, {} \\, ; {} \\, \\right]".format(convert_expr(self.value1),
+                                                         convert_expr(self.value2))
 
 # Extending mathlib classes with to_latex method for duck typing
 tl.Paragraph.to_latex = convert_paragraph
@@ -257,3 +278,5 @@ ml.Root.to_latex = convert_root
 ml.Integral.to_latex = convert_integral
 ml.Derivative.to_latex = convert_derivative
 ml.Range.to_latex = convert_range
+ml.Sum.to_latex = convert_sum
+ml.Limit.to_latex = convert_limit

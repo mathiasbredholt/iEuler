@@ -36,6 +36,14 @@ functions = {
         "object": ml.Derivative,
         "num_args": 2
     },
+    "sum": {
+        "object": ml.Sum,
+        "num_args": 2
+    },
+    "lim": {
+        "object": ml.Limit,
+        "num_args": 2
+    },
     "plot": {
         "object": ml.Plot,
         "num_args": 2
