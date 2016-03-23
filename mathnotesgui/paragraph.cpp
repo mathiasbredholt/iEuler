@@ -15,8 +15,9 @@ Paragraph::Paragraph(QWidget *parent,
     setPalette(parent->palette());
     setFont(parent->font());
 
-//    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+    setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 //    setFixedHeight(128);
+
     setLayout(new QVBoxLayout());
 
     connect(euler, SIGNAL(receivedLatexString(int, int, QString)), this, SLOT(receivedLatexString(int, int, QString)));
@@ -25,6 +26,7 @@ Paragraph::Paragraph(QWidget *parent,
 
     mathWidget = new MathWidget(this);
     layout()->addWidget(mathWidget);
+
 //    layout()->addWidget(renderer->webengine);
 
     mathEdit->setPlainText(mathString);
@@ -49,6 +51,7 @@ void Paragraph::initMathEdit()
 void Paragraph::preview()
 {
     QString mathString = mathEdit->toPlainText();
+    mathEdit->updateHeight();
     if (mathString.indexOf('%') == 0) {
         mathEdit->setMode(MathEdit::TEXTMODE);
     } else {

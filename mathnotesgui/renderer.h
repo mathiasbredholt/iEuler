@@ -28,6 +28,7 @@ public:
 
     void setZoomFactor(int factor);
     void render(MathWidget *target);
+    int windowWidth;
 
 public slots:
     void toggleRendering(bool disable);
