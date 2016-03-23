@@ -334,7 +334,7 @@ class Power(MathOperator):
 class Range(MathOperator):
 
     def is_vector(self):
-        return False
+        return value1.is_vector() and value2.is_vector()
 
     def __str__(self):
         return "Range({},{})".format(self.value1, self.value2)
@@ -346,12 +346,19 @@ class Range(MathOperator):
 
 class Integral:
 
+    def __init__(self, value, variable=None):
+        self.value = value
+        if type(variable) is Equality and type(variable.value2) is Range:
+            self.variable = variable.value1
+            self.range = variable.value2
+            self.is_definite = True
+        else:
+            self.variable = variable
+            self.range = None
+            self.is_definite = False
+
     def is_vector(self):
         return self.value.is_vector()
-
-    def __init__(self, value, variable):
-        self.value = value
-        self.variable = variable
 
     def get_value(self):
         return False
