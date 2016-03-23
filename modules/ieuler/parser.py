@@ -12,6 +12,6 @@ def parse(string, workspace, eval=True):
         if string[0] == '%':
             return text.parse(string[1:])
         else:
-            return math.parse(string, workspace)
+            return math.parse(string, eval, workspace)
     except ParseException:
         return ml.Variable("ParseException")

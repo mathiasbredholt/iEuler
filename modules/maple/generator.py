@@ -19,6 +19,27 @@ def parentheses(input_expr, do=True):
     return input_expr
 
 
+def convert_matrix(self):
+    result = "< "
+    horizontal_delim = ", "
+    vertical_delim = "; "
+    if self.height() == 1:
+        # Row vector
+        horizontal_delim = " | "
+    elif self.width() == 1:
+        # Column vector
+        vertical_delim = ", "
+    for rows in range(0, self.height()):
+        for cols in range(0, self.width()):
+            if cols > 0:
+                result += horizontal_delim
+            result += convert_expr(self.value[rows][cols])
+        if rows < self.height() - 1:
+            result += vertical_delim
+    result += " >"
+    return result
+
+
 def convert_value(self):
     if type(self) is ml.Unit:
         # TODO
@@ -52,7 +73,10 @@ def convert_subop(self):
 
 
 def convert_mulop(self):
-    output = "{} * {}"
+    if self.is_dot():
+        output = "{} . {}"
+    else:
+        output = "{} * {}"
     if type(self.value1) in [ml.AddOp, ml.SubOp]:
         output_1 = parentheses(self.value1)
     else:
@@ -122,6 +146,7 @@ def convert_function(self):
 
 # Extending mathlib classes with to_maple method for duck typing
 ml.MathValue.to_maple = convert_value
+ml.Matrix.to_maple = convert_matrix
 ml.Minus.to_maple = convert_minus
 ml.Factorial.to_maple = convert_factorial
 ml.Equality.to_maple = convert_equality
