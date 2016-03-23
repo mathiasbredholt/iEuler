@@ -1,7 +1,7 @@
 import re
 import mathlib as ml
 from functools import reduce
-from pyparsing import Keyword, White, NotAny, alphas, alphas8bit, nums
+from pyparsing import Keyword, White, NotAny, alphas, alphas8bit, nums, Word
 
 
 letters = alphas + alphas8bit
@@ -9,6 +9,8 @@ letters = alphas + alphas8bit
 chars = letters + nums
 
 space = White(' ')
+
+word = Word(letters, chars)
 
 word_start = NotAny(chars)
 
@@ -89,7 +91,7 @@ def get_matrix(toks, delimiters):
             print("invalid delimiter")
     # TODO: Check for irregularity
 
-    return ml.Matrix(values, len(values[0]), len(values))
+    return ml.Matrix(values)
 
 
 def get_ans(toks, workspace):
@@ -160,6 +162,11 @@ def get_factorial_op(toks):
 def get_minus_op(toks):
     value, op = parse_unary_operator(toks)
     return ml.Minus(value)
+
+
+def get_equal_op(toks):
+    value1, value2, op = parse_binary_operator(toks, get_equal_op)
+    return ml.Equality("=", value1, value2)
 
 
 def parse_binary_operator(toks, func, right=False):

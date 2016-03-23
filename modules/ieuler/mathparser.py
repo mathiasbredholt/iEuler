@@ -160,10 +160,12 @@ expression << infixNotation(operand, [
 expression.parseWithTabs()
 
 
-def parse(text, worksp):
+def parse(text, eval, worksp):
     # print(workspace)
     global workspace
     global user_variables
+    global evaluate
+    evaluate = eval
     workspace = worksp
     user_variables = worksp["user_variables"]
     return expression.parseString(text)[0]
