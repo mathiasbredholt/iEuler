@@ -399,14 +399,46 @@ class Sum:
     def is_matrix(self):
         return self.value.is_matrix()
 
-    def __init__(self, value, variable):
+    def __init__(self, value, variable=None):
         self.value = value
-        self.variable = variable
+        if type(variable) is Equality and type(variable.value2) is Range:
+            self.variable = variable.value1
+            self.range = variable.value2
+            self.has_limits = True
+        else:
+            self.variable = variable
+            self.range = None
+            self.has_limits = False
 
-        def get_value(self):
-            return False
+    def get_value(self):
+        return False
 
     def __str__(self):
-        return "Sum({},{},{})".format(self.value, self.variable)
+        return "Sum({},{},{})".format(self.value, self.variable, self.range)
+
+    __repr__ = __str__
+
+
+class Limit:
+
+    def is_matrix(self):
+        return self.value.is_matrix()
+
+    def __init__(self, value, variable=None):
+        self.value = value
+        if type(variable) is Equality:  # or type is arrow operator
+            self.variable = variable.value1
+            self.limit = variable.value2
+            self.has_limit = True
+        else:
+            self.variable = variable
+            self.limit = None
+            self.has_limit = False
+
+    def get_value(self):
+        return False
+
+    def __str__(self):
+        return "Limit({},{},{})".format(self.value, self.variable, self.limit)
 
     __repr__ = __str__

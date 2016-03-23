@@ -105,7 +105,7 @@ function = Combine(name + Suppress("(")) + \
 matrix = Suppress(oneOf(matrix_delimiters["start"]) + Optional(White())) + expression + ZeroOrMore(oneOf(matrix_delimiters[
     "horizontal"] + matrix_delimiters["vertical"]) + NotAny(oneOf(matrix_delimiters["end"])) + expression) + Suppress(Optional(White()) + oneOf(matrix_delimiters["end"]))
 
-number << (Combine(Word(nums) + Optional("." + Optional(Word(nums)))) +
+number << (Combine(Word(nums) + Optional("." + NotAny(Literal('.')) + Optional(Word(nums)))) +
            Optional(NotAny(White()) + (function | unit | variable)))
 
 eval_field = Suppress('#') + expression + Suppress('#')
