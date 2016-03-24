@@ -29,8 +29,11 @@ def set_path(p):
 
 
 def init():
-    shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" ".format(path)
-    return procio.run(shell_cmd)
+    shell_cmd = " \"{}\" -u -w 0 -c \"interface(prettyprint=0)\" -q ".format(
+        path)
+    # Command line options can be found here:
+    # http://www.maplesoft.com/support/help/maple/view.aspx?path=maple
+    return procio.run(shell_cmd, catch=False)
 
 
 def query(query, proc, queue, thread, convert=True):
@@ -38,7 +41,6 @@ def query(query, proc, queue, thread, convert=True):
         query = generator.generate(query) + ";\n"
     print("Maple query: {}".format(query))
     proc.stdin.write(query)
-    procio.process_input(proc, queue, thread, 0.5, True)
     return_string = procio.process_input(proc, queue, thread, 20)
     return_string = return_string.replace("\n", "")
     print("Maple return string: {}".format(return_string))
