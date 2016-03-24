@@ -106,6 +106,13 @@ def convert_power(self):
                                  convert_expr(self.value2))
 
 
+def convert_range(self):
+    return "{}..{} ".format(
+        parentheses(self.value1, not type(self.value1)
+                    in [ml.Number, ml.Variable]),
+        parentheses(self.value2, not type(self.value2) in [ml.Number, ml.Variable]))
+
+
 def convert_root(self):
     if self.value2.get_value() == "2":
         return "sqrt({}) ".format(convert_expr(self.value1))
@@ -115,13 +122,48 @@ def convert_root(self):
 
 
 def convert_integral(self):
-    if self.range_from is None:
+    if self.is_definite:
+        return "int({}, {}={}) ".format(convert_expr(self.value),
+                                        convert_expr(self.variable),
+                                        convert_expr(self.range))
+    elif not self.variable is None:
         return "int({}, {}) ".format(convert_expr(self.value),
                                      convert_expr(self.variable))
     else:
-        return "int({}, {}={}..{}) ".format(
-            convert_expr(self.value), convert_expr(self.variable),
-            convert_expr(self.range_from), convert_expr(self.range_to))
+        # guess the variable
+        vars = self.value.get_variables()
+        if len(vars) > 1:
+            # multiple options, we'll go with the first one
+            # TODO: warning
+            pass
+        return "int({}, {}) ".format(convert_expr(self.value),
+                                     convert_expr(vars[0]))
+
+
+def convert_sum(self):
+    if self.has_limits:
+        return "sum({}, {}={}) ".format(convert_expr(self.value),
+                                        convert_expr(self.variable),
+                                        convert_expr(self.range))
+    elif not self.variable is None:
+        return "sum({}, {}) ".format(convert_expr(self.value),
+                                     convert_expr(self.variable))
+    else:
+        # guess the variable
+        vars = self.value.get_variables()
+        if len(vars) > 1:
+            # multiple options, we'll go with the first one
+            # TODO: warning
+            pass
+        return "sum({}, {}) ".format(convert_expr(self.value),
+                                     convert_expr(vars[0]))
+
+
+def convert_limit(self):
+    if self.has_limit:
+        return "limit({}, {}={}) ".format(convert_expr(self.value),
+                                          convert_expr(self.variable),
+                                          convert_expr(self.limit))
 
 
 def convert_derivative(self):
@@ -159,3 +201,6 @@ ml.Root.to_maple = convert_root
 ml.Integral.to_maple = convert_integral
 ml.Derivative.to_maple = convert_derivative
 ml.Function.to_maple = convert_function
+ml.Range.to_maple = convert_range
+ml.Sum.to_maple = convert_sum
+ml.Limit.to_maple = convert_limit

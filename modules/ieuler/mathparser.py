@@ -66,8 +66,6 @@ def assign_variable(variable, value):
 
 def evaluate_expression(expr, convert=True):
     if evaluate:
-        print(expr)
-        print(convert)
         return mProcess.evaluate(expr, convert)
     return expr
 
