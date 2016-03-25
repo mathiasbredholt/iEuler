@@ -56,7 +56,7 @@ MainWindow::MainWindow(QWidget *parent) :
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
 
-    renderer = new Renderer();
+    renderer = new Renderer(minimumWidth(),minimumHeight());
     renderer->windowWidth = minimumWidth();
 
 //     Create/ tabs
@@ -79,6 +79,10 @@ MainWindow::~MainWindow()
 //    delete ui;
 }
 
+void MainWindow::initRenderer() {
+    renderer->move(this->pos());
+}
+
 void MainWindow::closeEvent(QCloseEvent *e) {
     if (isWindowModified()) {
         QMessageBox msgBox;
@@ -94,8 +98,14 @@ void MainWindow::closeEvent(QCloseEvent *e) {
         }
     } else {
         euler->terminate();
+        renderer->close();
         qDebug() << "Terminate python.";
     }
+}
+
+void MainWindow::moveEvent ( QMoveEvent * event )
+{
+    renderer->move(event->pos());
 }
 
 // Tabs

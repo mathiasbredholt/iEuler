@@ -12,6 +12,8 @@
 #include <QMessageBox>
 #include <QtWebEngineWidgets>
 #include <QWebEngineView>
+#include <QMoveEvent>
+#include <QThread>
 
 #include "cmdpanel.h"
 #include "paragraph.h"
@@ -25,6 +27,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
+    void initRenderer();
 
 private:
 //    Ui::MainWindow *ui;
@@ -39,7 +42,6 @@ private:
 
     void addNewParagraph(QString mathString = "");
     void createNewTab(bool empty = false, QString fileName = "Untitled.euler");
-    void initRenderer();
 
     void openFile();
     void saveFile();
@@ -48,6 +50,7 @@ private:
     QWidget *getTabContents();
 
     void closeEvent(QCloseEvent *event);
+    virtual void moveEvent ( QMoveEvent * event );
 
 protected:
     void keyPressEvent(QKeyEvent *);

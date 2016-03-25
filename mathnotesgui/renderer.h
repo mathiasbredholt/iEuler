@@ -21,7 +21,9 @@ class Renderer : public QObject
 {
     Q_OBJECT
 public:
-    explicit Renderer(QWidget *parent = 0);
+    explicit Renderer(int windowWidth, int windowHeight, QWidget *parent = 0);
+    void close();
+    void move(const QPoint p);
     QWebEngineView *webengine;
 
     qreal zoomFactor;
