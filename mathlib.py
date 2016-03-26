@@ -3,6 +3,7 @@
 
 
 class Empty:
+
     def __init__(self):
         pass
 
@@ -13,6 +14,7 @@ class Empty:
 
 
 class Equality:
+
     def __init__(self, type, value1, value2, assignment=False, hidden=False):
         self.type = type
         self.value1 = value1
@@ -21,11 +23,7 @@ class Equality:
         self.hidden = hidden
 
     def get_first(self):
-        if type(self.value1) is Equality:
-            return self.value1.get_first()
-        else:
-            # value1 is a value
-            return self.value1
+        return self.value1.get_first()
 
     def __str__(self):
         return "Equality(type:'{}', {}, {})".format(self.type, self.value1,
@@ -35,13 +33,23 @@ class Equality:
 
 
 class MathValue:
+
     def get_value(self):
         return self.value
 
     def get_decorators(self):
         return self.decorators
 
-    def is_vector(self):
+    def get_first(self):
+        return self
+
+    def get_last(self):
+        return self
+
+    def get_variables(self):
+        return []
+
+    def is_matrix(self):
         return type(self) is Matrix or 'vec' in self.decorators
 
     def add_decorator(self, dec):
@@ -59,6 +67,7 @@ class MathValue:
 
 
 class Number(MathValue):
+
     def __init__(self, value):
         self.value = value
         self.decorators = []
@@ -70,11 +79,23 @@ class Number(MathValue):
 
 
 class Matrix(MathValue):
-    def __init__(self, values, width, height):
+
+    def __init__(self, values):
         self.value = values
-        self.width = width
-        self.height = height
         self.decorators = []
+
+    def get_variables(self):
+        vars = []
+        for r in self.value:
+            for c in self.value[r]:
+                vars += self.value[r][c].get_variables()
+        return vars
+
+    def height(self):
+        return len(self.value)
+
+    def width(self):
+        return len(self.value[0])
 
     def __str__(self):
         return "Matrix({})".format(self.value)
@@ -83,11 +104,15 @@ class Matrix(MathValue):
 
 
 class Complex(MathValue):
+
     def __init__(self, realpart, imagpart):
         self.r = realpart
         self.i = imagpart
         self.value = (self.r, self.i)
         self.decorators = []
+
+    def get_variables(self):
+        return realpart.get_variables() + imagpart.get_variables()
 
     def __str__(self):
         return "Complex({})".format(self.value)
@@ -96,11 +121,15 @@ class Complex(MathValue):
 
 
 class Variable(MathValue):
+
     def __init__(self, value, is_symbol=False, decs=[], subscript=None):
         self.value = value
         self.decorators = decs
         self.is_symbol = is_symbol
         self.subscript = subscript
+
+    def get_variables(self):
+        return [self]
 
     def name(self):
         if self.subscript:
@@ -115,7 +144,24 @@ class Variable(MathValue):
     __repr__ = __str__
 
 
+class Ans(MathValue):
+
+    def __init__(self, value, index):
+        self.value = value
+        self.index = index
+
+    def get_variables(self):
+        return self.value.get_variables()
+
+    def __str__(self):
+        return "Ans(index: {}, value: {})".format(
+            self.index, self.value)
+
+    __repr__ = __str__
+
+
 class Unit(MathValue):
+
     def __init__(self, unit, prefix=""):
         self.value = unit
         self.prefix = prefix
@@ -131,10 +177,17 @@ class Unit(MathValue):
 
 
 class Function(MathValue):
+
     def __init__(self, name, *args):
         self.value = args
         self.name = name
         self.decorators = []
+
+    def get_variables(self):
+        vars = []
+        for a in self.args:
+            vars += a.get_variables()
+        return vars
 
     def __str__(self):
         return "Function({},{})".format(self.name, self.value)
@@ -143,6 +196,7 @@ class Function(MathValue):
 
 
 class Plot(MathValue):
+
     def __init__(self, value):
         self.value = value
         self.decorators = []
@@ -154,8 +208,12 @@ class Plot(MathValue):
 
 
 class MathUnaryOperator:
+
     def __init__(self, value):
         self.value = value
+
+    def get_variables(self):
+        return self.value.get_variables()
 
     def get_value(self):
         return False
@@ -171,8 +229,8 @@ class MathUnaryOperator:
     def get_last(self):
         return get_first(self)
 
-    def is_vector(self):
-        return self.value.is_vector()
+    def is_matrix(self):
+        return self.value.is_matrix()
 
     def __str__(self):
         return "MathUnaryOperator({},{})".format(self.value1, self.value2)
@@ -181,6 +239,7 @@ class MathUnaryOperator:
 
 
 class Minus(MathUnaryOperator):
+
     def __str__(self):
         return "Minus({})".format(self.value)
 
@@ -188,6 +247,7 @@ class Minus(MathUnaryOperator):
 
 
 class Factorial(MathUnaryOperator):
+
     def __str__(self):
         return "Factorial({})".format(self.value)
 
@@ -195,6 +255,7 @@ class Factorial(MathUnaryOperator):
 
 
 class MathOperator:
+
     def __init__(self, value1, value2):
         self.value1 = value1
         self.value2 = value2
@@ -202,21 +263,24 @@ class MathOperator:
     def get_value(self):
         return False
 
+    def get_variables(self):
+        return self.value1.get_variables() + self.value2.get_variables()
+
     def get_first(self):
-        if not self.value1.get_value():
-            # value1 is an operator
-            return self.value1.get_first()
-        else:
-            # value1 is a value
-            return self.value1
+        return self.value1.get_first()
+        # if not self.value1.get_value():
+        #     # value1 is an operator
+        # else:
+        #     # value1 is a value
+        #     return self.value1
 
     def get_last(self):
-        if not self.value2.get_value():
-            # value2 is an operator
-            return self.value2.get_last()
-        else:
-            # value2 is a value
-            return self.value2
+        return self.value2.get_last()
+        # if not self.value2.get_value():
+        #     # value2 is an operator
+        # else:
+        #     # value2 is a value
+        #     return self.value2
 
     def __str__(self):
         return "MathOperator({},{})".format(self.value1, self.value2)
@@ -225,8 +289,9 @@ class MathOperator:
 
 
 class AddOp(MathOperator):
-    def is_vector(self):
-        return self.value1.is_vector() or self.value2.is_vector()
+
+    def is_matrix(self):
+        return self.value1.is_matrix() or self.value2.is_matrix()
 
     def __str__(self):
         return "AddOp({},{})".format(self.value1, self.value2)
@@ -235,8 +300,9 @@ class AddOp(MathOperator):
 
 
 class SubOp(MathOperator):
-    def is_vector(self):
-        return self.value1.is_vector() or self.value2.is_vector()
+
+    def is_matrix(self):
+        return self.value1.is_matrix() or self.value2.is_matrix()
 
     def __str__(self):
         return "SubOp({},{})".format(self.value1, self.value2)
@@ -245,11 +311,12 @@ class SubOp(MathOperator):
 
 
 class MulOp(MathOperator):
-    def is_vector(self):
-        return self.value1.is_vector() != self.value2.is_vector()
+
+    def is_matrix(self):
+        return self.value1.is_matrix() != self.value2.is_matrix()
 
     def is_dot(self):
-        return self.value1.is_vector() and self.value2.is_vector()
+        return self.value1.get_last().is_matrix() and self.value2.get_first().is_matrix()
 
     def __str__(self):
         return "MulOp({},{})".format(self.value1, self.value2)
@@ -258,7 +325,8 @@ class MulOp(MathOperator):
 
 
 class CrossOp(MathOperator):
-    def is_vector(self):
+
+    def is_matrix(self):
         return True
 
     def __str__(self):
@@ -268,8 +336,9 @@ class CrossOp(MathOperator):
 
 
 class Fraction(MathOperator):
-    def is_vector(self):
-        return self.value1.is_vector()
+
+    def is_matrix(self):
+        return self.value1.is_matrix()
 
     def __str__(self):
         return "Fraction({},{})".format(self.value1, self.value2)
@@ -278,7 +347,8 @@ class Fraction(MathOperator):
 
 
 class Root(MathOperator):
-    def is_vector(self):
+
+    def is_matrix(self):
         return False
 
     def __str__(self):
@@ -288,7 +358,8 @@ class Root(MathOperator):
 
 
 class Power(MathOperator):
-    def is_vector(self):
+
+    def is_matrix(self):
         return False
 
     def __str__(self):
@@ -298,8 +369,9 @@ class Power(MathOperator):
 
 
 class Range(MathOperator):
-    def is_vector(self):
-        return False
+
+    def is_matrix(self):
+        return value1.is_vector() and value2.is_vector()
 
     def __str__(self):
         return "Range({},{})".format(self.value1, self.value2)
@@ -310,15 +382,32 @@ class Range(MathOperator):
 
 
 class Integral:
-    def is_vector(self):
-        return self.value.is_vector()
 
-    def __init__(self, value, variable):
+    def __init__(self, value, variable=None):
         self.value = value
-        self.variable = variable
+        if type(variable) is Equality and type(variable.value2) is Range:
+            self.variable = variable.value1
+            self.range = variable.value2
+            self.is_definite = True
+        else:
+            self.variable = variable
+            self.range = None
+            self.is_definite = False
+
+    def get_first(self):
+        return self
+
+    def get_last(self):
+        return self
+
+    def is_matrix(self):
+        return self.value.is_matrix()
 
     def get_value(self):
         return False
+
+    def get_variables(self):
+        return [] if self.variable is None else self.variable.get_variables()
 
     def __str__(self):
         return "Integral({},{})".format(self.value, self.variable)
@@ -327,16 +416,26 @@ class Integral:
 
 
 class Derivative:
-    def is_vector(self):
-        return self.value.is_vector()
+
+    def is_matrix(self):
+        return self.value.is_matrix()
 
     def __init__(self, value, variable, nth=Number("1")):
         self.value = value
         self.variable = variable
         self.nth = nth
 
+    def get_first(self):
+        return self
+
+    def get_last(self):
+        return self
+
     def get_value(self):
         return False
+
+    def get_variables(self):
+        return [] if self.variable is None else self.variable.get_variables()
 
     def __str__(self):
         return "Derivative({},{})".format(self.value, self.variable)
@@ -345,17 +444,56 @@ class Derivative:
 
 
 class Sum:
-    def is_vector(self):
-        return self.value.is_vector()
 
-    def __init__(self, value, variable):
+    def is_matrix(self):
+        return self.value.is_matrix()
+
+    def __init__(self, value, variable=None):
         self.value = value
-        self.variable = variable
+        if type(variable) is Equality and type(variable.value2) is Range:
+            self.variable = variable.value1
+            self.range = variable.value2
+            self.has_limits = True
+        else:
+            self.variable = variable
+            self.range = None
+            self.has_limits = False
 
-        def get_value(self):
-            return False
+    def get_variables(self):
+        return [x for x in self.value.get_variables() if x != self.variable]
+
+    def get_value(self):
+        return False
 
     def __str__(self):
-        return "Sum({},{},{})".format(self.value, self.variable)
+        return "Sum({},{},{})".format(self.value, self.variable, self.range)
+
+    __repr__ = __str__
+
+
+class Limit:
+
+    def is_matrix(self):
+        return self.value.is_matrix()
+
+    def get_variables(self):
+        return [x for x in self.value.get_variables() if x != self.variable]
+
+    def __init__(self, value, variable=None):
+        self.value = value
+        if type(variable) is Equality:  # or type is arrow operator
+            self.variable = variable.value1
+            self.limit = variable.value2
+            self.has_limit = True
+        else:
+            self.variable = variable
+            self.limit = None
+            self.has_limit = False
+
+    def get_value(self):
+        return False
+
+    def __str__(self):
+        return "Limit({},{},{})".format(self.value, self.variable, self.limit)
 
     __repr__ = __str__

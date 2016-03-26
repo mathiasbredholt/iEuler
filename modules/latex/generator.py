@@ -58,9 +58,29 @@ def convert_text(self):
     return self.text
 
 
+def convert_matrix(self):
+    result = "\\begin{{{}}}\n\t".format("bmatrix")
+    max_len = max([len(convert_expr(item))
+                   for row in self.value for item in row])
+    for rows in range(0, len(self.value)):
+        for cols in range(0, len(self.value[rows])):
+            if cols > 0:
+                result += "& "
+            val = convert_expr(self.value[rows][cols])
+            white = (max_len - len(val) + 1) // 2
+            result += val + " " * white
+        result += "\\\\\n\t" if rows < len(self.value) - 1 else "\n"
+    result += "\\end{{{}}}\n\t".format("bmatrix")
+    return result
+
+
 def convert_value(self):
     if type(self) is ml.Unit:
         result = "\\mathrm{{{}}}".format(self.prefix + self.value)
+    elif type(self) is ml.Ans:
+        result = "ans{}".format(
+            "_{" + convert_expr(self.index) + "}" if int(self.index.value) > 1 else "")
+        return result
     elif type(self) is ml.Variable:
         if self.is_symbol:
             if self.value in special_symbols:
@@ -191,13 +211,15 @@ def convert_root(self):
 
 
 def convert_integral(self):
-    if self.variable is None:
+    if self.is_definite:
+        return "\\displaystyle \\int_{{{}}}^{{{}}} {}\\;d {} ".format(
+            convert_expr(self.range.value1), convert_expr(self.range.value2),
+            convert_expr(self.value), convert_expr(self.variable))
+    elif not self.variable is None:
         return "\\displaystyle \\int {}\\;d {} ".format(
             convert_expr(self.value), convert_expr(self.variable))
     else:
-        return "\\displaystyle \\int_{{{}}}^{{{}}} {}\\;d {} ".format(
-            convert_expr(self.variable), convert_expr(self.variable),
-            convert_expr(self.value), convert_expr(self.variable))
+        return "\\displaystyle \\int {}".format(convert_expr(self.value))
 
 
 def convert_derivative(self):
@@ -210,14 +232,38 @@ def convert_derivative(self):
             convert_expr(self.nth), convert_expr(self.value))
 
 
+def convert_sum(self):
+    if self.has_limits:
+        return "\\displaystyle \\sum_{{{}}}^{{{}}} {}".format(
+            convert_expr(ml.Equality('=', self.variable, self.range.value1)), convert_expr(
+                self.range.value2),
+            convert_expr(self.value))
+    elif not self.variable is None:
+        return "\\displaystyle \\sum_{{{}}} {}".format(
+            convert_expr(self.variable), convert_expr(self.value))
+    else:
+        return "\\displaystyle \\sum {}".format(convert_expr(self.value))
+
+
+def convert_limit(self):
+    if self.has_limit:
+        return "\\displaystyle \\lim_{{{}}} {}".format(convert_expr(self.variable) + ' \\rightarrow ' + convert_expr(self.limit), convert_expr(self.value))
+    elif not self.variable is None:
+        return "\\displaystyle \\lim_{{{}}} {}".format(
+            convert_expr(self.variable), convert_expr(self.value))
+    else:
+        return "\\displaystyle \\lim {}".format(convert_expr(self.value))
+
+
 def convert_range(self):
-    return "\left[ \, {} \, ; {} \, \\right]".format(convert_expr(self.value1),
-                                                     convert_expr(self.value2))
+    return "\\left[ \\, {} \\, ; {} \\, \\right]".format(convert_expr(self.value1),
+                                                         convert_expr(self.value2))
 
 # Extending mathlib classes with to_latex method for duck typing
 tl.Paragraph.to_latex = convert_paragraph
 tl.Text.to_latex = convert_text
 ml.MathValue.to_latex = convert_value
+ml.Matrix.to_latex = convert_matrix
 ml.Equality.to_latex = convert_equality
 ml.Function.to_latex = convert_function
 ml.Minus.to_latex = convert_minus
@@ -232,3 +278,5 @@ ml.Root.to_latex = convert_root
 ml.Integral.to_latex = convert_integral
 ml.Derivative.to_latex = convert_derivative
 ml.Range.to_latex = convert_range
+ml.Sum.to_latex = convert_sum
+ml.Limit.to_latex = convert_limit

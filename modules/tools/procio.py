@@ -46,7 +46,6 @@ def wait_for_input(proc, queue, thread, regex, timeout=5):
     except Empty:
         return False
     else:  # got line
-        print("line={}".format(line))
         if re.match(regex, line, re.DOTALL):
             return True
         else:

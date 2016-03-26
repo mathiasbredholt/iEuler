@@ -56,7 +56,8 @@ MainWindow::MainWindow(QWidget *parent) :
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
 
-    renderer = new Renderer();
+    renderer = new Renderer(minimumWidth(),minimumHeight());
+    renderer->windowWidth = minimumWidth();
 
 //     Create/ tabs
     tabs = new QTabWidget(this);
@@ -64,7 +65,8 @@ MainWindow::MainWindow(QWidget *parent) :
     tabs->setTabsClosable(true);
     tabs->setStyleSheet("QTabWidget { left: 5px; border: none; background: #FFF; /* move to the right by 5px */ } QTabBar::tab { font: Monaco; color: white; background: #666; } QTabBar::tab:selected { background: #444 }");
     tabs->setMovable(true);
-    container->layout()->addWidget(tabs);
+    container->layout()->addWidget(tabs);    
+
     createNewTab();
 
 //     Create Command panel
@@ -75,6 +77,10 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 //    delete ui;
+}
+
+void MainWindow::initRenderer() {
+    renderer->move(this->pos());
 }
 
 void MainWindow::closeEvent(QCloseEvent *e) {
@@ -92,24 +98,35 @@ void MainWindow::closeEvent(QCloseEvent *e) {
         }
     } else {
         euler->terminate();
+        renderer->close();
         qDebug() << "Terminate python.";
     }
+}
+
+void MainWindow::moveEvent ( QMoveEvent * event )
+{
+    renderer->move(event->pos());
 }
 
 // Tabs
 
 void MainWindow::createNewTab(bool empty, QString fileName)
 {
-    QFrame *contents = new QFrame();
-    contents->setLayout(new QVBoxLayout());
-    contents->layout()->setAlignment(Qt::AlignTop);
+    QFrame *contents = new QFrame(this);
+    QVBoxLayout *layout = new QVBoxLayout;
+    layout->setContentsMargins(ptY(10), ptY(10), ptY(10), ptY(256));
+    layout->setAlignment(Qt::AlignTop);
+    contents->setLayout(layout);
     contents->setPalette(pal);
     contents->setFocusPolicy(Qt::NoFocus);
 
-    QScrollArea *scrollArea = new QScrollArea();
+    QScrollArea *scrollArea = new QScrollArea(this);
     scrollArea->setWidget(contents);
     scrollArea->setWidgetResizable(true);
     scrollArea->setFocusPolicy(Qt::NoFocus);
+//    scrollArea->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+    scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    contents->show();
 
     tabs->addTab(scrollArea, fileName);
     tabs->setCurrentWidget(scrollArea);
@@ -137,6 +154,9 @@ void MainWindow::addNewParagraph(QString mathString)
 
     numberOfLines++;
     paragraph->focus();
+
+    qApp->processEvents();
+    ((QScrollArea*) tabs->currentWidget())->ensureWidgetVisible(paragraph, 0, 400);
 }
 
 void MainWindow::newLine_triggered(int index)
@@ -163,7 +183,7 @@ void MainWindow::openFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getOpenFileName(this,
-        tr("Open iEuler file"), dir, tr("Text Files (*.euler)"));
+        tr("Open iEuler file"), dir, tr("iEuler files (*.eulerc)"));
     if (path != "") {
         QFileInfo fi(path);
         createNewTab(true, fi.fileName());

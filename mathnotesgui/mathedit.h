@@ -17,6 +17,7 @@ public:
 
     static const int MATHMODE = 0;
     static const int TEXTMODE = 1;
+    void updateHeight();
 
 signals:
     void evaluate();

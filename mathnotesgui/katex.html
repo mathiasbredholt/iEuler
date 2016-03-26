@@ -14,7 +14,7 @@ new QWebChannel(qt.webChannelTransport, function(channel) {
 
     doRender = function (latexString) {
         katex.render(latexString, elem, { displayMode: false });
-        setTimeout(function() { jshelper.onRenderComplete(elem.clientWidth, elem.clientHeight) }, 10);
+        setTimeout(function() { jshelper.onRenderComplete(elem.clientWidth, elem.clientHeight) }, 15);
     };
 });
 </script>

@@ -3,14 +3,18 @@
 #define webengine_DPI 96.0
 #define DEFAULT_ZOOM_FACTOR 1
 
-Renderer::Renderer(QWidget *parent) : QObject(parent)
+Renderer::Renderer(int windowWidth, int windowHeight, QWidget *parent) : QObject(parent)
 {
+    this->windowWidth = windowWidth;
     QString html = readFile(":/katex.html");
 //    QString html = readFile(":/mathjax.html");
 
     QUrl baseUrl = QUrl::fromLocalFile(QDir::currentPath() + "/mathnotesgui/webkit/");
     webengine = new QWebEngineView();
+    webengine->setWindowFlags(Qt::FramelessWindowHint | Qt::SubWindow);
+    webengine->setFixedSize(windowWidth * 0.9, windowHeight * 0.5);
     webengine->show();
+
 
     channel = new QWebChannel(webengine->page());
     channel->registerObject(QStringLiteral("jshelper"), this);
@@ -20,11 +24,21 @@ Renderer::Renderer(QWidget *parent) : QObject(parent)
 
     // Setup zoom levels
 //    setZoomFactor((int) dpi() / webengine_DPI * 100);
-
     isRendering = false;
 //    hasLoaded = false;
     canRender = true;
 
+}
+
+void Renderer::close()
+{
+    // close
+    webengine->close();
+}
+
+void Renderer::move(const QPoint p)
+{
+    webengine->move(p.x()+10,p.y());
 }
 
 void Renderer::startRendering()
@@ -58,7 +72,9 @@ void Renderer::setZoomFactor(int factor)
 void Renderer::render(MathWidget *target)
 {
     if (queue.empty() || queue.head() != target) queue.enqueue(target);
-    if (!isRendering && canRender && !queue.empty()) startRendering();
+    if (!isRendering && !queue.empty()) startRendering();
+
+//    if (!isRendering && canRender && !queue.empty()) startRendering();
 }
 
 int Renderer::getScreenDPI()
@@ -70,11 +86,12 @@ void Renderer::onRenderComplete(int outputWidth, int outputHeight)
 {
     if (queue.empty() || queue.head() != currentlyRendering) {
         // Convert the rendered output to bitmap and assign it to target
-        currentlyRendering->setPixmap(createPixmap(webengine->width(), outputHeight));
+        currentlyRendering->setPixmap(createPixmap(windowWidth * 0.9, outputHeight));
         isRendering = false;
     }
 
-    if (!queue.empty() && canRender){
+//    if (!queue.empty() && canRender) {
+    if (!queue.empty()){
         startRendering();
     }
 

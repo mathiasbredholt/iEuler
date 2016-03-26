@@ -14,6 +14,15 @@ units = ['V', 'A', 'J', 'm', 's', 'K', 'W', 'H', 'F', 'T', 'g', 'Hz', 'N',
 unit_prefixes = ['y', 'z', 'a', 'f', 'p', 'n', 'μ', 'm', 'c', 'd', 'da', 'h',
                  'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y']
 
+unit_escape_character = '.'
+
+matrix_delimiters = {
+    "start": ['<', '['],
+    "end": ['>', ']'],
+    "horizontal": [',', '\t'],
+    "vertical": [';', '\n']
+}
+
 functions = {
     "sqrt": {
         "object": lambda x: ml.Root(x, ml.Number("2")),
@@ -25,6 +34,14 @@ functions = {
     },
     "diff": {
         "object": ml.Derivative,
+        "num_args": 2
+    },
+    "sum": {
+        "object": ml.Sum,
+        "num_args": 2
+    },
+    "lim": {
+        "object": ml.Limit,
         "num_args": 2
     },
     "plot": {
