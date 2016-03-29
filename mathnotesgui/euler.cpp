@@ -12,10 +12,10 @@ Euler::Euler(QObject *parent) : QObject(parent)
     proc->start("python3 -u start.py");
 
     // Init socket
-    socket = new QUdpSocket(this);
-    socket->bind(QHostAddress::LocalHost, GUI_PORT);
+    socket = new QTcpSocket();
+    socket->connectToHost("127.0.0.1", GUI_PORT);
 
-    connect(socket, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
+    connect(socket, SIGNAL(readyRead()), this, SLOT(readyRead()));
 }
 
 void Euler::restartCore()
@@ -114,24 +114,31 @@ void Euler::sendExportRequest(QString path)
     writeDatagram(datagram);
 }
 
-void Euler::readPendingDatagrams()
+void Euler::sendNewTabRequest()
 {
-    while (socket->hasPendingDatagrams()) {
-        QByteArray datagram;
-        datagram.resize(socket->pendingDatagramSize());
-        QHostAddress addr;
-        quint16 port;
-
-        socket->readDatagram(datagram.data(), datagram.size(), &addr, &port);
-        processDatagram(datagram);
-    }
+    QByteArray datagram;
+    datagram.append(Euler::NEW);
+    writeDatagram(datagram);
 }
 
-void Euler::writeDatagram(QByteArray datagram)
+void Euler::readyRead()
 {
-    quint16 port = EULER_PORT;
+    qDebug() << socket->readAll();
+//    while (socket->hasPendingDatagrams()) {
+//        QByteArray datagram;
+//        datagram.resize(socket->pendingDatagramSize());
+//        QHostAddress addr;
+//        quint16 port;
+
+//        socket->readDatagram(datagram.data(), datagram.size(), &addr, &port);
+//        processDatagram(datagram);
+//    }
+}
+
+void Euler::twriteDatagram(QByteArray datagram)
+{
     socket->flush();
-    socket->writeDatagram(datagram, QHostAddress::LocalHost, port);
+    socket->write(datagram);
 }
 
 void Euler::readStandardOutput()

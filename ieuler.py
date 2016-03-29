@@ -121,11 +121,10 @@ def start():
     # Initialize UDP socket
     transmit.init()
 
+    print("Welcome to iEuler v0.1")
+
     tab_index = 0
-    workspace = [{}]
-    workspace[0]["user_variables"] = {}
-    workspace[0]["user_input"] = {}
-    workspace[0]["user_output"] = {}
+    workspace = []
 
     read_settings()
 
@@ -157,3 +156,8 @@ def start():
             workspace.append(load_workspace(data["path"], tab_index + 1))
         elif cmd == transmit.SAVE:  # Save workspace
             save_workspace(workspace[tab_index], data["path"])
+        elif cmd == transmit.NEW:  # New tab
+            workspace.append({})
+            workspace[tab_index + 1]["user_variables"] = {}
+            workspace[tab_index + 1]["user_input"] = {}
+            workspace[tab_index + 1]["user_output"] = {}

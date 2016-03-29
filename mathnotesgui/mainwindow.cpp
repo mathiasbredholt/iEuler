@@ -10,6 +10,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
 
     // Open menu
+    QAction *newAct = new QAction(tr("&New"), this);
+    newAct->setShortcut(QKeySequence(tr("Ctrl+N")));
+    connect(newAct, SIGNAL(triggered(bool)), this, SLOT(on_actionNew_triggered()));
+    fileMenu->addAction(newAct);
+
+
+    // Open menu
     QAction *openAct = new QAction(tr("&Open"), this);
     openAct->setShortcut(QKeySequence(tr("Ctrl+O")));
     connect(openAct, SIGNAL(triggered(bool)), this, SLOT(on_actionOpen_triggered()));
@@ -24,7 +31,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Close menu
     QAction *closeAct = new QAction(tr("&Close"), this);
     closeAct->setShortcut(QKeySequence(tr("Ctrl+W")));
-    connect(closeAct, &QAction::triggered, this, &MainWindow::close);
     connect(closeAct, SIGNAL(triggered(bool)), this, SLOT(on_actionClose_triggered()));
     fileMenu->addAction(closeAct);
 
@@ -55,6 +61,8 @@ MainWindow::MainWindow(QWidget *parent) :
 
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
+    connect(euler->socket, SIGNAL(connected()), this, SLOT(onConnection()));
+
 
     renderer = new Renderer();
     renderer->windowWidth = minimumWidth();
@@ -67,8 +75,6 @@ MainWindow::MainWindow(QWidget *parent) :
     tabs->setMovable(true);
     container->layout()->addWidget(tabs);    
 
-    createNewTab();
-
 //     Create Command panel
     cmdpanel = new CmdPanel(this);
     container->layout()->addWidget(cmdpanel);
@@ -77,6 +83,11 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 //    delete ui;
+}
+
+void MainWindow::onConnection()
+{
+    createNewTab();
 }
 
 void MainWindow::closeEvent(QCloseEvent *e) {
@@ -125,6 +136,7 @@ void MainWindow::createNewTab(bool empty, QString fileName)
 
     numberOfLines = 0;
     if (!empty) addNewParagraph();
+    euler->sendNewTabRequest();
 }
 
 
@@ -176,7 +188,7 @@ void MainWindow::openFile()
         tr("Open iEuler file"), dir, tr("iEuler files (*.eulerc)"));
     if (path != "") {
         QFileInfo fi(path);
-        createNewTab(true, fi.fileName());
+        createNewTab(true, fi.baseName());
 
         euler->sendOpenFileRequest(path);
     }
@@ -190,7 +202,10 @@ void MainWindow::saveFile()
         tr("Save iEuler file"), dir, tr("Text Files (*.euler)"));
 
     if (path != "") {
+        QFileInfo fi(path);
         euler->sendSaveFileRequest(path);
+        tabs->setTabText(tabs->currentIndex(), fi.baseName());
+        setWindowTitle("iEuler - "+fi.baseName());
     }
 }
 

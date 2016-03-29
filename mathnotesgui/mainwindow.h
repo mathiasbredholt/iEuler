@@ -38,7 +38,7 @@ private:
     int numberOfLines;
 
     void addNewParagraph(QString mathString = "");
-    void createNewTab(bool empty = false, QString fileName = "Untitled.euler");
+    void createNewTab(bool empty = false, QString fileName = "Untitled");
     void initRenderer();
 
     void openFile();
@@ -56,6 +56,7 @@ signals:
     void outputReady(int lineIndex, QString latexString);
 
 private slots:
+    void onConnection();
     void receivedMathString(int tabIndex, int index, QString mathString);
 
     void newLine_triggered(int index);
