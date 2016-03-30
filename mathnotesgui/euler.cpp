@@ -135,7 +135,7 @@ void Euler::readyRead()
 //    }
 }
 
-void Euler::twriteDatagram(QByteArray datagram)
+void Euler::writeDatagram(QByteArray datagram)
 {
     socket->flush();
     socket->write(datagram);
