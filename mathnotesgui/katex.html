@@ -2,7 +2,7 @@
 <link rel="stylesheet" href="katex/katex.min.css">
 <script src="katex/katex.min.js"></script>
 
-<div style="font-size: 20pt;" id="input"></div>
+<div style="font-size: 13pt;" id="input"></div>
 
 <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
 <script>
@@ -13,8 +13,12 @@ new QWebChannel(qt.webChannelTransport, function(channel) {
     var jshelper = channel.objects.jshelper;
 
     doRender = function (latexString) {
-        katex.render(latexString, elem, { displayMode: false });
-        setTimeout(function() { jshelper.onRenderComplete(elem.clientWidth, elem.clientHeight) }, 15);
+        katex.render(latexString + "s", elem);
+        //alert(latexString);
+        //jshelper.onRenderComplete(elem.clientWidth, elem.clientHeight);
+        //katex.render(latexString + "s", elem);
+        //alert(latexString);
+        jshelper.onRenderComplete(elem.clientWidth, elem.clientHeight);
     };
 });
 </script>

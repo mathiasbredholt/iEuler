@@ -71,10 +71,14 @@ void Renderer::setZoomFactor(int factor)
 
 void Renderer::render(MathWidget *target)
 {
-    if (queue.empty() || queue.head() != target) queue.enqueue(target);
-    if (!isRendering && !queue.empty()) startRendering();
+//    if (queue.empty() || queue.head() != target) queue.enqueue(target);
+//    if (!isRendering && !queue.empty()) startRendering();
 
 //    if (!isRendering && canRender && !queue.empty()) startRendering();
+    webengine->page()->runJavaScript("doRender(String.raw`"+target->latexString+"`);");
+    currentlyRendering = target;
+    qDebug() << target->latexString;
+
 }
 
 int Renderer::getScreenDPI()
@@ -91,9 +95,9 @@ void Renderer::onRenderComplete(int outputWidth, int outputHeight)
     }
 
 //    if (!queue.empty() && canRender) {
-    if (!queue.empty()){
-        startRendering();
-    }
+//    if (!queue.empty()){
+//        startRendering();
+//    }
 
 }
 
