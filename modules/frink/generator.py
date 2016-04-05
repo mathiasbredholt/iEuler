@@ -100,4 +100,4 @@ ml.MulOp.to_frink = convert_mulop
 ml.Fraction.to_frink = convert_fraction
 ml.Power.to_frink = convert_power
 ml.Root.to_frink = convert_root
-ml.Function.to_frink = convert_function
+# ml.Function.to_frink = convert_function

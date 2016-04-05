@@ -5,24 +5,27 @@ import modules.ieuler.generator as generator
 import modules.latex.generator
 import modules.latex.process
 import modules.maple.process
+import modules.frink.process
 import mathlib as ml
 import modules.tools.plot2d as plot2d
 import modules.tools.transmit as transmit
 
 
 def conf(os):
-    if os is "win":
+    if os is "daniel":
         __settings__ = {
-            "frink": "C:/Program Files (x86)/Frink/frink.jar",
+            "frink": "C:/Users/danie/Dropbox/Frink/frink.jar",
             "maple": "C:/Program Files/Maple 2015/bin.X86_64_WINDOWS/cmaple",
-            "pdflatex": "pdflatex"
+            "pdflatex": "pdflatex",
+            "default_calculator": "maple"
         }
-    elif os is "osx":
+    elif os is "mathias":
         __settings__ = {
             "frink": "/Applications/Frink/frink.jar",
             "maple":
             "/Library/Frameworks/Maple.framework/Versions/2015/bin/maple",
-            "pdflatex": "/usr/local/texlive/2015/bin/x86_64-darwin/pdftex"
+            "pdflatex": "/usr/local/texlive/2015/bin/x86_64-darwin/pdftex",
+            "default_calculator": "maple"
         }
     with open('settings.conf', 'w') as f:
         json.dump(__settings__, f)
@@ -111,10 +114,11 @@ def parse_math(math_string, workspace, evaluate):
 
 
 def read_settings():
+    global settings
     with open('settings.conf', 'r') as f:
         settings = json.load(f)
     modules.maple.process.set_path(settings["maple"])
-    modules.maple.process.set_path(settings["frink"])
+    modules.frink.process.set_path(settings["frink"])
     modules.latex.process.set_path(settings["pdflatex"])
 
 
@@ -145,6 +149,8 @@ def start():
                 workspace[tab_index]["user_variables"] = {}
                 workspace[tab_index]["user_input"] = {}
                 workspace[tab_index]["user_output"] = {}
+                workspace[tab_index]["default_calculator"] = settings[
+                    "default_calculator"]
 
             # Parse math string in iEuler syntax to a python representation
             math_obj = parse_math(math_string, workspace[tab_index], evaluate)

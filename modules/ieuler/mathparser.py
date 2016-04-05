@@ -3,9 +3,7 @@ import parsing
 from modules.ieuler.lib import *
 import re
 from pyparsing import *
-import modules.maple.process as maple
-import modules.frink.process as frink
-import modules.tools.plot2d as plot2d
+from importlib import import_module
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
@@ -33,13 +31,12 @@ def get_equality_op(toks):
     value1, value2, op = parsing.parse_binary_operator(
         toks, get_equality_op)
     hidden = False
-    print(t)
     assignment = False
     if "equals" in t:
         type = "="
         if t["equals"]["modifier"]:
             if "#" in t["equals"]["modifier"]:
-                value2 = evaluate_expression(value2)
+                value2 = evaluate_expression(value2, t["equals"]["option"])
             if "::" in t["equals"]["modifier"]:
                 hidden = True
                 if evaluate:
@@ -66,9 +63,11 @@ def assign_variable(variable, value):
             'Can only assign variables, not {}!'.format(type(variable)))
 
 
-def evaluate_expression(expr, convert=True):
+def evaluate_expression(expr, calculator="", convert=True):
     if evaluate:
-        return maple.evaluate(expr, convert)
+        if not calculator:
+            calculator = workspace["default_calculator"]
+        return import_module("modules.{}.process".format(calculator)).evaluate(expr, convert)
     return expr
 
 

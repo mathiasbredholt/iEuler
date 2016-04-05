@@ -18,7 +18,7 @@ def make_expression():
     variable = word.copy()
 
     operand = (
-        | variable.setParseAction(lambda x: parsing.get_variable(x, variables))
+        variable.setParseAction(lambda x: parsing.get_variable(x, variables))
         | number.setParseAction(parsing.get_value)
     )
 
@@ -33,7 +33,7 @@ def make_expression():
     expression << infixNotation(
         operand, [(factop, 1, opAssoc.LEFT, parsing.get_factorial_op),
                   (signop, 1, opAssoc.RIGHT, parsing.get_minus_op),
-                  (expop, 2, opAssoc.RIGHT, get_pow_op),
+                  (expop, 2, opAssoc.RIGHT, parsing.get_pow_op),
                   (fracop, 2, opAssoc.LEFT, parsing.get_div_op),
                   (multop, 2, opAssoc.LEFT, parsing.get_mul_op),
                   (plusop, 2, opAssoc.LEFT, parsing.get_add_op),
@@ -45,4 +45,5 @@ expression = make_expression()
 
 
 def parse(input_string):
+    print(input_string)
     return expression.parseString(input_string)[0]
