@@ -5,9 +5,10 @@ import matplotlib.pyplot as plt
 import mathlib as ml
 import modules.numpy.generator as generator
 import modules.latex.generator
+import modules.tools.transmit as transmit
 
 
-def plot(expr, var='x', from_x=-4, to_x=4, precision=500, func=None):
+def plot(expr, var='x', from_x=-4, to_x=4, precision=500, path="plot.png", func=None):
     plt.figure(figsize=(6, 5))
     t = np.arange(from_x, to_x, (to_x - from_x) / precision)
     generator.set_plot_variables({var: t})
@@ -27,5 +28,5 @@ def plot(expr, var='x', from_x=-4, to_x=4, precision=500, func=None):
         plt.ylabel('$y$', fontsize=16)
         # plt.title('$y=' + modules.latex.generator.convert_expr(expr.value) +
         #           '$', fontsize=18, y=1.04)
-    plt.savefig('mathnotes.png', transparent=True)
+    plt.savefig(path, transparent=True)
     plt.clf()

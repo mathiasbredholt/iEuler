@@ -64,6 +64,19 @@ void Euler::processDatagram(QByteArray datagram)
             mathString = QString::fromUtf8(datagram.remove(0, 4));
 
             emit receivedMathString(tabIndex, index, mathString);
+        } else if (cmd == Euler::PLOT) {
+            int tabIndex;
+            int index;
+            QString path;
+
+            tabIndex = (int) datagram.at(1);
+
+            index = (int) datagram.at(2) << 8;
+            index += (int) datagram.at(3) & 0xFF;
+
+            path = QString::fromUtf8(datagram.remove(0, 4));
+
+            emit receivedPlot(tabIndex, index, path);
         }
     }
 }

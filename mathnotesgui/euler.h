@@ -36,6 +36,12 @@
      6: Export pdf
         0   cmd
         [1] path
+     7: Receive plot
+        0   cmd
+        1   tabIndex
+        2   index MSB
+        3   index LSB
+        [4] plot
 */
 
 #include <QObject>
@@ -63,12 +69,14 @@ public:
     static const char RENDER   = 4;
     static const char MATH_STR = 5;
     static const char EXPORT   = 6;
+    static const char PLOT     = 7;
 
     bool hasCrashed = false;
 
 signals:
     void receivedLatexString(int tabIndex, int index, QString latexString);
     void receivedMathString(int tabIndex, int index, QString mathString);
+    void receivedPlot(int tabIndex, int index, QString path);
 
 public slots:
 
