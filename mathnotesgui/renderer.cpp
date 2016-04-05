@@ -27,7 +27,7 @@ Renderer::Renderer(int windowWidth, int windowHeight, QWidget *parent) : QObject
     isRendering = false;
 //    hasLoaded = false;
     canRender = true;
-
+    hasRenderedOnce = false;
 }
 
 void Renderer::close()
@@ -75,6 +75,8 @@ void Renderer::render(MathWidget *target)
     if (!isRendering && !queue.empty()) startRendering();
 
 //    if (!isRendering && canRender && !queue.empty()) startRendering();
+//    webengine->page()->runJavaScript("doRender(String.raw`"+target->latexString+"`);");
+//    currentlyRendering = target;
 }
 
 int Renderer::getScreenDPI()
@@ -84,6 +86,13 @@ int Renderer::getScreenDPI()
 
 void Renderer::onRenderComplete(int outputWidth, int outputHeight)
 {
+    if (!hasRenderedOnce) {
+        webengine->page()->runJavaScript("doRender(String.raw`"+currentlyRendering->latexString+"\\;`);");
+        hasRenderedOnce = true;
+    } else {
+        hasRenderedOnce = false;
+    }
+
     if (queue.empty() || queue.head() != currentlyRendering) {
         // Convert the rendered output to bitmap and assign it to target
         currentlyRendering->setPixmap(createPixmap(windowWidth * 0.9, outputHeight));
@@ -94,7 +103,6 @@ void Renderer::onRenderComplete(int outputWidth, int outputHeight)
     if (!queue.empty()){
         startRendering();
     }
-
 }
 
 void Renderer::toggleRendering(bool disable)

@@ -50,7 +50,7 @@ private:
     QWidget *getTabContents();
 
     void closeEvent(QCloseEvent *event);
-    virtual void moveEvent ( QMoveEvent * event );
+    void moveEvent(QMoveEvent *event);
 
 protected:
     void keyPressEvent(QKeyEvent *);
