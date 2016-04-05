@@ -42,7 +42,6 @@ private:
 
     void addNewParagraph(QString mathString = "");
     void createNewTab(bool empty = false, QString fileName = "Untitled");
-    void initRenderer();
 
     void openFile();
     void saveFile();
