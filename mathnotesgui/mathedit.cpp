@@ -21,10 +21,10 @@ void MathEdit::setMode(int mathEditMode)
     if (this->mathEditMode != mathEditMode) {
         this->mathEditMode = mathEditMode;
         if (mathEditMode == MATHMODE) {
-            setStyleSheet("QPlainTextEdit { border: none; background: #EEE; font-size: 14px;  }");
+            setStyleSheet("QPlainTextEdit { border: none; background: none; }");
         }
         else if (mathEditMode == TEXTMODE) {
-            setStyleSheet("QPlainTextEdit { border: none; background: #DDD; font-size: 14px;  }");
+            setStyleSheet("QPlainTextEdit { border: none; background: #EEE; }");
         }
     }
 }
