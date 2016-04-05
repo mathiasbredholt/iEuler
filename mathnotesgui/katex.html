@@ -13,12 +13,8 @@ new QWebChannel(qt.webChannelTransport, function(channel) {
     var jshelper = channel.objects.jshelper;
 
     doRender = function (latexString) {
-        katex.render(latexString + "s", elem);
-        //alert(latexString);
-        //jshelper.onRenderComplete(elem.clientWidth, elem.clientHeight);
-        //katex.render(latexString + "s", elem);
-        //alert(latexString);
-        jshelper.onRenderComplete(elem.clientWidth, elem.clientHeight);
+        katex.render(latexString, elem);
+        setTimeout(function () { jshelper.onRenderComplete(elem.clientWidth, elem.clientHeight) }, 30);
     };
 });
 </script>

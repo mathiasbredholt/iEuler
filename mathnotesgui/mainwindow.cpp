@@ -6,6 +6,7 @@ MainWindow::MainWindow(QWidget *parent) :
     QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
     setMinimumSize(ptX(600), ptY(600));
+    installEventFilter(this);
 
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
 
@@ -72,6 +73,24 @@ MainWindow::MainWindow(QWidget *parent) :
 //     Create Command panel
     cmdpanel = new CmdPanel(this);
     container->layout()->addWidget(cmdpanel);
+    renderer->move(this->pos());
+    renderer->move(this->pos());
+
+    renderer->move(this->pos());
+
+    renderer->move(this->pos());
+
+    renderer->move(this->pos());
+
+    renderer->move(this->pos());
+
+    renderer->move(this->pos());
+
+    renderer->move(this->pos());
+
+    renderer->move(this->pos());
+
+
 }
 
 MainWindow::~MainWindow()
@@ -103,9 +122,9 @@ void MainWindow::closeEvent(QCloseEvent *e) {
     }
 }
 
-void MainWindow::moveEvent ( QMoveEvent * event )
+void MainWindow::moveEvent(QMoveEvent *event)
 {
-    renderer->move(event->pos());
+    renderer->move(pos());
 }
 
 // Tabs

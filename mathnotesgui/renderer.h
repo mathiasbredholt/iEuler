@@ -41,6 +41,7 @@ private:
     qreal baseScaling;
     bool isRendering;
     bool canRender;
+    bool hasRenderedOnce;
     int getScreenDPI();
     void startRendering();
     QSize getSize();
