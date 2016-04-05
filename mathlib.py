@@ -57,6 +57,11 @@ class MathValue:
         decos.append(dec)
         self.decorators = decos
 
+    def add_attribute(self, attribute, value):
+        attrs = self.attributes.copy()
+        attrs[attribute] = value
+        self.attributes = attrs
+
     def name(self):
         return self.value
 
@@ -122,11 +127,12 @@ class Complex(MathValue):
 
 class Variable(MathValue):
 
-    def __init__(self, value, is_symbol=False, decs=[], subscript=None):
+    def __init__(self, value, is_symbol=False, decs=[], subscript=None, attributes={}):
         self.value = value
         self.decorators = decs
         self.is_symbol = is_symbol
         self.subscript = subscript
+        self.attributes = attributes
 
     def get_variables(self):
         return [self]
@@ -137,9 +143,9 @@ class Variable(MathValue):
         return self.value
 
     def __str__(self):
-        return "Variable(name: {}, value: {} subscript: {} deco:{} symbol: {})".format(
+        return "Variable(name: {}, value: {} subscript: {} deco:{} symbol: {} attributes: {})".format(
             self.name(), self.value, self.subscript, self.decorators, "yes" if
-            self.is_symbol else "no")
+            self.is_symbol else "no", self.attributes)
 
     __repr__ = __str__
 

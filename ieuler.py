@@ -153,10 +153,11 @@ def start():
 
             # Parse math string in iEuler syntax to a python representation
             math_obj = parse_math(math_string, workspace[tab_index], evaluate)
-            # print(math_obj)
+            print(math_obj)
 
             # Convert to LaTeX
             latex_string = modules.latex.generator.generate(math_obj)
+            # print(latex_string)
 
             # Add math object to workspace
             workspace[tab_index]["user_input"][index] = math_string
