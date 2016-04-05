@@ -56,7 +56,6 @@ signals:
     void outputReady(int lineIndex, QString latexString);
 
 private slots:
-    void onConnection();
     void receivedMathString(int tabIndex, int index, QString mathString);
 
     void newLine_triggered(int index);

@@ -30,6 +30,7 @@ Paragraph::Paragraph(QWidget *parent,
 //    layout()->addWidget(renderer->webengine);
 
     mathEdit->setPlainText(mathString);
+    preview();
 }
 
 void Paragraph::focus()

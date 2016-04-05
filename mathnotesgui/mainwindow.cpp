@@ -61,7 +61,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
-    connect(euler->socket, SIGNAL(connected()), this, SLOT(onConnection()));
 
 
     renderer = new Renderer();
@@ -73,7 +72,9 @@ MainWindow::MainWindow(QWidget *parent) :
     tabs->setTabsClosable(true);
     tabs->setStyleSheet("QTabWidget { left: 5px; border: none; background: #FFF; /* move to the right by 5px */ } QTabBar::tab { font: Monaco; color: white; background: #666; } QTabBar::tab:selected { background: #444 }");
     tabs->setMovable(true);
-    container->layout()->addWidget(tabs);    
+    container->layout()->addWidget(tabs);
+
+    createNewTab();
 
 //     Create Command panel
     cmdpanel = new CmdPanel(this);
@@ -83,11 +84,6 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 //    delete ui;
-}
-
-void MainWindow::onConnection()
-{
-    createNewTab();
 }
 
 void MainWindow::closeEvent(QCloseEvent *e) {
@@ -136,17 +132,18 @@ void MainWindow::createNewTab(bool empty, QString fileName)
 
     numberOfLines = 0;
     if (!empty) addNewParagraph();
-    euler->sendNewTabRequest();
 }
 
 
 void MainWindow::addNewParagraph(QString mathString)
 {
+    int tabIndex = tabs->currentIndex();
+    int index = numberOfLines;
     Paragraph *paragraph = new Paragraph(this,
                                          euler,
                                          renderer,
-                                         tabs->currentIndex(),
-                                         numberOfLines,
+                                         tabIndex,
+                                         index,
                                          mathString);
 
     getTabContents()->layout()->addWidget(paragraph);

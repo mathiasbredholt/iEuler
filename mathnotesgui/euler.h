@@ -41,7 +41,7 @@
 #include <QObject>
 #include <QDebug>
 #include <QProcess>
-#include <QTcpSocket>
+#include <QUdpSocket>
 #include <QMessageBox>
 
 class Euler : public QObject
@@ -55,7 +55,6 @@ public:
     void sendOpenFileRequest(QString path);
     void sendSaveFileRequest(QString path);
     void sendExportRequest(QString path);
-    void sendNewTabRequest();
 
     static const char PREVIEW  = 0;
     static const char EVALUATE = 1;
@@ -64,9 +63,6 @@ public:
     static const char RENDER   = 4;
     static const char MATH_STR = 5;
     static const char EXPORT   = 6;
-    static const char NEW      = 7;
-
-    QTcpSocket *socket;
 
     bool hasCrashed = false;
 
@@ -78,11 +74,12 @@ public slots:
 
 private:
     QProcess *proc;
+    QUdpSocket *socket;
 
     void processDatagram(QByteArray datagram);
 
 private slots:
-    void readyRead();
+    void readPendingDatagrams();
     void writeDatagram(QByteArray datagram);
     void readStandardOutput();
     void readStandardError();

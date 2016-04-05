@@ -138,6 +138,13 @@ def start():
             math_string = data["math_string"]
             evaluate = cmd == 1
 
+            # Create new tab if it doesn't exist
+            if tab_index >= len(workspace):
+                workspace.append({})
+                workspace[tab_index]["user_variables"] = {}
+                workspace[tab_index]["user_input"] = {}
+                workspace[tab_index]["user_output"] = {}
+
             # Parse math string in iEuler syntax to a python representation
             math_obj = parse_math(math_string, workspace[tab_index], evaluate)
             # print(math_obj)
@@ -156,8 +163,3 @@ def start():
             workspace.append(load_workspace(data["path"], tab_index + 1))
         elif cmd == transmit.SAVE:  # Save workspace
             save_workspace(workspace[tab_index], data["path"])
-        elif cmd == transmit.NEW:  # New tab
-            workspace.append({})
-            workspace[tab_index + 1]["user_variables"] = {}
-            workspace[tab_index + 1]["user_input"] = {}
-            workspace[tab_index + 1]["user_output"] = {}
