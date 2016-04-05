@@ -138,6 +138,12 @@ def start():
             math_string = data["math_string"]
             evaluate = cmd == 1
 
+            # Plot extension, needs abstraction of command parsing
+            # path = "plot.png"
+            # plot_expr = something
+            # plot2d.plot(plot_expr, "plot.png")
+            # transmit.send_plot(tab_index, index, "plot.png")
+
             # Create new tab if it doesn't exist
             if tab_index >= len(workspace):
                 workspace.append({})

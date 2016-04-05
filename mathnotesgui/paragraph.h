@@ -41,6 +41,7 @@ private slots:
     void preview();
     void evaluate();
     void receivedLatexString(int tabIndex, int index, QString latexString);
+    void receivedPlot(int tabIndex, int index, QString path);
     void arrowsPressed(bool upArrowPressed);
     void deletePressed();
 };

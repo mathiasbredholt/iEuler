@@ -11,32 +11,39 @@ SAVE = 3
 RENDER = 4
 MATH_STR = 5
 EXPORT = 6
-NEW = 7
+PLOT = 7
 
-client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 
 def init():
-    client_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    client_socket.bind((ADDRESS, EULER_PORT))
+    sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+    sock.bind((ADDRESS, EULER_PORT))
 
 
 def send_latex(tab_index, index, latex_string):
     data = bytes([RENDER, tab_index, index >> 8, index & 0xFF]) + bytes(
         latex_string, 'utf-8')
 
-    client_socket.sendto(data, (ADDRESS, GUI_PORT))
+    sock.sendto(data, (ADDRESS, GUI_PORT))
 
 
 def send_math_string(tab_index, index, math_string):
     data = bytes([MATH_STR, tab_index, index >> 8, index & 0xFF]) + bytes(
         math_string, 'utf-8')
 
-    client_socket.sendto(data, (ADDRESS, GUI_PORT))
+    sock.sendto(data, (ADDRESS, GUI_PORT))
+
+
+def send_plot(tab_index, index, path):
+    data = bytes([PLOT, tab_index, index >> 8, index & 0xFF]) + bytes(
+        path, 'utf-8')
+
+    sock.sendto(data, (ADDRESS, GUI_PORT))
 
 
 def receive():
-    data, addr = client_socket.recvfrom(1024)
+    data, addr = sock.recvfrom(1024)
     cmd = data[0]
 
     if cmd == PREVIEW or cmd == EVALUATE:

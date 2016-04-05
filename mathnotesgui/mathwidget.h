@@ -9,6 +9,7 @@ class MathWidget : public QLabel
 public:
     explicit MathWidget(QWidget *parent = 0);
     QString latexString;
+    void loadPlot(QString path);
 
 public slots:
 

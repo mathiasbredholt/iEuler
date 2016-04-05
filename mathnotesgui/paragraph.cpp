@@ -21,6 +21,7 @@ Paragraph::Paragraph(QWidget *parent,
     setLayout(new QVBoxLayout());
 
     connect(euler, SIGNAL(receivedLatexString(int, int, QString)), this, SLOT(receivedLatexString(int, int, QString)));
+    connect(euler, SIGNAL(receivedPlot(int,int,QString)), this, SLOT(receivedPlot(int,int,QString)));
 
     initMathEdit();
 
@@ -76,6 +77,13 @@ void Paragraph::receivedLatexString(int tabIndex, int index, QString latexString
     if (tabIndex == this->tabIndex && index == this->index && mathWidget->latexString != latexString) {
         mathWidget->latexString = latexString;
         renderer->render(mathWidget);
+    }
+}
+
+void Paragraph::receivedPlot(int tabIndex, int index, QString path)
+{
+    if (tabIndex == this->tabIndex && index == this->index) {
+        mathWidget->loadPlot(path);
     }
 }
 
