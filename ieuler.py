@@ -114,6 +114,7 @@ def read_settings():
     with open('settings.conf', 'r') as f:
         settings = json.load(f)
     modules.maple.process.set_path(settings["maple"])
+    modules.maple.process.set_path(settings["frink"])
     modules.latex.process.set_path(settings["pdflatex"])
 
 
