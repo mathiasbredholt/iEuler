@@ -30,6 +30,7 @@ Paragraph::Paragraph(QWidget *parent,
 //    layout()->addWidget(renderer->webengine);
 
     mathEdit->setPlainText(mathString);
+    preview();
 }
 
 void Paragraph::focus()
@@ -51,12 +52,15 @@ void Paragraph::initMathEdit()
 void Paragraph::preview()
 {
     QString mathString = mathEdit->toPlainText();
+
     mathEdit->updateHeight();
+
     if (mathString.indexOf('%') == 0) {
         mathEdit->setMode(MathEdit::TEXTMODE);
     } else {
         mathEdit->setMode(MathEdit::MATHMODE);
     }
+
     euler->sendMathString(tabIndex, index, mathString, false);
 }
 

@@ -41,7 +41,8 @@ private:
     int numberOfLines;
 
     void addNewParagraph(QString mathString = "");
-    void createNewTab(bool empty = false, QString fileName = "Untitled.euler");
+    void createNewTab(bool empty = false, QString fileName = "Untitled");
+    void initRenderer();
 
     void openFile();
     void saveFile();

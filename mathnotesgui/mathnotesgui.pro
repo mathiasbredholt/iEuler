@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += network
 QT       += webchannel
 QT       += webenginewidgets
 

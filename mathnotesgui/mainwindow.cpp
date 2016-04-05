@@ -10,6 +10,13 @@ MainWindow::MainWindow(QWidget *parent) :
     QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
 
     // Open menu
+    QAction *newAct = new QAction(tr("&New"), this);
+    newAct->setShortcut(QKeySequence(tr("Ctrl+N")));
+    connect(newAct, SIGNAL(triggered(bool)), this, SLOT(on_actionNew_triggered()));
+    fileMenu->addAction(newAct);
+
+
+    // Open menu
     QAction *openAct = new QAction(tr("&Open"), this);
     openAct->setShortcut(QKeySequence(tr("Ctrl+O")));
     connect(openAct, SIGNAL(triggered(bool)), this, SLOT(on_actionOpen_triggered()));
@@ -24,7 +31,6 @@ MainWindow::MainWindow(QWidget *parent) :
     // Close menu
     QAction *closeAct = new QAction(tr("&Close"), this);
     closeAct->setShortcut(QKeySequence(tr("Ctrl+W")));
-    connect(closeAct, &QAction::triggered, this, &MainWindow::close);
     connect(closeAct, SIGNAL(triggered(bool)), this, SLOT(on_actionClose_triggered()));
     fileMenu->addAction(closeAct);
 
@@ -65,7 +71,7 @@ MainWindow::MainWindow(QWidget *parent) :
     tabs->setTabsClosable(true);
     tabs->setStyleSheet("QTabWidget { left: 5px; border: none; background: #FFF; /* move to the right by 5px */ } QTabBar::tab { font: Monaco; color: white; background: #666; } QTabBar::tab:selected { background: #444 }");
     tabs->setMovable(true);
-    container->layout()->addWidget(tabs);    
+    container->layout()->addWidget(tabs);
 
     createNewTab();
 
@@ -140,11 +146,13 @@ void MainWindow::createNewTab(bool empty, QString fileName)
 
 void MainWindow::addNewParagraph(QString mathString)
 {
+    int tabIndex = tabs->currentIndex();
+    int index = numberOfLines;
     Paragraph *paragraph = new Paragraph(this,
                                          euler,
                                          renderer,
-                                         tabs->currentIndex(),
-                                         numberOfLines,
+                                         tabIndex,
+                                         index,
                                          mathString);
 
     getTabContents()->layout()->addWidget(paragraph);
@@ -186,7 +194,7 @@ void MainWindow::openFile()
         tr("Open iEuler file"), dir, tr("iEuler files (*.eulerc)"));
     if (path != "") {
         QFileInfo fi(path);
-        createNewTab(true, fi.fileName());
+        createNewTab(true, fi.baseName());
 
         euler->sendOpenFileRequest(path);
     }
@@ -200,7 +208,10 @@ void MainWindow::saveFile()
         tr("Save iEuler file"), dir, tr("Text Files (*.euler)"));
 
     if (path != "") {
+        QFileInfo fi(path);
         euler->sendSaveFileRequest(path);
+        tabs->setTabText(tabs->currentIndex(), fi.baseName());
+        setWindowTitle("iEuler - "+fi.baseName());
     }
 }
 

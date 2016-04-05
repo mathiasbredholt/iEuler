@@ -11,6 +11,7 @@ SAVE = 3
 RENDER = 4
 MATH_STR = 5
 EXPORT = 6
+NEW = 7
 
 client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -52,13 +53,3 @@ def receive():
         path = data[1:].decode('utf-8')
         result = {"path": path}
         return (cmd, result)
-    else:
-        return (cmd, {})
-
-# Test input
-# import socket
-# s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-# s.bind(('localhost', 41000))
-# while 1:
-#     data, addr = s.recvfrom(1024)
-#     print(data)
