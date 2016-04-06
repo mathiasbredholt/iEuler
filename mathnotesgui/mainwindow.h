@@ -40,6 +40,8 @@ private:
 
     int numberOfLines;
 
+    void createFileMenu();
+
     void addNewParagraph(QString mathString = "");
     void createNewTab(bool empty = false, QString fileName = "Untitled");
 

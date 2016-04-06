@@ -63,10 +63,10 @@ def get_variable(toks, variables, symbols={"__standard__": []}, user_variables={
         subscript = None
         name = value
 
+    print(value)
+
     # print("Variable: {}".format(name))
-    if name in user_variables:
-        return user_variables[name]
-    elif name in variables:
+    if name in variables:
         return variables[name]["object"]()
     elif value in symbols["__standard__"]:
         return ml.Variable(value, is_symbol=True, subscript=subscript)
@@ -106,8 +106,6 @@ def get_unit(toks, variables):
     # print("get_unit toks: {}".format(toks))
     if type(toks[0]) is ml.Number:
         return ml.MulOp(toks[0], get_unit(toks[1:], variables))
-    if toks[0] in variables:
-        return ml.Variable(toks[0])
     if len(toks) > 1:
         name = toks[0] + toks[1]
         if name in variables:

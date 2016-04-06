@@ -8,39 +8,6 @@ MainWindow::MainWindow(QWidget *parent) :
     setMinimumSize(ptX(600), ptY(600));
     installEventFilter(this);
 
-    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
-
-    // Open menu
-    QAction *newAct = new QAction(tr("&New"), this);
-    newAct->setShortcut(QKeySequence(tr("Ctrl+N")));
-    connect(newAct, SIGNAL(triggered(bool)), this, SLOT(on_actionNew_triggered()));
-    fileMenu->addAction(newAct);
-
-
-    // Open menu
-    QAction *openAct = new QAction(tr("&Open"), this);
-    openAct->setShortcut(QKeySequence(tr("Ctrl+O")));
-    connect(openAct, SIGNAL(triggered(bool)), this, SLOT(on_actionOpen_triggered()));
-    fileMenu->addAction(openAct);
-
-    // Save menu
-    QAction *saveAct = new QAction(tr("&Save"), this);
-    saveAct->setShortcut(QKeySequence(tr("Ctrl+S")));
-    connect(saveAct, SIGNAL(triggered(bool)), this, SLOT(on_actionSave_triggered()));
-    fileMenu->addAction(saveAct);
-
-    // Close menu
-    QAction *closeAct = new QAction(tr("&Close"), this);
-    closeAct->setShortcut(QKeySequence(tr("Ctrl+W")));
-    connect(closeAct, SIGNAL(triggered(bool)), this, SLOT(on_actionClose_triggered()));
-    fileMenu->addAction(closeAct);
-
-    // Restart core
-    QAction *coreAct = new QAction(tr("&Restart core"), this);
-    coreAct->setShortcut(QKeySequence(tr("Ctrl+R")));
-    connect(coreAct, SIGNAL(triggered(bool)), this, SLOT(on_actionRestart_core_triggered()));
-    fileMenu->addAction(coreAct);
-
     pal = palette();
 //    Dark theme
 //    pal.setColor(QPalette::Base, QColor("#333"));
@@ -54,6 +21,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setPalette(pal);
 
     setFont(QFont("Monaco", 12));
+
+    createFileMenu();
 
     container = new QWidget(this);
     container->setLayout(new QVBoxLayout());
@@ -102,6 +71,42 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 //    delete ui;
+}
+
+void MainWindow::createFileMenu()
+{
+    QMenu *fileMenu = menuBar()->addMenu(tr("&File"));
+
+    // Open menu
+    QAction *newAct = new QAction(tr("&New"), this);
+    newAct->setShortcut(QKeySequence(tr("Ctrl+N")));
+    connect(newAct, SIGNAL(triggered(bool)), this, SLOT(on_actionNew_triggered()));
+    fileMenu->addAction(newAct);
+
+
+    // Open menu
+    QAction *openAct = new QAction(tr("&Open"), this);
+    openAct->setShortcut(QKeySequence(tr("Ctrl+O")));
+    connect(openAct, SIGNAL(triggered(bool)), this, SLOT(on_actionOpen_triggered()));
+    fileMenu->addAction(openAct);
+
+    // Save menu
+    QAction *saveAct = new QAction(tr("&Save"), this);
+    saveAct->setShortcut(QKeySequence(tr("Ctrl+S")));
+    connect(saveAct, SIGNAL(triggered(bool)), this, SLOT(on_actionSave_triggered()));
+    fileMenu->addAction(saveAct);
+
+    // Close menu
+    QAction *closeAct = new QAction(tr("&Close"), this);
+    closeAct->setShortcut(QKeySequence(tr("Ctrl+W")));
+    connect(closeAct, SIGNAL(triggered(bool)), this, SLOT(on_actionClose_triggered()));
+    fileMenu->addAction(closeAct);
+
+    // Restart core
+    QAction *coreAct = new QAction(tr("&Restart core"), this);
+    coreAct->setShortcut(QKeySequence(tr("Ctrl+R")));
+    connect(coreAct, SIGNAL(triggered(bool)), this, SLOT(on_actionRestart_core_triggered()));
+    fileMenu->addAction(coreAct);
 }
 
 void MainWindow::initRenderer() {
