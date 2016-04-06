@@ -148,7 +148,7 @@ operand = (
 
 insert_value = parsing.word_start + Literal('@') + parsing.no_white
 attrop = Literal('++') + Word(parsing.chars) + Optional(Literal(':') +
-                                                        escape_field.copy())
+                                                        (escape_field | Word(parsing.chars)))
 factop = parsing.no_white + Literal('!') + parsing.word_end
 signop = parsing.word_start + Literal('-') + parsing.no_white
 expop = Literal('^')
