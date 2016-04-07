@@ -168,16 +168,17 @@ class Ans(MathValue):
 
 class Unit(MathValue):
 
-    def __init__(self, unit, prefix=""):
+    def __init__(self, unit, prefix="", unknown=False):
         self.value = unit
         self.prefix = prefix
         self.decorators = []
+        self.unknown = unknown
 
     def convert_to_variable(self):
         return Variable(self.prefix + self.value, False, self.decorators)
 
     def __str__(self):
-        return "Unit({}, prefix: {})".format(self.value, self.prefix)
+        return "Unit({}, prefix: {}, unknown: {})".format(self.value, self.prefix, self.unknown)
 
     __repr__ = __str__
 
@@ -225,15 +226,16 @@ class MathUnaryOperator:
         return False
 
     def get_first(self):
-        if not self.value.get_value():
-            # value is an operator
-            return self.value.get_first()
-        else:
-            # value is a value
-            return self.value
+        return self.value.get_first()
+        # if not self.value.get_value():
+        #     # value is an operator
+        #     return self.value.get_first()
+        # else:
+        #     # value is a value
+        #     return self.value
 
     def get_last(self):
-        return get_first(self)
+        return self.get_first()
 
     def is_matrix(self):
         return self.value.is_matrix()

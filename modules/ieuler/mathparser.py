@@ -12,8 +12,8 @@ ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 def get_variable_value(toks):
     var, op = parsing.parse_unary_operator(toks)
     if type(var) is ml.Variable:
-        if var.value in user_variables:
-            return user_variables[var.value]
+        if var.name() in user_variables:
+            return user_variables[var.name()]
     if type(var) is ml.Ans:
         return var.value
     return var
@@ -77,7 +77,7 @@ def assign_variable(variable, value):
     if type(variable) is ml.Unit:
         variable = variable.convert_to_variable()
     if type(variable) is ml.Variable:
-        user_variables[variable.value] = value
+        user_variables[variable.name()] = value
     else:
         raise NameError(
             'Can only assign variables, not {}!'.format(type(variable)))
@@ -93,17 +93,21 @@ ParserElement.setDefaultWhitespaceChars(' ')
 
 deco_kw_list = parsing.make_keyword_list(decorator_keywords)
 equality_kw_list = parsing.make_keyword_list(equality_keywords)
-units_list = oneOf(units)
-unit_prefixes_list = oneOf(unit_prefixes)
+units_list = oneOf(units['units'] + list(units['aliases'].keys()))
+unit_prefixes_list = oneOf(
+    units['prefixes'] + list(units['prefix_aliases'].keys()))
 
 
 expression = Forward()
 
-unit = Optional(Word(nums).setParseAction(parsing.get_value)) + Suppress(Literal(unit_escape_character) + parsing.no_white) + (
+unit = Optional(Word(nums).setParseAction(parsing.get_value)) + Suppress(Literal(units['escape_character']) + parsing.no_white) + (
     units_list + NotAny(parsing.no_white + Word(parsing.chars)) | (
         Optional(unit_prefixes_list + parsing.no_white) + units_list +
         NotAny(parsing.no_white + Word(parsing.chars)))
-) + NotAny(parsing.no_white + Literal(unit_escape_character))
+) + NotAny(parsing.no_white + Literal(units['escape_character']))
+
+other_unit = Suppress(Literal(units['escape_character']) + parsing.no_white) + Word(
+    parsing.letters) + NotAny(parsing.no_white + Literal(units['escape_character']))
 
 name = NotAny(deco_kw_list | equality_kw_list | Keyword('cross')) + Word(
     parsing.letters, parsing.chars)
@@ -138,7 +142,8 @@ operand = (
     | eval_direct_field.setParseAction(
         lambda x: evaluate_expression(x[0], False))
     | function.setParseAction(lambda x: parsing.get_function(x, functions))
-    | unit.setParseAction(lambda x: parsing.get_unit(x, user_variables))
+    | unit.setParseAction(lambda x: parsing.get_unit(x, units))
+    | other_unit.setParseAction(lambda x: parsing.get_unit(x, units, unknown=True))
     | ans.setParseAction(lambda x: parsing.get_ans(x, workspace))
     | variable.setParseAction(
         lambda x: parsing.get_variable(x, variables, symbols, user_variables))

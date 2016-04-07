@@ -10,6 +10,7 @@ special_symbols = {
     'Rho': "P",
     'Tau': "T",
     'Chi': "X",
+    'μ': "\\mu",
     "complexes": "\\mathbb{C}",
     "reals": "\\mathbb{R}",
     "rationals": "\\mathbb{Q}",
@@ -32,4 +33,8 @@ equalities = {
     '~=': "\\simeq",
     '~==': "\\cong",
     '!=': "\\neq"
+}
+
+special_units = {
+    'Ohm': '\\Omega'
 }

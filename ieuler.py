@@ -8,6 +8,8 @@ import modules.maple.process
 import mathlib as ml
 import modules.tools.plot2d as plot2d
 import modules.tools.transmit as transmit
+import sys
+import codecs
 
 
 def conf(os):
@@ -122,7 +124,8 @@ def start():
     transmit.init()
 
     print("Welcome to iEuler v0.1")
-
+    if sys.stdout.encoding != 'utf-8':
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
     tab_index = 0
     workspace = []
 
