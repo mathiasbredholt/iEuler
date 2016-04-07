@@ -3,31 +3,11 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
-    setMinimumSize(ptX(600), ptY(600));
     installEventFilter(this);
 
-    pal = palette();
-//    Dark theme
-//    pal.setColor(QPalette::Base, QColor("#333"));
-//    pal.setColor(QPalette::Background, QColor("#333"));
-//    pal.setColor(QPalette::Text, QColor("#FFF"));
-
-    pal.setColor(QPalette::Base, QColor("#FFF"));
-    pal.setColor(QPalette::Background, QColor("#FFF"));
-    pal.setColor(QPalette::Text, QColor("#000"));
-
-    setPalette(pal);
-
-    setFont(QFont("Monaco", 12));
-
+    setupUIParameters();
     createFileMenu();
-
-    container = new QWidget(this);
-    container->setLayout(new QVBoxLayout());
-    container->layout()->setMargin(0);
-    setCentralWidget(container);
+    createContainer();
 
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
@@ -48,29 +28,48 @@ MainWindow::MainWindow(QWidget *parent) :
 //     Create Command panel
     cmdpanel = new CmdPanel(this);
     container->layout()->addWidget(cmdpanel);
-    renderer->move(this->pos());
-    renderer->move(this->pos());
 
-    renderer->move(this->pos());
-
-    renderer->move(this->pos());
-
-    renderer->move(this->pos());
-
-    renderer->move(this->pos());
-
-    renderer->move(this->pos());
-
-    renderer->move(this->pos());
-
-    renderer->move(this->pos());
-
+    // Create console
+    console = new Console(this);
+    container->layout()->addWidget(console);
+    connect(euler, SIGNAL(receivedMsg(QString)), console, SLOT(receivedMsg(QString)));
+    connect(euler, SIGNAL(receivedError(QString)), console, SLOT(receivedError(QString)));
 
 }
 
 MainWindow::~MainWindow()
 {
 //    delete ui;
+}
+
+void MainWindow::setupUIParameters()
+{
+    QGuiApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+
+    setMinimumSize(ptX(600), ptY(600));
+
+    pal = palette();
+
+//    Dark theme
+//    pal.setColor(QPalette::Base, QColor("#333"));
+//    pal.setColor(QPalette::Background, QColor("#333"));
+//    pal.setColor(QPalette::Text, QColor("#FFF"));
+
+    pal.setColor(QPalette::Base, QColor("#FFF"));
+    pal.setColor(QPalette::Background, QColor("#FFF"));
+    pal.setColor(QPalette::Text, QColor("#000"));
+
+    setPalette(pal);
+
+    setFont(QFont("Monaco", 12));
+}
+
+void MainWindow::createContainer()
+{
+    container = new QWidget(this);
+    container->setLayout(new QVBoxLayout());
+    container->layout()->setMargin(0);
+    setCentralWidget(container);
 }
 
 void MainWindow::createFileMenu()

@@ -150,7 +150,9 @@ void Euler::writeDatagram(QByteArray datagram)
 void Euler::readStandardOutput()
 {
     while (proc->canReadLine()) {
-        qDebug() << "python: " << QString::fromLocal8Bit(proc->readLine());
+        QString msg = QString::fromLocal8Bit(proc->readLine());
+        qDebug() << "iEuler: " + msg;
+        emit receivedMsg(msg);
     }
 }
 
@@ -162,6 +164,8 @@ void Euler::readStandardError()
     QStringList errorList = error.split("\n");
     for (int i = 0; i < errorList.size(); ++i)
         qDebug() << errorList.at(i);
+
+    emit receivedError(error);
 
     if (!hasCrashed) {
         hasCrashed = true;

@@ -77,6 +77,8 @@ signals:
     void receivedLatexString(int tabIndex, int index, QString latexString);
     void receivedMathString(int tabIndex, int index, QString mathString);
     void receivedPlot(int tabIndex, int index, QString path);
+    void receivedMsg(QString msg);
+    void receivedError(QString msg);
 
 public slots:
 
