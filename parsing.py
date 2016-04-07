@@ -102,16 +102,21 @@ def get_ans(toks, workspace):
     # return ml.Empty()
 
 
-def get_unit(toks, variables):
+def get_unit(toks, units, unknown=False):
     # print("get_unit toks: {}".format(toks))
     if type(toks[0]) is ml.Number:
-        return ml.MulOp(toks[0], get_unit(toks[1:], variables))
+        return ml.MulOp(toks[0], get_unit(toks[1:], units))
     if len(toks) > 1:
-        name = toks[0] + toks[1]
-        if name in variables:
-            return ml.Variable(name)
-        return ml.Unit(toks[1], toks[0])
-    return ml.Unit(toks[0])
+        unit = toks[1]
+        prefix = toks[0]
+    else:
+        unit = toks[0]
+        prefix = ""
+    if unit in units['aliases']:
+        unit = units['aliases'][unit]
+    if prefix in units['prefix_aliases']:
+        prefix = units['prefix_aliases'][prefix]
+    return ml.Unit(unit, prefix, unknown=unknown)
 
 
 def get_pow_op(toks):
@@ -154,6 +159,7 @@ def get_factorial_op(toks):
 
 
 def get_minus_op(toks):
+    # print("get_minus_op toks: {}".format(toks))
     value, op = parse_unary_operator(toks)
     return ml.Minus(value)
 

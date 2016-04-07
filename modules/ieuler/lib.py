@@ -7,14 +7,67 @@ decorator_keywords = ['hat', 'bar', 'ul', 'vec', 'dot', 'ddot', 'tdot',
 
 equality_keywords = ['in', '!in', 'sub', 'sup', 'sube', 'supe']
 
-units = ['V', 'A', 'J', 'm', 's', 'K', 'W', 'H', 'F', 'T', 'g', 'Hz', 'N',
-         'Pa', 'C', 'Ohm', 'S', 'Wb', 'lm', 'lx', 'Bq', 'Gy', 'Sv', 'cd', 'mol'
-         ]
+units = {
+    'units': ['V', 'A', 'J', 'm', 's', 'K', 'W', 'H', 'F', 'T', 'g', 'Hz', 'N', 'Pa', 'C', 'Ohm', 'ohm', 'Omega', 'S', 'Wb', 'lm', 'lx', 'Bq', 'Gy', 'Sv', 'cd', 'mol'],
+    'aliases': {
+        'volt': 'V',
+        'ampere': 'A',
+        'amp': 'A',
+        'joule': 'J',
+        'meter': 'm',
+        'second': 's',
+        'kelvin': 'K',
+        'watt': 'W',
+        'henry': 'H',
+        'farad': 'F',
+        'tesla': 'T',
+        'gram': 'g',
+        'herz': 'Hz',
+        'newton': 'N',
+        'pascal': 'Pa',
+        'coulomb': 'C',
+        'ohm': 'Ohm',
+        'Omega': 'Ohm',
+        'siemens': 'S',
+        'weber': 'Wb',
+        'lumen': 'lm',
+        'lux': 'lx',
+        'bequerel': 'Bq',
+        'gray': 'Gy',
+        'sievert': 'Sv',
+        'candela': 'cd',
+        'mole': 'mol'
+    },
+    'plural': 's',
+    'prefixes': ['y', 'z', 'a', 'f', 'p', 'n', u'μ', 'm', 'c', 'd', 'da', 'h', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'],
+    'prefix_aliases': {
+        'yocto': 'y',
+        'zepto': 'z',
+        'atto': 'a',
+        'femto': 'f',
+        'pico': 'p',
+        'nano': 'n',
+        'micro': u'μ',
+        'u': u'μ',
+        'milli': 'm',
+        'centi': 'c',
+        'deci': 'd',
+        'deca': 'da',
+        'hepto': 'h',
+        'kilo': 'k',
+        'mega': 'M',
+        'giga': 'G',
+        'tera': 'T',
+        'peta': 'P',
+        'exa': 'E',
+        'zetta': 'Z',
+        'yotta': 'Y'
+    },
+    'escape_character': '.'
+}
 
-unit_prefixes = ['y', 'z', 'a', 'f', 'p', 'n', 'μ', 'm', 'c', 'd', 'da', 'h',
-                 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y']
-
-unit_escape_character = '.'
+for key, val in units['aliases'].copy().items():
+    units['aliases'][key + units['plural']] = units['aliases'][key]
 
 matrix_delimiters = {
     "start": ['<', '['],
