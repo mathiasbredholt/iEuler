@@ -6,8 +6,12 @@
 
 <script src="qrc:///qtwebchannel/qwebchannel.js"></script>
 <script>
-var doRender;
+var doRender, changeFontSize;
 var elem = document.getElementById("input");
+
+changeFontSize = function(size) {
+    elem.style.fontSize = size;
+};
 
 new QWebChannel(qt.webChannelTransport, function(channel) {
     var jshelper = channel.objects.jshelper;

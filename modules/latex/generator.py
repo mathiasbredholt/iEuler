@@ -74,28 +74,44 @@ def convert_matrix(self):
     return result
 
 
+def get_symbol(x, is_symbol=False):
+    if x in special_symbols:
+        return special_symbols[x]
+    elif is_symbol:
+        return "\\{}".format(x)
+    return x
+
+
 def convert_value(self):
     if type(self) is ml.Unit:
-        result = "\\mathrm{{{}}}".format(self.prefix + self.value)
+        prefix = get_symbol(self.prefix)
+        if self.value in special_units:
+            unit = special_units[self.value]
+        else:
+            unit = get_symbol(self.value)
+        return "\\mathrm{{{} {}}}".format(prefix, unit)
     elif type(self) is ml.Ans:
         result = "ans{}".format(
             "_{" + convert_expr(self.index) + "}" if int(self.index.value) > 1 else "")
         return result
     elif type(self) is ml.Variable:
-        if self.is_symbol:
-            if self.value in special_symbols:
-                result = special_symbols[self.value]
+        if not "latex" in self.attributes:
+            if self.is_symbol:
+                if self.value in special_symbols:
+                    result = special_symbols[self.value]
+                else:
+                    result = "\\{}".format(self.value)
             else:
-                result = "\\{}".format(self.value)
+                result = self.value
+            result = convert_decorators(self, result)
+            if self.subscript:
+                if len(self.subscript.name()) == 1:
+                    result += "_{}".format(convert_expr(self.subscript))
+                else:
+                    result += "_{{{}}}".format(convert_expr(self.subscript))
+            return result
         else:
-            result = self.value
-        result = convert_decorators(self, result)
-        if self.subscript:
-            if len(self.subscript.name()) == 1:
-                result += "_{}".format(convert_expr(self.subscript))
-            else:
-                result += "_{{{}}}".format(convert_expr(self.subscript))
-        return result
+            return self.attributes["latex"]
     elif self.value[-1] == ".":
         result = self.value.strip(".")
     else:
@@ -113,7 +129,9 @@ def convert_decorators(self, string):
             elif dec == "ul":
                 string = "\\underline{{{}}}".format(string)
             elif dec == "vec":
-                string = "\\boldsymbol{{\\mathbf{{{}}}}}".format(string)
+                # KaTeX does not support \boldsymbol
+                # string = "\\boldsymbol{{\\mathbf{{{}}}}}".format(string)
+                string = "\\mathbf{{{}}}".format(string)
             elif dec == "dot":
                 string = "\\dot{{{}}}".format(string)
             elif dec == "ddot":

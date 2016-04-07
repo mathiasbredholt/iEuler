@@ -9,6 +9,8 @@ import modules.frink.process
 import mathlib as ml
 import modules.tools.plot2d as plot2d
 import modules.tools.transmit as transmit
+import sys
+import codecs
 
 
 def conf(os):
@@ -127,7 +129,8 @@ def start():
     transmit.init()
 
     print("Welcome to iEuler v0.1")
-
+    if sys.stdout.encoding != 'utf-8':
+        sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
     tab_index = 0
     workspace = []
 
@@ -160,10 +163,11 @@ def start():
 
             # Parse math string in iEuler syntax to a python representation
             math_obj = parse_math(math_string, workspace[tab_index], evaluate)
-            # print(math_obj)
+            print(math_obj)
 
             # Convert to LaTeX
             latex_string = modules.latex.generator.generate(math_obj)
+            # print(latex_string)
 
             # Add math object to workspace
             workspace[tab_index]["user_input"][index] = math_string

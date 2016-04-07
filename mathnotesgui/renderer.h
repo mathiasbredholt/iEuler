@@ -33,6 +33,7 @@ public:
     int windowWidth;
 
 public slots:
+    void loadFinished(bool);
     void toggleRendering(bool disable);
     void onRenderComplete(int outputWidth, int outputHeight);
 

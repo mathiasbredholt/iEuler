@@ -15,6 +15,7 @@ Renderer::Renderer(int windowWidth, int windowHeight, QWidget *parent) : QObject
     webengine->setFixedSize(windowWidth * 0.9, windowHeight * 0.5);
     webengine->show();
 
+    connect(webengine, SIGNAL(loadFinished(bool)), this, SLOT(loadFinished(bool)));
 
     channel = new QWebChannel(webengine->page());
     channel->registerObject(QStringLiteral("jshelper"), this);
@@ -23,7 +24,6 @@ Renderer::Renderer(int windowWidth, int windowHeight, QWidget *parent) : QObject
     webengine->setHtml(html, baseUrl);
 
     // Setup zoom levels
-//    setZoomFactor((int) dpi() / webengine_DPI * 100);
     isRendering = false;
 //    hasLoaded = false;
     canRender = true;
@@ -67,6 +67,8 @@ QPixmap Renderer::createPixmap(int width, int height)
 void Renderer::setZoomFactor(int factor)
 {
 //    webengine->page()->runJavaScript("MathJax.Hub.Config({'SVG': { scale: " + factor + " } });");
+    QString fontSize = QString::number((factor*13)/100);
+    webengine->page()->runJavaScript("changeFontSize('" + fontSize + "pt');");
 }
 
 void Renderer::render(MathWidget *target)
@@ -103,6 +105,11 @@ void Renderer::onRenderComplete(int outputWidth, int outputHeight)
     if (!queue.empty()){
         startRendering();
     }
+}
+
+void Renderer::loadFinished(bool)
+{
+    setZoomFactor((int) dpi() / webengine_DPI * 100);
 }
 
 void Renderer::toggleRendering(bool disable)

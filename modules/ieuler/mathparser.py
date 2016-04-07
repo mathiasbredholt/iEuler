@@ -11,8 +11,8 @@ ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 def get_variable_value(toks):
     var, op = parsing.parse_unary_operator(toks)
     if type(var) is ml.Variable:
-        if var.value in user_variables:
-            return user_variables[var.value]
+        if var.name() in user_variables:
+            return user_variables[var.name()]
     if type(var) is ml.Ans:
         return var.value
     return var
@@ -50,6 +50,25 @@ def get_equality_op(toks):
     return ml.Equality(type, value1, value2, assignment, hidden)
 
 
+def get_attr_op(toks):
+    t = toks[0]
+    variable = t[0]
+    if evaluate:
+        if variable not in user_variables:
+            user_variables[variable.name()] = variable
+
+        if len(t) > 3:
+            attribute = t[2]
+            value = t[4]
+            user_variables[variable.name()].add_attribute(attribute, value)
+        else:
+            decorator = t[2]
+            user_variables[variable.name()].add_decorator(decorator)
+
+    print(user_variables)
+    return variable
+
+
 def assign_variable(variable, value):
     global user_variables
     if type(variable) is ml.Equality:
@@ -57,7 +76,7 @@ def assign_variable(variable, value):
     if type(variable) is ml.Unit:
         variable = variable.convert_to_variable()
     if type(variable) is ml.Variable:
-        user_variables[variable.value] = value
+        user_variables[variable.name()] = value
     else:
         raise NameError(
             'Can only assign variables, not {}!'.format(type(variable)))
@@ -75,17 +94,21 @@ ParserElement.setDefaultWhitespaceChars(' ')
 
 deco_kw_list = parsing.make_keyword_list(decorator_keywords)
 equality_kw_list = parsing.make_keyword_list(equality_keywords)
-units_list = oneOf(units)
-unit_prefixes_list = oneOf(unit_prefixes)
+units_list = oneOf(units['units'] + list(units['aliases'].keys()))
+unit_prefixes_list = oneOf(
+    units['prefixes'] + list(units['prefix_aliases'].keys()))
 
 
 expression = Forward()
 
-unit = Optional(Word(nums).setParseAction(parsing.get_value)) + Suppress(Literal(unit_escape_character) + parsing.no_white) + (
+unit = Optional(Word(nums).setParseAction(parsing.get_value)) + Suppress(Literal(units['escape_character']) + parsing.no_white) + (
     units_list + NotAny(parsing.no_white + Word(parsing.chars)) | (
         Optional(unit_prefixes_list + parsing.no_white) + units_list +
         NotAny(parsing.no_white + Word(parsing.chars)))
-) + NotAny(parsing.no_white + Literal(unit_escape_character))
+) + NotAny(parsing.no_white + Literal(units['escape_character']))
+
+other_unit = Suppress(Literal(units['escape_character']) + parsing.no_white) + Word(
+    parsing.letters) + NotAny(parsing.no_white + Literal(units['escape_character']))
 
 name = NotAny(deco_kw_list | equality_kw_list | Keyword('cross')) + Word(
     parsing.letters, parsing.chars)
@@ -109,22 +132,29 @@ number << (Combine(Word(nums) + Optional("." + NotAny(Literal('.')) + Optional(W
 
 eval_field = Suppress('#') + expression + Suppress('#')
 
-eval_direct_field = Suppress('$') + expression + Suppress('$')
+# escape_field = Suppress(oneOf('\' "')) +  + Suppress(oneOf('\' "'))
+escape_field = QuotedString("'") | QuotedString('"')
+
+eval_direct_field = QuotedString("$")
 
 operand = (
     eval_field.setParseAction(lambda x: evaluate_expression(x[0]))
+    | escape_field.setParseAction(lambda x: parsing.get_variable(x, variables))
     | eval_direct_field.setParseAction(
         lambda x: evaluate_expression(x[0], False))
     | function.setParseAction(lambda x: parsing.get_function(x, functions))
-    | unit.setParseAction(lambda x: parsing.get_unit(x, user_variables))
+    | unit.setParseAction(lambda x: parsing.get_unit(x, units))
+    | other_unit.setParseAction(lambda x: parsing.get_unit(x, units, unknown=True))
     | ans.setParseAction(lambda x: parsing.get_ans(x, workspace))
     | variable.setParseAction(
-        lambda x: parsing.get_variable(x, variables, symbols))
+        lambda x: parsing.get_variable(x, variables, symbols, user_variables))
     | matrix.setParseAction(lambda x: parsing.get_matrix(x, matrix_delimiters))
     | number.setParseAction(parsing.get_value)
 )
 
 insert_value = parsing.word_start + Literal('@') + parsing.no_white
+attrop = Literal('++') + Word(parsing.chars) + Optional(Literal(':') +
+                                                        (escape_field | Word(parsing.chars)))
 factop = parsing.no_white + Literal('!') + parsing.word_end
 signop = parsing.word_start + Literal('-') + parsing.no_white
 expop = Literal('^')
@@ -144,6 +174,7 @@ right = opAssoc.RIGHT
 left = opAssoc.LEFT
 expression << infixNotation(operand, [
     (insert_value, 1, right, get_variable_value),
+    (attrop, 1, left, get_attr_op),
     (factop, 1, left, parsing.get_factorial_op),
     (deco_kw_list, 1, right, get_decorator),
     (signop, 1, right, parsing.get_minus_op),
