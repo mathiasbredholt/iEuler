@@ -19,6 +19,7 @@
 #include "paragraph.h"
 #include "euler.h"
 #include "util.h"
+#include "console.h"
 
 class MainWindow : public QMainWindow
 {
@@ -37,10 +38,14 @@ private:
     Euler *euler;
     Renderer *renderer;
     QPalette pal;
+    Console *console;
 
     int numberOfLines;
 
     void createFileMenu();
+
+    void setupUIParameters();
+    void createContainer();
 
     void addNewParagraph(QString mathString = "");
     void createNewTab(bool empty = false, QString fileName = "Untitled");
