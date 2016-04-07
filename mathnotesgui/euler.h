@@ -42,6 +42,12 @@
         2   index MSB
         3   index LSB
         [4] plot
+     8: Receive workspace
+        0   cmd
+        1   tabIndex
+        2   index MSB
+        3   index LSB
+        [4] workspace (json)
 */
 
 #include <QObject>
@@ -49,6 +55,9 @@
 #include <QProcess>
 #include <QUdpSocket>
 #include <QMessageBox>
+#include <QJsonObject>
+#include <QJsonDocument>
+#include <QVariantMap>
 
 class Euler : public QObject
 {
@@ -70,6 +79,7 @@ public:
     static const char MATH_STR = 5;
     static const char EXPORT   = 6;
     static const char PLOT     = 7;
+    static const char WORKSP   = 8;
 
     bool hasCrashed = false;
 
@@ -77,6 +87,7 @@ signals:
     void receivedLatexString(int tabIndex, int index, QString latexString);
     void receivedMathString(int tabIndex, int index, QString mathString);
     void receivedPlot(int tabIndex, int index, QString path);
+    void receivedWorkspace(int tabIndex, int index, QVariantMap workspace);
     void receivedMsg(QString msg);
     void receivedError(QString msg);
 

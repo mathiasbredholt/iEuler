@@ -27,7 +27,9 @@ SOURCES += \
     mathedit.cpp \
     cmdpanelitem.cpp \
     util.cpp \
-    console.cpp
+    console.cpp \
+    workspace.cpp \
+    mapmodel.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -40,7 +42,9 @@ HEADERS  += \
     mathedit.h \
     cmdpanelitem.h \
     util.h \
-    console.h
+    console.h \
+    workspace.h \
+    mapmodel.h
 
 FORMS    += \
     mainwindow.ui

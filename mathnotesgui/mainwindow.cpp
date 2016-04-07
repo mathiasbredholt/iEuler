@@ -25,6 +25,11 @@ MainWindow::MainWindow(QWidget *parent) :
 
     createNewTab();
 
+    // Create workspace
+    workspace = new Workspace(this);
+    container->layout()->addWidget(workspace);
+    connect(euler, SIGNAL(receivedWorkspace(int,int,QVariantMap)), workspace, SLOT(receivedWorkspace(int,int,QVariantMap)));
+
 //     Create Command panel
     cmdpanel = new CmdPanel(this);
     container->layout()->addWidget(cmdpanel);

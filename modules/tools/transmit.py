@@ -1,4 +1,5 @@
 import socket
+import json
 
 ADDRESS = 'localhost'
 EULER_PORT = 41000
@@ -12,6 +13,7 @@ RENDER = 4
 MATH_STR = 5
 EXPORT = 6
 PLOT = 7
+WORKSP = 8
 
 sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
@@ -38,6 +40,13 @@ def send_math_string(tab_index, index, math_string):
 def send_plot(tab_index, index, path):
     data = bytes([PLOT, tab_index, index >> 8, index & 0xFF]) + bytes(
         path, 'utf-8')
+
+    sock.sendto(data, (ADDRESS, GUI_PORT))
+
+
+def send_workspace(tab_index, index, var_lib):
+    data = bytes([WORKSP, tab_index, index >> 8, index & 0xFF]) + \
+        bytes(json.dumps(var_lib), 'utf-8')
 
     sock.sendto(data, (ADDRESS, GUI_PORT))
 
