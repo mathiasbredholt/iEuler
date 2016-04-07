@@ -45,6 +45,7 @@ private:
     int numberOfLines;
 
     void createFileMenu();
+    void createToolsMenu();
 
     void setupUIParameters();
     void createContainer();

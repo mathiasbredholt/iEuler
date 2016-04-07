@@ -67,7 +67,7 @@ QPixmap Renderer::createPixmap(int width, int height)
 void Renderer::setZoomFactor(int factor)
 {
 //    webengine->page()->runJavaScript("MathJax.Hub.Config({'SVG': { scale: " + factor + " } });");
-    QString fontSize = QString::number((factor*13)/100);
+    QString fontSize = QString::number((factor*13) * dpi() / webengine_DPI / 100);
     webengine->page()->runJavaScript("changeFontSize('" + fontSize + "pt');");
 }
 
@@ -109,7 +109,7 @@ void Renderer::onRenderComplete(int outputWidth, int outputHeight)
 
 void Renderer::loadFinished(bool)
 {
-    setZoomFactor((int) dpi() / webengine_DPI * 100);
+    setZoomFactor(100);
 }
 
 void Renderer::toggleRendering(bool disable)

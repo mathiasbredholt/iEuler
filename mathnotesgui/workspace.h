@@ -6,7 +6,8 @@
 #include <QTableWidgetItem>
 #include <QHeaderView>
 #include <QDebug>
-#include "mapmodel.h"
+
+#include "util.h"
 
 class Workspace : public QTableWidget
 {

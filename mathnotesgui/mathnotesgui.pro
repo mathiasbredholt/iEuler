@@ -28,8 +28,7 @@ SOURCES += \
     cmdpanelitem.cpp \
     util.cpp \
     console.cpp \
-    workspace.cpp \
-    mapmodel.cpp
+    workspace.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -43,11 +42,9 @@ HEADERS  += \
     cmdpanelitem.h \
     util.h \
     console.h \
-    workspace.h \
-    mapmodel.h
+    workspace.h
 
-FORMS    += \
-    mainwindow.ui
+FORMS    +=
 
 RESOURCES += \
     katex.qrc

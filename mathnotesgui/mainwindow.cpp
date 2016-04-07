@@ -7,6 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setupUIParameters();
     createFileMenu();
+    createToolsMenu();
     createContainer();
 
     euler = new Euler();
@@ -45,6 +46,27 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 //    delete ui;
+}
+
+void MainWindow::createToolsMenu()
+{
+    QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
+
+    // Zoom
+    QAction *zoom100 = new QAction(tr("&Zoom 100%"), this);
+    zoom100->setShortcut(QKeySequence(tr("Ctrl+1")));
+    connect(zoom100, SIGNAL(triggered(bool)), this, SLOT(on_action100_triggered()));
+    toolsMenu->addAction(zoom100);
+
+    QAction *zoom150 = new QAction(tr("&Zoom 150%"), this);
+    zoom150->setShortcut(QKeySequence(tr("Ctrl+2")));
+    connect(zoom150, SIGNAL(triggered(bool)), this, SLOT(on_action150_triggered()));
+    toolsMenu->addAction(zoom150);
+
+    QAction *zoom200 = new QAction(tr("&Zoom 200%"), this);
+    zoom200->setShortcut(QKeySequence(tr("Ctrl+3")));
+    connect(zoom200, SIGNAL(triggered(bool)), this, SLOT(on_action200_triggered()));
+    toolsMenu->addAction(zoom200);
 }
 
 void MainWindow::setupUIParameters()
@@ -286,17 +308,17 @@ void MainWindow::receivedMathString(int tabIndex, int index, QString mathString)
 
 void MainWindow::on_action100_triggered()
 {
-    renderer->setZoomFactor(1);
+    renderer->setZoomFactor(100);
 }
 
 void MainWindow::on_action150_triggered()
 {
-    renderer->setZoomFactor(1.5);
+    renderer->setZoomFactor(150);
 }
 
 void MainWindow::on_action200_triggered()
 {
-    renderer->setZoomFactor(2);
+    renderer->setZoomFactor(200);
 }
 
 void MainWindow::on_actionNew_triggered()
