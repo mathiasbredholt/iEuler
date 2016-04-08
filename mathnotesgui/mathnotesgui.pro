@@ -27,7 +27,8 @@ SOURCES += \
     mathedit.cpp \
     cmdpanelitem.cpp \
     util.cpp \
-    console.cpp
+    console.cpp \
+    workspace.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -40,10 +41,10 @@ HEADERS  += \
     mathedit.h \
     cmdpanelitem.h \
     util.h \
-    console.h
+    console.h \
+    workspace.h
 
-FORMS    += \
-    mainwindow.ui
+FORMS    +=
 
 RESOURCES += \
     katex.qrc

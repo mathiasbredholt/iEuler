@@ -176,6 +176,16 @@ def start():
 
             # Send index and latex string through UDP socket
             transmit.send_latex(tab_index, index, latex_string)
+
+            # Format user variables as LaTeX
+            # print(workspace[tab_index]["user_variables"])
+            var_lib = {}
+            for key, value in workspace[tab_index]["user_variables"].items():
+                var_lib[key] = modules.latex.generator.generate(value)
+
+            print(var_lib)
+            # Send workspace
+            transmit.send_workspace(tab_index, index, var_lib)
         elif cmd == transmit.OPEN:  # Open workspace
             workspace.append(load_workspace(data["path"], tab_index + 1))
         elif cmd == transmit.SAVE:  # Save workspace

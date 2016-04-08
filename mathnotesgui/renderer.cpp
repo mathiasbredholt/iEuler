@@ -38,7 +38,7 @@ void Renderer::close()
 
 void Renderer::move(const QPoint p)
 {
-    webengine->move(p.x()+10,p.y());
+    webengine->move(p.x() + 10, p.y());
 }
 
 void Renderer::startRendering()
@@ -52,14 +52,14 @@ void Renderer::startRendering()
         MathWidget *target = queue.dequeue();
         currentlyRendering = target;
 
-        webengine->page()->runJavaScript("doRender(String.raw`"+target->latexString+"`);");
+        webengine->page()->runJavaScript("doRender(String.raw`" + target->latexString + "`);");
         isRendering = true;
     }
 }
 
 QPixmap Renderer::createPixmap(int width, int height)
 {
-    QPixmap pixmap(QSize(width, height*1.75));
+    QPixmap pixmap(QSize(width, height * 1.75));
     webengine->render(&pixmap, QPoint(0, 0));
     return pixmap;
 }
@@ -67,7 +67,7 @@ QPixmap Renderer::createPixmap(int width, int height)
 void Renderer::setZoomFactor(int factor)
 {
 //    webengine->page()->runJavaScript("MathJax.Hub.Config({'SVG': { scale: " + factor + " } });");
-    QString fontSize = QString::number((factor*13)/100);
+    QString fontSize = QString::number((factor * 13) * dpi() / webengine_DPI / 100);
     webengine->page()->runJavaScript("changeFontSize('" + fontSize + "pt');");
 }
 
@@ -89,7 +89,7 @@ int Renderer::getScreenDPI()
 void Renderer::onRenderComplete(int outputWidth, int outputHeight)
 {
     if (!hasRenderedOnce) {
-        webengine->page()->runJavaScript("doRender(String.raw`"+currentlyRendering->latexString+"\\;`);");
+        webengine->page()->runJavaScript("doRender(String.raw`" + currentlyRendering->latexString + "\\;`);");
         hasRenderedOnce = true;
     } else {
         hasRenderedOnce = false;
@@ -102,20 +102,20 @@ void Renderer::onRenderComplete(int outputWidth, int outputHeight)
     }
 
 //    if (!queue.empty() && canRender) {
-    if (!queue.empty()){
+    if (!queue.empty()) {
         startRendering();
     }
 }
 
 void Renderer::loadFinished(bool)
 {
-    setZoomFactor((int) dpi() / webengine_DPI * 100);
+    setZoomFactor(100);
 }
 
 void Renderer::toggleRendering(bool disable)
 {
     canRender = !disable;
-    if (canRender && !queue.empty()){
+    if (canRender && !queue.empty()) {
         startRendering();
     }
 }

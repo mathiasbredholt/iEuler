@@ -20,6 +20,7 @@
 #include "euler.h"
 #include "util.h"
 #include "console.h"
+#include "workspace.h"
 
 class MainWindow : public QMainWindow
 {
@@ -39,10 +40,12 @@ private:
     Renderer *renderer;
     QPalette pal;
     Console *console;
+    Workspace *workspace;
 
     int numberOfLines;
 
     void createFileMenu();
+    void createToolsMenu();
 
     void setupUIParameters();
     void createContainer();

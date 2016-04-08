@@ -7,12 +7,13 @@ MainWindow::MainWindow(QWidget *parent) :
 
     setupUIParameters();
     createFileMenu();
+    createToolsMenu();
     createContainer();
 
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
 
-    renderer = new Renderer(minimumWidth(),minimumHeight());
+    renderer = new Renderer(minimumWidth(), minimumHeight());
     renderer->windowWidth = minimumWidth();
 
 //     Create/ tabs
@@ -24,6 +25,11 @@ MainWindow::MainWindow(QWidget *parent) :
     container->layout()->addWidget(tabs);
 
     createNewTab();
+
+    // Create workspace
+    workspace = new Workspace(this);
+    container->layout()->addWidget(workspace);
+    connect(euler, SIGNAL(receivedWorkspace(int, int, QVariantMap)), workspace, SLOT(receivedWorkspace(int, int, QVariantMap)));
 
 //     Create Command panel
     cmdpanel = new CmdPanel(this);
@@ -40,6 +46,27 @@ MainWindow::MainWindow(QWidget *parent) :
 MainWindow::~MainWindow()
 {
 //    delete ui;
+}
+
+void MainWindow::createToolsMenu()
+{
+    QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
+
+    // Zoom
+    QAction *zoom100 = new QAction(tr("&Zoom 100%"), this);
+    zoom100->setShortcut(QKeySequence(tr("Ctrl+1")));
+    connect(zoom100, SIGNAL(triggered(bool)), this, SLOT(on_action100_triggered()));
+    toolsMenu->addAction(zoom100);
+
+    QAction *zoom150 = new QAction(tr("&Zoom 150%"), this);
+    zoom150->setShortcut(QKeySequence(tr("Ctrl+2")));
+    connect(zoom150, SIGNAL(triggered(bool)), this, SLOT(on_action150_triggered()));
+    toolsMenu->addAction(zoom150);
+
+    QAction *zoom200 = new QAction(tr("&Zoom 200%"), this);
+    zoom200->setShortcut(QKeySequence(tr("Ctrl+3")));
+    connect(zoom200, SIGNAL(triggered(bool)), this, SLOT(on_action200_triggered()));
+    toolsMenu->addAction(zoom200);
 }
 
 void MainWindow::setupUIParameters()
@@ -160,7 +187,7 @@ void MainWindow::createNewTab(bool empty, QString fileName)
     tabs->addTab(scrollArea, fileName);
     tabs->setCurrentWidget(scrollArea);
     connect(tabs, SIGNAL(tabBarClicked(int)), this, SLOT(onTabChange(int)));
-    setWindowTitle("iEuler - "+fileName);
+    setWindowTitle("iEuler - " + fileName);
 
     numberOfLines = 0;
     if (!empty) addNewParagraph();
@@ -179,7 +206,7 @@ void MainWindow::addNewParagraph(QString mathString)
                                          mathString);
 
     getTabContents()->layout()->addWidget(paragraph);
-    connect(paragraph, SIGNAL(changeFocus_triggered(bool,int)), this, SLOT(changeFocus_triggered(bool,int)));
+    connect(paragraph, SIGNAL(changeFocus_triggered(bool, int)), this, SLOT(changeFocus_triggered(bool, int)));
     connect(paragraph, SIGNAL(newLine_triggered(int)), this, SLOT(newLine_triggered(int)));
     connect(paragraph, SIGNAL(deleteLine_triggered(Paragraph*)), this, SLOT(deleteLine_triggered(Paragraph*)));
 
@@ -214,7 +241,7 @@ void MainWindow::openFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getOpenFileName(this,
-        tr("Open iEuler file"), dir, tr("iEuler files (*.eulerc)"));
+                   tr("Open iEuler file"), dir, tr("iEuler files (*.eulerc)"));
     if (path != "") {
         QFileInfo fi(path);
         createNewTab(true, fi.baseName());
@@ -228,13 +255,13 @@ void MainWindow::saveFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getSaveFileName(this,
-        tr("Save iEuler file"), dir, tr("Text Files (*.euler)"));
+                   tr("Save iEuler file"), dir, tr("Text Files (*.euler)"));
 
     if (path != "") {
         QFileInfo fi(path);
         euler->sendSaveFileRequest(path);
         tabs->setTabText(tabs->currentIndex(), fi.baseName());
-        setWindowTitle("iEuler - "+fi.baseName());
+        setWindowTitle("iEuler - " + fi.baseName());
     }
 }
 
@@ -242,7 +269,7 @@ void MainWindow::exportFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getSaveFileName(this,
-        tr("Export PDF file"), dir, tr("PDF Files (*.pdf)"));
+                   tr("Export PDF file"), dir, tr("PDF Files (*.pdf)"));
 
     if (path != "") {
         euler->sendExportRequest(path);
@@ -263,7 +290,7 @@ void MainWindow::changeFocus_triggered(bool up, int index)
     if (up) {
         if (index > 0) focusPreviousChild();
     } else {
-        if (index < numberOfLines-1) focusNextChild();
+        if (index < numberOfLines - 1) focusNextChild();
     }
 }
 
@@ -281,17 +308,17 @@ void MainWindow::receivedMathString(int tabIndex, int index, QString mathString)
 
 void MainWindow::on_action100_triggered()
 {
-    renderer->setZoomFactor(1);
+    renderer->setZoomFactor(100);
 }
 
 void MainWindow::on_action150_triggered()
 {
-    renderer->setZoomFactor(1.5);
+    renderer->setZoomFactor(150);
 }
 
 void MainWindow::on_action200_triggered()
 {
-    renderer->setZoomFactor(2);
+    renderer->setZoomFactor(200);
 }
 
 void MainWindow::on_actionNew_triggered()
@@ -328,7 +355,7 @@ void MainWindow::on_actionExport_triggered()
 
 void MainWindow::onTabChange(int index)
 {
-    setWindowTitle("iEuler - "+tabs->tabText(index));
+    setWindowTitle("iEuler - " + tabs->tabText(index));
 }
 
 void MainWindow::on_actionRestart_core_triggered()

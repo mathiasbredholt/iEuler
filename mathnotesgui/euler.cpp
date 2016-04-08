@@ -35,7 +35,7 @@ void Euler::terminate()
 
 void Euler::processDatagram(QByteArray datagram)
 {
-    if (datagram.size()>0) {
+    if (datagram.size() > 0) {
         char cmd = datagram.at(0);
 
         if (cmd == Euler::RENDER) {
@@ -77,6 +77,18 @@ void Euler::processDatagram(QByteArray datagram)
             path = QString::fromUtf8(datagram.remove(0, 4));
 
             emit receivedPlot(tabIndex, index, path);
+        } else if (cmd == Euler::WORKSP) {
+            int tabIndex;
+            int index;
+            QJsonObject workspace;
+
+            tabIndex = (int) datagram.at(1);
+
+            index = (int) datagram.at(2) << 8;
+            index += (int) datagram.at(3) & 0xFF;
+
+            workspace = QJsonDocument::fromJson(datagram.remove(0, 4)).object();
+            emit receivedWorkspace(tabIndex, index, workspace.toVariantMap());
         }
     }
 }
@@ -151,7 +163,8 @@ void Euler::readStandardOutput()
 {
     while (proc->canReadLine()) {
         QString msg = QString::fromLocal8Bit(proc->readLine());
-        qDebug() << "iEuler: " + msg;
+
+//        qDebug() << "iEuler: " + msg;
         emit receivedMsg(msg);
     }
 }
