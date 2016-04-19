@@ -204,7 +204,7 @@ def convert_crossop(self):
 
 def convert_fraction(self, display=True):
     # removed dfrac for compatibility issues with MathJax
-    return "\\{}frac{{{}}}{{{}}} ".format("" if display else "",
+    return "\\{}frac{{{}}}{{{}}} ".format("d" if display else "",
                                           convert_expr(self.value1),
                                           convert_expr(self.value2))
 
