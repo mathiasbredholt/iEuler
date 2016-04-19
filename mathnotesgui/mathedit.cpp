@@ -5,7 +5,7 @@ MathEdit::MathEdit(QWidget *parent) : QPlainTextEdit(parent)
     mathEditMode = MATHMODE;
     setFocusPolicy(Qt::StrongFocus);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    setStyleSheet("QPlainTextEdit { border: none; }");
+    setStyleSheet("QPlainTextEdit { border: none; } QPlainTextEdit:focus { border: 1px solid; }");
     setBackgroundRole(QPalette::Dark);
     setFont(parent->font());
     setPalette(parent->palette());
@@ -14,6 +14,7 @@ MathEdit::MathEdit(QWidget *parent) : QPlainTextEdit(parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     updateHeight();
+    qDebug() << styleSheet();
 }
 
 void MathEdit::setMode(int mathEditMode)
@@ -21,10 +22,10 @@ void MathEdit::setMode(int mathEditMode)
     if (this->mathEditMode != mathEditMode) {
         this->mathEditMode = mathEditMode;
         if (mathEditMode == MATHMODE) {
-            setStyleSheet("QPlainTextEdit { border: none; background: #EEE; font-size: 14px;  }");
+            setStyleSheet("QPlainTextEdit { border: none; } QPlainTextEdit:focus { border: 1px solid; }");
         }
         else if (mathEditMode == TEXTMODE) {
-            setStyleSheet("QPlainTextEdit { border: none; background: #DDD; font-size: 14px;  }");
+            setStyleSheet("QPlainTextEdit { border: none; } QPlainTextEdit:focus { border: 1px solid; }");
         }
     }
 }

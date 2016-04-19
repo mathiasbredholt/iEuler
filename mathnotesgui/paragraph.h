@@ -27,7 +27,7 @@ public:
 signals:
     void newLine_triggered(int index);
     void deleteLine_triggered(Paragraph *target);
-    void changeFocus_triggered(bool up, int index);
+    void changeFocus_triggered(Paragraph *paragraph, bool goUp);
 
 private:
     Euler *euler;

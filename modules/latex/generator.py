@@ -157,6 +157,7 @@ def convert_factorial(self):
 def convert_function(self):
     name = "\\mathrm{{{}}}".format(self.name) if len(
         self.name) > 1 else self.name
+    name = convert_decorators(self, name)
     result = name + "\\left( " + convert_expr(self.value[0])
     for arg in self.value[1:]:
         result += ", " + convert_expr(arg)

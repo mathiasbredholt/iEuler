@@ -89,7 +89,7 @@ void Paragraph::receivedPlot(int tabIndex, int index, QString path)
 
 void Paragraph::arrowsPressed(bool upArrowPressed)
 {
-    emit changeFocus_triggered(upArrowPressed, index);
+    emit changeFocus_triggered(this, upArrowPressed);
 }
 
 void Paragraph::deletePressed()

@@ -164,6 +164,11 @@ void MainWindow::moveEvent(QMoveEvent *event)
     renderer->move(pos());
 }
 
+void MainWindow::scrollTo(Paragraph *paragraph)
+{
+    ((QScrollArea*) tabs->currentWidget())->ensureWidgetVisible(paragraph, 0, 400);
+}
+
 // Tabs
 
 void MainWindow::createNewTab(bool empty, QString fileName)
@@ -206,7 +211,7 @@ void MainWindow::addNewParagraph(QString mathString)
                                          mathString);
 
     getTabContents()->layout()->addWidget(paragraph);
-    connect(paragraph, SIGNAL(changeFocus_triggered(bool,int)), this, SLOT(changeFocus_triggered(bool,int)));
+    connect(paragraph, SIGNAL(changeFocus_triggered(Paragraph*,bool)), this, SLOT(changeFocus_triggered(Paragraph*,bool)));
     connect(paragraph, SIGNAL(newLine_triggered(int)), this, SLOT(newLine_triggered(int)));
     connect(paragraph, SIGNAL(deleteLine_triggered(Paragraph*)), this, SLOT(deleteLine_triggered(Paragraph*)));
 
@@ -214,7 +219,7 @@ void MainWindow::addNewParagraph(QString mathString)
     paragraph->focus();
 
     qApp->processEvents();
-    ((QScrollArea*) tabs->currentWidget())->ensureWidgetVisible(paragraph, 0, 400);
+    scrollTo(paragraph);
 }
 
 void MainWindow::newLine_triggered(int index)
@@ -285,12 +290,13 @@ void MainWindow::on_actionShow_command_panel_triggered()
     }
 }
 
-void MainWindow::changeFocus_triggered(bool up, int index)
+void MainWindow::changeFocus_triggered(Paragraph *paragraph, bool goUp)
 {
-    if (up) {
-        if (index > 0) focusPreviousChild();
+    scrollTo(paragraph);
+    if (goUp) {
+        if (paragraph->index > 0) focusPreviousChild();
     } else {
-        if (index < numberOfLines-1) focusNextChild();
+        if (paragraph->index < numberOfLines-1) focusNextChild();
     }
 }
 
