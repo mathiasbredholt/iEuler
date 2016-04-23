@@ -62,6 +62,8 @@ private:
     void closeEvent(QCloseEvent *event);
     void moveEvent(QMoveEvent *event);
 
+    void scrollTo(Paragraph *paragraph);
+
 protected:
     void keyPressEvent(QKeyEvent *);
 
@@ -75,7 +77,7 @@ private slots:
     void deleteLine_triggered(Paragraph *target);
 
     void on_actionShow_command_panel_triggered();
-    void changeFocus_triggered(bool up, int index);
+    void changeFocus_triggered(Paragraph *paragraph, bool goUp);
     void on_action100_triggered();
     void on_action150_triggered();
     void on_action200_triggered();
