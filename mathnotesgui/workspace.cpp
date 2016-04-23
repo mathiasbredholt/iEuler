@@ -2,6 +2,7 @@
 
 Workspace::Workspace(QWidget *parent) : QTableWidget(parent)
 {
+    setFocusPolicy(Qt::ClickFocus);
     setColumnCount(2);
     setFont(parent->font());
     verticalHeader()->hide();
@@ -19,7 +20,6 @@ void Workspace::receivedWorkspace(int tabIndex, int index, QVariantMap workspace
 
     while (i.hasNext()) {
       i.next();
-       qDebug() << i.key();
       setItem(j, 0, new QTableWidgetItem(i.key()));
       setItem(j, 1, new QTableWidgetItem(i.value().toString()));
       j++;

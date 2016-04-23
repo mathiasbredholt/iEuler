@@ -2,6 +2,7 @@
 
 MathWidget::MathWidget(QWidget *parent) : QLabel(parent)
 {
+    setFocusPolicy(Qt::NoFocus);
 }
 
 void MathWidget::loadPlot(QString path)

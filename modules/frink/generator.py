@@ -8,7 +8,6 @@ def generate(input_expr):
 
 
 def convert_expr(input_expr):
-    print("input_expr: {}".format(input_expr))
     return input_expr.to_frink()
 
 

@@ -3,8 +3,6 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    installEventFilter(this);
-
     setupUIParameters();
     createFileMenu();
     createToolsMenu();
@@ -159,14 +157,14 @@ void MainWindow::closeEvent(QCloseEvent *e) {
     }
 }
 
-void MainWindow::moveEvent(QMoveEvent *event)
+void MainWindow::moveEvent(QMoveEvent *)
 {
     renderer->move(pos());
 }
 
 void MainWindow::scrollTo(Paragraph *paragraph)
 {
-    ((QScrollArea*) tabs->currentWidget())->ensureWidgetVisible(paragraph, 0, 400);
+    ((QScrollArea*) tabs->currentWidget())->ensureWidgetVisible(paragraph, 0, 600);
 }
 
 // Tabs
@@ -194,15 +192,15 @@ void MainWindow::createNewTab(bool empty, QString fileName)
     connect(tabs, SIGNAL(tabBarClicked(int)), this, SLOT(onTabChange(int)));
     setWindowTitle("iEuler - " + fileName);
 
-    numberOfLines = 0;
+    paragraphID = 0;
     if (!empty) addNewParagraph();
 }
 
 
-void MainWindow::addNewParagraph(QString mathString)
+Paragraph * MainWindow::addNewParagraph(int lineNumber, QString mathString)
 {
     int tabIndex = tabs->currentIndex();
-    int index = numberOfLines;
+    int index = paragraphID;
     Paragraph *paragraph = new Paragraph(this,
                                          euler,
                                          renderer,
@@ -210,35 +208,82 @@ void MainWindow::addNewParagraph(QString mathString)
                                          index,
                                          mathString);
 
-    getTabContents()->layout()->addWidget(paragraph);
-    connect(paragraph, SIGNAL(changeFocus_triggered(Paragraph*,bool)), this, SLOT(changeFocus_triggered(Paragraph*,bool)));
-    connect(paragraph, SIGNAL(newLine_triggered(int)), this, SLOT(newLine_triggered(int)));
-    connect(paragraph, SIGNAL(deleteLine_triggered(Paragraph*)), this, SLOT(deleteLine_triggered(Paragraph*)));
+    if (lineNumber < 0) {
+        getTabContents()->layout()->addWidget(paragraph);
+    } else {
+        ((QVBoxLayout*) getTabContents()->layout())->insertWidget(lineNumber, paragraph);
+    }
 
-    numberOfLines++;
+    connect(paragraph, SIGNAL(keyboardAction(int, Paragraph*)), this, SLOT(keyboardAction(int, Paragraph*)));
+    connect(this, SIGNAL(lineNumberChanged(QLayout*)), paragraph, SLOT(lineNumberChanged(QLayout*)));
+
+    emit lineNumberChanged(getTabContents()->layout());
+
+    paragraphID++;
+
     paragraph->focus();
 
     qApp->processEvents();
     scrollTo(paragraph);
+    return paragraph;
 }
 
-void MainWindow::newLine_triggered(int index)
+void MainWindow::keyboardAction(int action, Paragraph *target)
 {
-    if (index == numberOfLines - 1) {
-        addNewParagraph();
+    int lineNumber = getTabContents()->layout()->indexOf(target);
+    int count = getTabContents()->layout()->count();
+    if (action == MathEdit::EVAL_AND_CONTINUE) {
+        if (lineNumber == count - 1) {
+            if (!target->isEmpty()) addNewParagraph();
+        } else {
+            focusNextChild();
+        }
+    } else if (action == MathEdit::DELETE_LINE) {
+        if (count > 1) {
+            if (lineNumber == 0) {
+                focusNextChild();
+            } else {
+                focusPreviousChild();
+            }
+            getTabContents()->layout()->removeWidget(target);
+            emit lineNumberChanged(getTabContents()->layout());
+            delete target;
+        }
+    } else if (action == MathEdit::MOVE_UP) {
+        if (lineNumber > 0) {
+            focusPreviousChild();
+            scrollTo(target);
+        }
+    } else if (action == MathEdit::MOVE_DOWN) {
+        if (lineNumber < count - 1) {
+            focusNextChild();
+            scrollTo(target);
+        }
+    } else if (action == MathEdit::INSERT_ABOVE) {
+        Paragraph *paragraph = addNewParagraph(lineNumber);
+
+        int index = getTabContents()->layout()->indexOf(paragraph);
+
+        if (index > 0) {
+            Paragraph *before = (Paragraph *) getTabContents()->layout()->itemAt(index - 1)->widget();
+            setTabOrder(before->mathEdit, paragraph->mathEdit);
+        }
+
+        setTabOrder(paragraph->mathEdit, target->mathEdit);
+
+    } else if (action == MathEdit::INSERT_BELOW) {
+        Paragraph *paragraph = addNewParagraph(lineNumber + 1);
+
+        int index = getTabContents()->layout()->indexOf(paragraph);
+
+        setTabOrder(target->mathEdit, paragraph->mathEdit);
+
+        if (index < count - 1) {
+            Paragraph *after = (Paragraph *) getTabContents()->layout()->itemAt(index + 1)->widget();
+            setTabOrder(paragraph->mathEdit, after->mathEdit);
+        }
     }
 }
-
-void MainWindow::deleteLine_triggered(Paragraph *target)
-{
-    if (numberOfLines > 1) {
-        focusPreviousChild();
-        getTabContents()->layout()->removeWidget(target);
-        delete target;
-        numberOfLines--;
-    }
-}
-
 
 // File I/O
 
@@ -290,16 +335,6 @@ void MainWindow::on_actionShow_command_panel_triggered()
     }
 }
 
-void MainWindow::changeFocus_triggered(Paragraph *paragraph, bool goUp)
-{
-    scrollTo(paragraph);
-    if (goUp) {
-        if (paragraph->index > 0) focusPreviousChild();
-    } else {
-        if (paragraph->index < numberOfLines-1) focusNextChild();
-    }
-}
-
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Escape) {
@@ -307,9 +342,9 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void MainWindow::receivedMathString(int tabIndex, int index, QString mathString)
+void MainWindow::receivedMathString(int, int, QString mathString)
 {
-    addNewParagraph(mathString);
+    addNewParagraph(-1, mathString);
 }
 
 void MainWindow::on_action100_triggered()

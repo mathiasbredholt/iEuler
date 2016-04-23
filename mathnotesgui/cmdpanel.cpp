@@ -77,7 +77,7 @@ bool CmdPanel::eventFilter(QObject *object, QEvent *event)
     return false;
 }
 
-void CmdPanel::showEvent(QShowEvent *e)
+void CmdPanel::showEvent(QShowEvent *)
 {
     cmdline->setFocus();
 }
