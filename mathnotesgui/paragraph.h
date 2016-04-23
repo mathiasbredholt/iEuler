@@ -2,8 +2,7 @@
 #define PARAGRAPH_H
 
 #include <QWidget>
-#include <QVBoxLayout>
-#include <QHBoxLayout>
+#include <QGridLayout>
 #include <QDebug>
 #include <QLabel>
 #include <QFontMetrics>

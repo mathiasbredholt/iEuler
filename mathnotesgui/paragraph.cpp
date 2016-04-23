@@ -19,34 +19,29 @@ Paragraph::Paragraph(QWidget *parent,
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 //    setFixedHeight(128);
 
-    setLayout(new QHBoxLayout());
-    layout()->setMargin(0);
+    QGridLayout *gridLayout = new QGridLayout();
+
+    gridLayout->setMargin(0);
 
     lineNumberWidget = new QLabel("1");
     lineNumberWidget->setFont(parent->font());
-    lineNumberWidget->setFixedSize(ptX(8), QFontMetrics(font()).height() + ptY(10));
-    layout()->addWidget(lineNumberWidget);
-    layout()->setAlignment(lineNumberWidget, Qt::AlignTop);
-
-    QWidget *container = new QWidget();
-    container->setLayout(new QVBoxLayout());
-    container->layout()->setMargin(0);
+    lineNumberWidget->setFixedWidth(ptX(16));
+    gridLayout->addWidget(lineNumberWidget, 0, 0);
+    gridLayout->setAlignment(lineNumberWidget, Qt::AlignVCenter);
 
     connect(euler, SIGNAL(receivedLatexString(int, int, QString)), this, SLOT(receivedLatexString(int, int, QString)));
     connect(euler, SIGNAL(receivedPlot(int,int,QString)), this, SLOT(receivedPlot(int,int,QString)));
 
     initMathEdit();
-    container->layout()->addWidget(mathEdit);
+    gridLayout->addWidget(mathEdit, 0, 1);
 
     mathWidget = new MathWidget(this);
-    container->layout()->addWidget(mathWidget);
+    gridLayout->addWidget(mathWidget, 1, 1);
 
     mathEdit->setPlainText(mathString);
 
     preview();
-
-    layout()->addWidget(container);
-    layout()->setAlignment(container, Qt::AlignTop);
+    setLayout(gridLayout);
 }
 
 void Paragraph::focus()
