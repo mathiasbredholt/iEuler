@@ -19,20 +19,34 @@ Paragraph::Paragraph(QWidget *parent,
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 //    setFixedHeight(128);
 
-    setLayout(new QVBoxLayout());
+    setLayout(new QHBoxLayout());
+    layout()->setMargin(0);
+
+    lineNumberWidget = new QLabel("1");
+    lineNumberWidget->setFont(parent->font());
+    lineNumberWidget->setFixedSize(ptX(8), QFontMetrics(font()).height() + ptY(10));
+    layout()->addWidget(lineNumberWidget);
+    layout()->setAlignment(lineNumberWidget, Qt::AlignTop);
+
+    QWidget *container = new QWidget();
+    container->setLayout(new QVBoxLayout());
+    container->layout()->setMargin(0);
 
     connect(euler, SIGNAL(receivedLatexString(int, int, QString)), this, SLOT(receivedLatexString(int, int, QString)));
     connect(euler, SIGNAL(receivedPlot(int,int,QString)), this, SLOT(receivedPlot(int,int,QString)));
 
     initMathEdit();
+    container->layout()->addWidget(mathEdit);
 
     mathWidget = new MathWidget(this);
-    layout()->addWidget(mathWidget);
-
-//    layout()->addWidget(renderer->webengine);
+    container->layout()->addWidget(mathWidget);
 
     mathEdit->setPlainText(mathString);
+
     preview();
+
+    layout()->addWidget(container);
+    layout()->setAlignment(container, Qt::AlignTop);
 }
 
 void Paragraph::focus()
@@ -45,9 +59,7 @@ void Paragraph::initMathEdit()
     mathEdit = new MathEdit(this);
     connect(mathEdit, SIGNAL(textChanged()), this, SLOT(preview()));
     connect(mathEdit, SIGNAL(keyboardAction(int)), this, SLOT(evaluate(int)));
-//    connect(mathEdit, SIGNAL(keyboardAction(int)), this, SLOT(deletePressed(int)));
     connect(mathEdit, SIGNAL(keyboardAction(int)), this, SLOT(keyboardAction(int)));
-    layout()->addWidget(mathEdit);
 }
 
 void Paragraph::preview()
@@ -67,7 +79,7 @@ void Paragraph::preview()
 
 void Paragraph::evaluate(int action)
 {
-    if (action == MathEdit::EVAL_AND_CONTINUE || action == MathEdit::EVAL_IN_PLACE) {
+    if ((action == MathEdit::EVAL_AND_CONTINUE || action == MathEdit::EVAL_IN_PLACE) && !isEmpty()) {
         QString mathString = mathEdit->toPlainText();
         euler->sendMathString(tabIndex, index, mathString, true);
     }
@@ -76,6 +88,12 @@ void Paragraph::evaluate(int action)
 void Paragraph::keyboardAction(int action)
 {
     emit keyboardAction(action, this);
+}
+
+void Paragraph::lineNumberChanged(QLayout *mainLayout)
+{
+    qDebug() << mainLayout->indexOf(this) + 1;
+    lineNumberWidget->setNum(mainLayout->indexOf(this) + 1);
 }
 
 void Paragraph::receivedLatexString(int tabIndex, int index, QString latexString)
@@ -93,12 +111,7 @@ void Paragraph::receivedPlot(int tabIndex, int index, QString path)
     }
 }
 
-//void Paragraph::arrowsPressed(int action)
-//{
-//    emit changeFocus_triggered(this, action);
-//}
-
-//void Paragraph::deletePressed(int action)
-//{
-//    if (action == MathEdit::DELETE_LINE) emit deleteLine_triggered(this);
-//}
+bool Paragraph::isEmpty()
+{
+    return mathEdit->toPlainText().length() == 0;
+}

@@ -3,12 +3,16 @@
 
 #include <QWidget>
 #include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <QDebug>
+#include <QLabel>
+#include <QFontMetrics>
 
 #include "mathedit.h"
 #include "mathwidget.h"
 #include "euler.h"
 #include "renderer.h"
+#include "util.h"
 
 class Paragraph : public QWidget
 {
@@ -26,6 +30,8 @@ public:
 
     MathEdit *mathEdit;
 
+    bool isEmpty();
+
 
 signals:
 //    void newLine_triggered(int index);
@@ -38,6 +44,7 @@ private:
     Euler *euler;
     Renderer *renderer;
     MathWidget *mathWidget;
+    QLabel *lineNumberWidget;
 
     void initMathEdit();
 
@@ -49,6 +56,10 @@ private slots:
 //    void arrowsPressed(int action);
 //    void deletePressed(int action);
     void keyboardAction(int action);
+
+public slots:
+    void lineNumberChanged(QLayout *mainLayout);
+
 };
 
 #endif // PARAGRAPH_H

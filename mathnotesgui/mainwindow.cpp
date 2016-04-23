@@ -197,7 +197,7 @@ void MainWindow::createNewTab(bool empty, QString fileName)
 }
 
 
-Paragraph * MainWindow::addNewParagraph(int targetIndex, QString mathString)
+Paragraph * MainWindow::addNewParagraph(int lineNumber, QString mathString)
 {
     int tabIndex = tabs->currentIndex();
     int index = paragraphID;
@@ -208,14 +208,16 @@ Paragraph * MainWindow::addNewParagraph(int targetIndex, QString mathString)
                                          index,
                                          mathString);
 
-    if (targetIndex < 0) {
+    if (lineNumber < 0) {
         getTabContents()->layout()->addWidget(paragraph);
     } else {
-        ((QVBoxLayout*) getTabContents()->layout())->insertWidget(targetIndex, paragraph);
+        ((QVBoxLayout*) getTabContents()->layout())->insertWidget(lineNumber, paragraph);
     }
 
-
     connect(paragraph, SIGNAL(keyboardAction(int, Paragraph*)), this, SLOT(keyboardAction(int, Paragraph*)));
+    connect(this, SIGNAL(lineNumberChanged(QLayout*)), paragraph, SLOT(lineNumberChanged(QLayout*)));
+
+    emit lineNumberChanged(getTabContents()->layout());
 
     paragraphID++;
 
@@ -228,36 +230,37 @@ Paragraph * MainWindow::addNewParagraph(int targetIndex, QString mathString)
 
 void MainWindow::keyboardAction(int action, Paragraph *target)
 {
-    int targetIndex = getTabContents()->layout()->indexOf(target);
+    int lineNumber = getTabContents()->layout()->indexOf(target);
     int count = getTabContents()->layout()->count();
     if (action == MathEdit::EVAL_AND_CONTINUE) {
-        if (targetIndex == count - 1) {
-            addNewParagraph();
+        if (lineNumber == count - 1) {
+            if (!target->isEmpty()) addNewParagraph();
         } else {
             focusNextChild();
         }
     } else if (action == MathEdit::DELETE_LINE) {
         if (count > 1) {
-            if (targetIndex == 0) {
+            if (lineNumber == 0) {
                 focusNextChild();
             } else {
                 focusPreviousChild();
             }
             getTabContents()->layout()->removeWidget(target);
+            emit lineNumberChanged(getTabContents()->layout());
             delete target;
         }
     } else if (action == MathEdit::MOVE_UP) {
-        if (targetIndex > 0) {
+        if (lineNumber > 0) {
             focusPreviousChild();
             scrollTo(target);
         }
     } else if (action == MathEdit::MOVE_DOWN) {
-        if (targetIndex < paragraphID - 1) {
+        if (lineNumber < count - 1) {
             focusNextChild();
             scrollTo(target);
         }
     } else if (action == MathEdit::INSERT_ABOVE) {
-        Paragraph *paragraph = addNewParagraph(targetIndex);
+        Paragraph *paragraph = addNewParagraph(lineNumber);
 
         int index = getTabContents()->layout()->indexOf(paragraph);
 
@@ -269,7 +272,7 @@ void MainWindow::keyboardAction(int action, Paragraph *target)
         setTabOrder(paragraph->mathEdit, target->mathEdit);
 
     } else if (action == MathEdit::INSERT_BELOW) {
-        Paragraph *paragraph = addNewParagraph(targetIndex + 1);
+        Paragraph *paragraph = addNewParagraph(lineNumber + 1);
 
         int index = getTabContents()->layout()->indexOf(paragraph);
 

@@ -70,6 +70,7 @@ protected:
 
 signals:
     void outputReady(int lineIndex, QString latexString);
+    void lineNumberChanged(QLayout *mainLayout);
 
 private slots:
     void receivedMathString(int, int, QString mathString);

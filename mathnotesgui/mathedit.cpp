@@ -2,7 +2,7 @@
 
 MathEdit::MathEdit(QWidget *parent) : QPlainTextEdit(parent)
 {
-    setStyleSheet("border: none;");
+    setStyleSheet("border: none; padding: 0");
     mathEditMode = MATHMODE;
     setFocusPolicy(Qt::StrongFocus);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
@@ -22,10 +22,10 @@ void MathEdit::setMode(int mathEditMode)
         this->mathEditMode = mathEditMode;
         if (mathEditMode == MATHMODE) {
 
-            setStyleSheet("QPlainTextEdit { border: none; } QPlainTextEdit:focus { border: 1px solid; }");
+//            setStyleSheet("QPlainTextEdit { border: none; } QPlainTextEdit:focus { border: 1px solid; }");
         }
         else if (mathEditMode == TEXTMODE) {
-            setStyleSheet("QPlainTextEdit { border: none; } QPlainTextEdit:focus { border: 1px solid; }");
+//            setStyleSheet("QPlainTextEdit { border: none; } QPlainTextEdit:focus { border: 1px solid; }");
         }
     }
 }
@@ -57,11 +57,11 @@ bool MathEdit::eventFilter(QObject *object, QEvent *event)
             emit keyboardAction(DELETE_LINE);
             return true;
         }
-        else if (keyEvent->key() == Qt::Key_Up && keyEvent->modifiers() & Qt::ControlModifier && keyEvent->modifiers() & Qt::KeypadModifier) {
+        else if (keyEvent->key() == Qt::Key_Up && keyEvent->modifiers() & Qt::ControlModifier) {
             emit keyboardAction(INSERT_ABOVE);
             return true;
         }
-        else if (keyEvent->key() == Qt::Key_Down && keyEvent->modifiers() & Qt::ControlModifier && keyEvent->modifiers() & Qt::KeypadModifier) {
+        else if (keyEvent->key() == Qt::Key_Down && keyEvent->modifiers() & Qt::ControlModifier) {
             emit keyboardAction(INSERT_BELOW);
             return true;
         }
@@ -102,5 +102,6 @@ bool MathEdit::eventFilter(QObject *object, QEvent *event)
 
 void MathEdit::updateHeight()
 {
-    setFixedHeight(ptY(LINE_ADD + blockCount() * LINE_HEIGHT));
+    QFontMetrics *metrics = new QFontMetrics(font());
+    setFixedHeight(ptY(10) + blockCount() * (metrics->height() + ptY(1)));
 }
