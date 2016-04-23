@@ -3,20 +3,21 @@ import parsing
 from modules.ieuler.lib import *
 import re
 from pyparsing import *
-import modules.maple.process as mProcess
-import modules.tools.plot2d as plot2d
+from importlib import import_module
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
 
 def get_variable_value(toks):
     var, op = parsing.parse_unary_operator(toks)
-    if type(var) is ml.Variable:
-        if var.name() in user_variables:
-            return user_variables[var.name()]
-    if type(var) is ml.Ans:
-        return var.value
-    return var
+
+# def insert_variable_value(obj):
+#     if type(obj) is ml.Variable:
+#         if obj.name() in user_variables:
+#             return user_variables[obj.name()]
+#     if type(obj) is ml.Ans:
+#         return obj.value
+#     return obj
 
 
 def get_decorator(toks):
@@ -37,7 +38,7 @@ def get_equality_op(toks):
         type = "="
         if t["equals"]["modifier"]:
             if "#" in t["equals"]["modifier"]:
-                value2 = evaluate_expression(value2)
+                value2 = evaluate_expression(value2, t["equals"]["option"])
             if "::" in t["equals"]["modifier"]:
                 hidden = True
                 if evaluate:
@@ -83,9 +84,11 @@ def assign_variable(variable, value):
             'Can only assign variables, not {}!'.format(type(variable)))
 
 
-def evaluate_expression(expr, convert=True):
+def evaluate_expression(expr, calculator="", convert=True):
     if evaluate:
-        return mProcess.evaluate(expr, convert)
+        if not calculator:
+            calculator = workspace["default_calculator"]
+        return import_module("modules.{}.process".format(calculator)).evaluate(expr, convert)
     return expr
 
 
