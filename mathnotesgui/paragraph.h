@@ -24,26 +24,31 @@ public:
     int index;
     void focus();
 
+    MathEdit *mathEdit;
+
+
 signals:
-    void newLine_triggered(int index);
-    void deleteLine_triggered(Paragraph *target);
-    void changeFocus_triggered(Paragraph *paragraph, bool goUp);
+//    void newLine_triggered(int index);
+//    void nextLine_triggered();
+//    void deleteLine_triggered(Paragraph *target);
+//    void changeFocus_triggered(Paragraph *paragraph, bool goUp);
+    void keyboardAction(int action, Paragraph *);
 
 private:
     Euler *euler;
     Renderer *renderer;
-    MathEdit *mathEdit;
     MathWidget *mathWidget;
 
     void initMathEdit();
 
 private slots:
     void preview();
-    void evaluate();
+    void evaluate(int action);
     void receivedLatexString(int tabIndex, int index, QString latexString);
     void receivedPlot(int tabIndex, int index, QString path);
-    void arrowsPressed(bool upArrowPressed);
-    void deletePressed();
+//    void arrowsPressed(int action);
+//    void deletePressed(int action);
+    void keyboardAction(int action);
 };
 
 #endif // PARAGRAPH_H

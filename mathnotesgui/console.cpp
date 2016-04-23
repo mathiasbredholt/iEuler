@@ -8,6 +8,7 @@ Console::Console(QWidget *parent) : QTextEdit(parent)
 //    QScrollArea *scrollArea = new QScrollArea(label);
 //    layout()->addWidget(scrollArea);
 
+    setFocusPolicy(Qt::ClickFocus);
     setFixedHeight(ptY(80));
     setReadOnly(true);
     setFont(QFont("Monaco", 10));

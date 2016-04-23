@@ -12,6 +12,7 @@ Paragraph::Paragraph(QWidget *parent,
     this->tabIndex = tabIndex;
     this->index = index;
 
+    setFocusPolicy(Qt::NoFocus);
     setPalette(parent->palette());
     setFont(parent->font());
 
@@ -43,10 +44,9 @@ void Paragraph::initMathEdit()
 {
     mathEdit = new MathEdit(this);
     connect(mathEdit, SIGNAL(textChanged()), this, SLOT(preview()));
-    connect(mathEdit, SIGNAL(evaluate()), this, SLOT(evaluate()));
-    connect(mathEdit, SIGNAL(arrowsPressed(bool)), this, SLOT(arrowsPressed(bool)));
-    connect(mathEdit, SIGNAL(deletePressed()), this, SLOT(deletePressed()));
-    connect(mathEdit, SIGNAL(autoRepeating(bool)), renderer, SLOT(toggleRendering(bool)));
+    connect(mathEdit, SIGNAL(keyboardAction(int)), this, SLOT(evaluate(int)));
+//    connect(mathEdit, SIGNAL(keyboardAction(int)), this, SLOT(deletePressed(int)));
+    connect(mathEdit, SIGNAL(keyboardAction(int)), this, SLOT(keyboardAction(int)));
     layout()->addWidget(mathEdit);
 }
 
@@ -65,11 +65,17 @@ void Paragraph::preview()
     euler->sendMathString(tabIndex, index, mathString, false);
 }
 
-void Paragraph::evaluate()
+void Paragraph::evaluate(int action)
 {
-    QString mathString = mathEdit->toPlainText();
-    euler->sendMathString(tabIndex, index, mathString, true);
-    emit newLine_triggered(index);
+    if (action == MathEdit::EVAL_AND_CONTINUE || action == MathEdit::EVAL_IN_PLACE) {
+        QString mathString = mathEdit->toPlainText();
+        euler->sendMathString(tabIndex, index, mathString, true);
+    }
+}
+
+void Paragraph::keyboardAction(int action)
+{
+    emit keyboardAction(action, this);
 }
 
 void Paragraph::receivedLatexString(int tabIndex, int index, QString latexString)
@@ -87,12 +93,12 @@ void Paragraph::receivedPlot(int tabIndex, int index, QString path)
     }
 }
 
-void Paragraph::arrowsPressed(bool upArrowPressed)
-{
-    emit changeFocus_triggered(this, upArrowPressed);
-}
+//void Paragraph::arrowsPressed(int action)
+//{
+//    emit changeFocus_triggered(this, action);
+//}
 
-void Paragraph::deletePressed()
-{
-    emit deleteLine_triggered(this);
-}
+//void Paragraph::deletePressed(int action)
+//{
+//    if (action == MathEdit::DELETE_LINE) emit deleteLine_triggered(this);
+//}

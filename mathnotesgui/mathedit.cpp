@@ -2,10 +2,10 @@
 
 MathEdit::MathEdit(QWidget *parent) : QPlainTextEdit(parent)
 {
+    setStyleSheet("border: none;");
     mathEditMode = MATHMODE;
     setFocusPolicy(Qt::StrongFocus);
     setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
-    setStyleSheet("QPlainTextEdit { border: none; } QPlainTextEdit:focus { border: 1px solid; }");
     setBackgroundRole(QPalette::Dark);
     setFont(parent->font());
     setPalette(parent->palette());
@@ -14,7 +14,6 @@ MathEdit::MathEdit(QWidget *parent) : QPlainTextEdit(parent)
     setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
 
     updateHeight();
-    qDebug() << styleSheet();
 }
 
 void MathEdit::setMode(int mathEditMode)
@@ -46,28 +45,39 @@ bool MathEdit::eventFilter(QObject *object, QEvent *event)
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
         if (keyEvent->key() == Qt::Key_Return && keyEvent->modifiers() == Qt::ShiftModifier) {
-            emit evaluate();
+            emit keyboardAction(EVAL_IN_PLACE);
+            return true;
+        }
+        else if (keyEvent->key() == Qt::Key_Return && keyEvent->modifiers() == Qt::ControlModifier) {
+            emit keyboardAction(EVAL_AND_CONTINUE);
             return true;
         }
         else if (keyEvent->key() == Qt::Key_Backspace && keyEvent->modifiers() == Qt::ShiftModifier) {
-            emit deletePressed();
+            emit keyboardAction(DELETE_LINE);
+            return true;
+        }
+        else if (keyEvent->key() == Qt::Key_Up && keyEvent->modifiers() & Qt::ControlModifier && keyEvent->modifiers() & Qt::KeypadModifier) {
+            emit keyboardAction(INSERT_ABOVE);
+            return true;
+        }
+        else if (keyEvent->key() == Qt::Key_Down && keyEvent->modifiers() & Qt::ControlModifier && keyEvent->modifiers() & Qt::KeypadModifier) {
+            emit keyboardAction(INSERT_BELOW);
             return true;
         }
         else if (keyEvent->key() == Qt::Key_Up) {
             if (textCursor().blockNumber() == 0) {
-                emit arrowsPressed(true);
+                emit keyboardAction(MOVE_UP);
                 return true;
             }
         }
         else if (keyEvent->key() == Qt::Key_Down) {
             if (textCursor().blockNumber() == blockCount() - 1) {
-                emit arrowsPressed(false);
+                emit keyboardAction(MOVE_DOWN);
                 return true;
             }
         }
-        emit autoRepeating(keyEvent->isAutoRepeat());
+//        emit autoRepeating(keyEvent->isAutoRepeat());
     }
-
     else if (object == this && event->type() == QEvent::KeyRelease) {
         QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
@@ -77,8 +87,15 @@ bool MathEdit::eventFilter(QObject *object, QEvent *event)
         else if (keyEvent->key() == Qt::Key_Backspace) {
             return false;
         }
-        emit autoRepeating(keyEvent->isAutoRepeat());
+//        emit autoRepeating(keyEvent->isAutoRepeat());
     }
+    else if (object == this && event->type() == QEvent::FocusIn) {
+        setStyleSheet("border: 1px solid;");
+    }
+    else if (object == this && event->type() == QEvent::FocusOut) {
+        setStyleSheet("border: none;");
+    }
+
     return false;
 }
 

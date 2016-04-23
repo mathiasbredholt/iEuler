@@ -3,8 +3,6 @@
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent)
 {
-    installEventFilter(this);
-
     setupUIParameters();
     createFileMenu();
     createToolsMenu();
@@ -13,7 +11,7 @@ MainWindow::MainWindow(QWidget *parent) :
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
 
-    renderer = new Renderer(minimumWidth(),minimumHeight());
+    renderer = new Renderer(minimumWidth(), minimumHeight());
     renderer->windowWidth = minimumWidth();
 
 //     Create/ tabs
@@ -29,7 +27,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Create workspace
     workspace = new Workspace(this);
     container->layout()->addWidget(workspace);
-    connect(euler, SIGNAL(receivedWorkspace(int,int,QVariantMap)), workspace, SLOT(receivedWorkspace(int,int,QVariantMap)));
+    connect(euler, SIGNAL(receivedWorkspace(int, int, QVariantMap)), workspace, SLOT(receivedWorkspace(int, int, QVariantMap)));
 
 //     Create Command panel
     cmdpanel = new CmdPanel(this);
@@ -159,14 +157,14 @@ void MainWindow::closeEvent(QCloseEvent *e) {
     }
 }
 
-void MainWindow::moveEvent(QMoveEvent *event)
+void MainWindow::moveEvent(QMoveEvent *)
 {
     renderer->move(pos());
 }
 
 void MainWindow::scrollTo(Paragraph *paragraph)
 {
-    ((QScrollArea*) tabs->currentWidget())->ensureWidgetVisible(paragraph, 0, 400);
+    ((QScrollArea*) tabs->currentWidget())->ensureWidgetVisible(paragraph, 0, 600);
 }
 
 // Tabs
@@ -192,17 +190,17 @@ void MainWindow::createNewTab(bool empty, QString fileName)
     tabs->addTab(scrollArea, fileName);
     tabs->setCurrentWidget(scrollArea);
     connect(tabs, SIGNAL(tabBarClicked(int)), this, SLOT(onTabChange(int)));
-    setWindowTitle("iEuler - "+fileName);
+    setWindowTitle("iEuler - " + fileName);
 
-    numberOfLines = 0;
+    paragraphID = 0;
     if (!empty) addNewParagraph();
 }
 
 
-void MainWindow::addNewParagraph(QString mathString)
+Paragraph * MainWindow::addNewParagraph(int targetIndex, QString mathString)
 {
     int tabIndex = tabs->currentIndex();
-    int index = numberOfLines;
+    int index = paragraphID;
     Paragraph *paragraph = new Paragraph(this,
                                          euler,
                                          renderer,
@@ -210,35 +208,79 @@ void MainWindow::addNewParagraph(QString mathString)
                                          index,
                                          mathString);
 
-    getTabContents()->layout()->addWidget(paragraph);
-    connect(paragraph, SIGNAL(changeFocus_triggered(Paragraph*,bool)), this, SLOT(changeFocus_triggered(Paragraph*,bool)));
-    connect(paragraph, SIGNAL(newLine_triggered(int)), this, SLOT(newLine_triggered(int)));
-    connect(paragraph, SIGNAL(deleteLine_triggered(Paragraph*)), this, SLOT(deleteLine_triggered(Paragraph*)));
+    if (targetIndex < 0) {
+        getTabContents()->layout()->addWidget(paragraph);
+    } else {
+        ((QVBoxLayout*) getTabContents()->layout())->insertWidget(targetIndex, paragraph);
+    }
 
-    numberOfLines++;
+
+    connect(paragraph, SIGNAL(keyboardAction(int, Paragraph*)), this, SLOT(keyboardAction(int, Paragraph*)));
+
+    paragraphID++;
+
     paragraph->focus();
 
     qApp->processEvents();
     scrollTo(paragraph);
+    return paragraph;
 }
 
-void MainWindow::newLine_triggered(int index)
+void MainWindow::keyboardAction(int action, Paragraph *target)
 {
-    if (index == numberOfLines - 1) {
-        addNewParagraph();
+    int targetIndex = getTabContents()->layout()->indexOf(target);
+    int count = getTabContents()->layout()->count();
+    if (action == MathEdit::EVAL_AND_CONTINUE) {
+        if (targetIndex == count - 1) {
+            addNewParagraph();
+        } else {
+            focusNextChild();
+        }
+    } else if (action == MathEdit::DELETE_LINE) {
+        if (count > 1) {
+            if (targetIndex == 0) {
+                focusNextChild();
+            } else {
+                focusPreviousChild();
+            }
+            getTabContents()->layout()->removeWidget(target);
+            delete target;
+        }
+    } else if (action == MathEdit::MOVE_UP) {
+        if (targetIndex > 0) {
+            focusPreviousChild();
+            scrollTo(target);
+        }
+    } else if (action == MathEdit::MOVE_DOWN) {
+        if (targetIndex < paragraphID - 1) {
+            focusNextChild();
+            scrollTo(target);
+        }
+    } else if (action == MathEdit::INSERT_ABOVE) {
+        Paragraph *paragraph = addNewParagraph(targetIndex);
+
+        int index = getTabContents()->layout()->indexOf(paragraph);
+
+        if (index > 0) {
+            Paragraph *before = (Paragraph *) getTabContents()->layout()->itemAt(index - 1)->widget();
+            setTabOrder(before->mathEdit, paragraph->mathEdit);
+        }
+
+        setTabOrder(paragraph->mathEdit, target->mathEdit);
+
+    } else if (action == MathEdit::INSERT_BELOW) {
+        Paragraph *paragraph = addNewParagraph(targetIndex + 1);
+
+        int index = getTabContents()->layout()->indexOf(paragraph);
+
+        setTabOrder(target->mathEdit, paragraph->mathEdit);
+
+        if (index < count - 1) {
+            Paragraph *after = (Paragraph *) getTabContents()->layout()->itemAt(index + 1)->widget();
+            setTabOrder(paragraph->mathEdit, after->mathEdit);
+        }
     }
 }
-
-void MainWindow::deleteLine_triggered(Paragraph *target)
-{
-    if (numberOfLines > 1) {
-        focusPreviousChild();
-        getTabContents()->layout()->removeWidget(target);
-        delete target;
-        numberOfLines--;
-    }
-}
-
 
 // File I/O
 
@@ -246,7 +288,7 @@ void MainWindow::openFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getOpenFileName(this,
-        tr("Open iEuler file"), dir, tr("iEuler files (*.eulerc)"));
+                   tr("Open iEuler file"), dir, tr("iEuler files (*.eulerc)"));
     if (path != "") {
         QFileInfo fi(path);
         createNewTab(true, fi.baseName());
@@ -260,13 +302,13 @@ void MainWindow::saveFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getSaveFileName(this,
-        tr("Save iEuler file"), dir, tr("Text Files (*.euler)"));
+                   tr("Save iEuler file"), dir, tr("Text Files (*.euler)"));
 
     if (path != "") {
         QFileInfo fi(path);
         euler->sendSaveFileRequest(path);
         tabs->setTabText(tabs->currentIndex(), fi.baseName());
-        setWindowTitle("iEuler - "+fi.baseName());
+        setWindowTitle("iEuler - " + fi.baseName());
     }
 }
 
@@ -274,7 +316,7 @@ void MainWindow::exportFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getSaveFileName(this,
-        tr("Export PDF file"), dir, tr("PDF Files (*.pdf)"));
+                   tr("Export PDF file"), dir, tr("PDF Files (*.pdf)"));
 
     if (path != "") {
         euler->sendExportRequest(path);
@@ -290,16 +332,6 @@ void MainWindow::on_actionShow_command_panel_triggered()
     }
 }
 
-void MainWindow::changeFocus_triggered(Paragraph *paragraph, bool goUp)
-{
-    scrollTo(paragraph);
-    if (goUp) {
-        if (paragraph->index > 0) focusPreviousChild();
-    } else {
-        if (paragraph->index < numberOfLines-1) focusNextChild();
-    }
-}
-
 void MainWindow::keyPressEvent(QKeyEvent *e)
 {
     if (e->key() == Qt::Key_Escape) {
@@ -307,9 +339,9 @@ void MainWindow::keyPressEvent(QKeyEvent *e)
     }
 }
 
-void MainWindow::receivedMathString(int tabIndex, int index, QString mathString)
+void MainWindow::receivedMathString(int, int, QString mathString)
 {
-    addNewParagraph(mathString);
+    addNewParagraph(-1, mathString);
 }
 
 void MainWindow::on_action100_triggered()
@@ -361,7 +393,7 @@ void MainWindow::on_actionExport_triggered()
 
 void MainWindow::onTabChange(int index)
 {
-    setWindowTitle("iEuler - "+tabs->tabText(index));
+    setWindowTitle("iEuler - " + tabs->tabText(index));
 }
 
 void MainWindow::on_actionRestart_core_triggered()

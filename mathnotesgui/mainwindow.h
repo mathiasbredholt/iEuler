@@ -21,6 +21,7 @@
 #include "util.h"
 #include "console.h"
 #include "workspace.h"
+#include "mathedit.h"
 
 class MainWindow : public QMainWindow
 {
@@ -42,7 +43,7 @@ private:
     Console *console;
     Workspace *workspace;
 
-    int numberOfLines;
+    int paragraphID;
 
     void createFileMenu();
     void createToolsMenu();
@@ -50,7 +51,7 @@ private:
     void setupUIParameters();
     void createContainer();
 
-    void addNewParagraph(QString mathString = "");
+    Paragraph *addNewParagraph(int targetIndex = -1, QString mathString = "");
     void createNewTab(bool empty = false, QString fileName = "Untitled");
 
     void openFile();
@@ -60,7 +61,7 @@ private:
     QWidget *getTabContents();
 
     void closeEvent(QCloseEvent *event);
-    void moveEvent(QMoveEvent *event);
+    void moveEvent(QMoveEvent *);
 
     void scrollTo(Paragraph *paragraph);
 
@@ -71,13 +72,10 @@ signals:
     void outputReady(int lineIndex, QString latexString);
 
 private slots:
-    void receivedMathString(int tabIndex, int index, QString mathString);
-
-    void newLine_triggered(int index);
-    void deleteLine_triggered(Paragraph *target);
+    void receivedMathString(int, int, QString mathString);
+    void keyboardAction(int action, Paragraph *target);
 
     void on_actionShow_command_panel_triggered();
-    void changeFocus_triggered(Paragraph *paragraph, bool goUp);
     void on_action100_triggered();
     void on_action150_triggered();
     void on_action200_triggered();
