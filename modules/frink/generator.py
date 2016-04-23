@@ -8,6 +8,7 @@ def generate(input_expr):
 
 
 def convert_expr(input_expr):
+    print("input_expr: {}".format(input_expr))
     return input_expr.to_frink()
 
 
@@ -88,6 +89,11 @@ def convert_root(self):
         return "root({}, {}) ".format(
             convert_expr(self.value1), convert_expr(self.value2))
 
+
+def convert_ans(self):
+    return convert_expr(self.value)
+
+
 # Extending mathlib classes with to_frink method for duck typing
 ml.MathValue.to_frink = convert_value
 ml.Minus.to_frink = convert_minus
@@ -99,4 +105,5 @@ ml.MulOp.to_frink = convert_mulop
 ml.Fraction.to_frink = convert_fraction
 ml.Power.to_frink = convert_power
 ml.Root.to_frink = convert_root
+ml.Ans.to_frink = convert_ans
 # ml.Function.to_frink = convert_function

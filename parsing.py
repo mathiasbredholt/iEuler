@@ -95,9 +95,18 @@ def get_matrix(toks, delimiters):
 
 
 def get_ans(toks, workspace):
-    i = int(toks[1]) if len(toks) > 1 else 1
-    value = workspace["user_output"][workspace["index"] - i] if workspace["index"] - \
-        i in workspace["user_output"].keys() else ml.Empty()
+    print("workspace: {}".format(workspace))
+    i = 1
+    if len(toks) == 1:
+        if type(workspace["parsed_input"][workspace["index"]]) is ml.Equality:
+            eqs = workspace["parsed_input"][workspace["index"]].flatten()
+            for x in range(1, len(eqs)):
+                if eqs[x].find(ml.Ans):
+                    return ml.Ans(eqs[x - 1])
+    else:
+        i = int(toks[1])
+    value = workspace["parsed_input"][workspace["index"] - i] if workspace[
+        "index"] - i in workspace["parsed_input"].keys() else ml.Empty()
     return ml.Ans(value, ml.Number(str(i)))
     # return ml.Empty()
 
