@@ -9,11 +9,6 @@ import parsing
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
 
-def parse(input_string):
-    x = parse_expression(input_string)
-    return x
-
-
 def get_pow_op(toks):
     p = parsing.get_pow_op(toks)
     if (

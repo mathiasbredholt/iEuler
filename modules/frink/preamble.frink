@@ -9,26 +9,16 @@ electric_conductance :-> "S"
 magnetic_flux :-> "Wb"
 magnetic_flux_density :-> "T"
 inductance :-> "H"
+surface_charge_density :-> "C m^-2"
+electric_charge_density :-> "C m^-3"
+electric_field_strength :-> "V m^-1"
+magnetic_field_strength :-> "A m^-1"
+heat_capacity :-> "J K^-1"
+specific_heat_capacity :-> "J kg^-1 K^-1"
 
-j := \u2149
-\u00B50 := mu0
-\u00B5_0 := mu0
-Am := A m
 
 setEngineering[true]
-setPrecision[10]
-
-phasor[z, arg = m] := 
-{
-	if arg conforms m
-		return [abs[z], (argument[z] -> deg) + "\u00b0"]
-	else
-		return z*(cos[arg]+j*sin[arg])
-}
-
-argument[z] := arctan[Im[z],Re[z]]
-
-conjugate[z] := Re[z] - j Im[z]
-
-parallel[a, b] := 1/(1/a + 1/b)
-par[a, b] := parallel[a, b]
+setPrecision[6]
+showDimensionName[false]
+showApproximations[false]
+rationalAsFloat[true]
