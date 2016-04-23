@@ -13,7 +13,7 @@ MainWindow::MainWindow(QWidget *parent) :
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
 
-    renderer = new Renderer(minimumWidth(),minimumHeight());
+    renderer = new Renderer(minimumWidth(), minimumHeight());
     renderer->windowWidth = minimumWidth();
 
 //     Create/ tabs
@@ -29,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     // Create workspace
     workspace = new Workspace(this);
     container->layout()->addWidget(workspace);
-    connect(euler, SIGNAL(receivedWorkspace(int,int,QVariantMap)), workspace, SLOT(receivedWorkspace(int,int,QVariantMap)));
+    connect(euler, SIGNAL(receivedWorkspace(int, int, QVariantMap)), workspace, SLOT(receivedWorkspace(int, int, QVariantMap)));
 
 //     Create Command panel
     cmdpanel = new CmdPanel(this);
@@ -192,7 +192,7 @@ void MainWindow::createNewTab(bool empty, QString fileName)
     tabs->addTab(scrollArea, fileName);
     tabs->setCurrentWidget(scrollArea);
     connect(tabs, SIGNAL(tabBarClicked(int)), this, SLOT(onTabChange(int)));
-    setWindowTitle("iEuler - "+fileName);
+    setWindowTitle("iEuler - " + fileName);
 
     numberOfLines = 0;
     if (!empty) addNewParagraph();
@@ -246,7 +246,7 @@ void MainWindow::openFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getOpenFileName(this,
-        tr("Open iEuler file"), dir, tr("iEuler files (*.eulerc)"));
+                   tr("Open iEuler file"), dir, tr("iEuler files (*.eulerc)"));
     if (path != "") {
         QFileInfo fi(path);
         createNewTab(true, fi.baseName());
@@ -260,13 +260,13 @@ void MainWindow::saveFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getSaveFileName(this,
-        tr("Save iEuler file"), dir, tr("Text Files (*.euler)"));
+                   tr("Save iEuler file"), dir, tr("Text Files (*.euler)"));
 
     if (path != "") {
         QFileInfo fi(path);
         euler->sendSaveFileRequest(path);
         tabs->setTabText(tabs->currentIndex(), fi.baseName());
-        setWindowTitle("iEuler - "+fi.baseName());
+        setWindowTitle("iEuler - " + fi.baseName());
     }
 }
 
@@ -274,7 +274,7 @@ void MainWindow::exportFile()
 {
     QString dir = QStandardPaths::locate(QStandardPaths::DocumentsLocation, QString(), QStandardPaths::LocateDirectory);
     QString path = QFileDialog::getSaveFileName(this,
-        tr("Export PDF file"), dir, tr("PDF Files (*.pdf)"));
+                   tr("Export PDF file"), dir, tr("PDF Files (*.pdf)"));
 
     if (path != "") {
         euler->sendExportRequest(path);
@@ -361,7 +361,7 @@ void MainWindow::on_actionExport_triggered()
 
 void MainWindow::onTabChange(int index)
 {
-    setWindowTitle("iEuler - "+tabs->tabText(index));
+    setWindowTitle("iEuler - " + tabs->tabText(index));
 }
 
 void MainWindow::on_actionRestart_core_triggered()
