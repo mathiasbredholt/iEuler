@@ -10,12 +10,14 @@ ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
 def get_variable_value(toks):
     var, op = parsing.parse_unary_operator(toks)
-    if type(var) is ml.Variable:
-        if var.name() in user_variables:
-            return user_variables[var.name()]
-    if type(var) is ml.Ans:
-        return var.value
-    return var
+
+# def insert_variable_value(obj):
+#     if type(obj) is ml.Variable:
+#         if obj.name() in user_variables:
+#             return user_variables[obj.name()]
+#     if type(obj) is ml.Ans:
+#         return obj.value
+#     return obj
 
 
 def get_decorator(toks):
