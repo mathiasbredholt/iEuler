@@ -21,7 +21,6 @@ void MathEdit::setMode(int mathEditMode)
     if (this->mathEditMode != mathEditMode) {
         this->mathEditMode = mathEditMode;
         if (mathEditMode == MATHMODE) {
-
 //            setStyleSheet("QPlainTextEdit { border: none; } QPlainTextEdit:focus { border: 1px solid; }");
         }
         else if (mathEditMode == TEXTMODE) {

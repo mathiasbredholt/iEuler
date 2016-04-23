@@ -22,8 +22,44 @@ class Equality:
         self.assignment = assignment
         self.hidden = hidden
 
-    def get_first(self):
-        return self.value1.get_first()
+    def flatten(self):
+        val1 = self.value1.flatten() if type(
+            self.value1) is Equality else [self.value1]
+        val2 = self.value2.flatten() if type(
+            self.value2) is Equality else [self.value2]
+        return val1 + val2
+
+    def find(self, x, i=[], index=[]):
+        self.value1.find(x, i, index + [0])
+        self.value2.find(x, i, index + [1])
+        if type(self) is x:
+            i += [index]
+        return i
+
+    def index(self, i):
+        if len(i) == 0:
+            return self
+        index = i[0]
+        rest = i[1:]
+        if not index in [0, 1]:
+            raise IndexError()
+        return self.value1.index(rest) if index == 0 else self.value2.index(rest)
+
+    # def has(self, type):
+    # return type(self) is type or self.value1.has(type) or
+    # self.value2.has(type)
+
+    def get_first_value(self):
+        return self.value1.get_first_value()
+
+    def get_last_value(self):
+        return self.value2.get_last_value()
+
+    def get_first_expression(self):
+        return self.value1.get_first_expression()
+
+    def get_last_expression(self):
+        return self.value2.get_last_expression()
 
     def __str__(self):
         return "Equality(type:'{}', {}, {})".format(self.type, self.value1,
@@ -40,10 +76,27 @@ class MathValue:
     def get_decorators(self):
         return self.decorators
 
-    def get_first(self):
+    def find(self, x, i=[], index=[]):
+        if type(self) is x:
+            i += [index]
+        return i
+
+    def index(self, i):
+        if not len(i) == 0:
+            raise IndexError()
+        else:
+            return self
+
+    def get_first_value(self):
         return self
 
-    def get_last(self):
+    def get_last_value(self):
+        return self
+
+    def get_first_expression(self):
+        return self
+
+    def get_last_expression(self):
         return self
 
     def get_variables(self):
@@ -152,7 +205,7 @@ class Variable(MathValue):
 
 class Ans(MathValue):
 
-    def __init__(self, value, index):
+    def __init__(self, value, index=Number('1')):
         self.value = value
         self.index = index
 
@@ -222,23 +275,44 @@ class MathUnaryOperator:
     def get_variables(self):
         return self.value.get_variables()
 
+    def find(self, x, i=[], index=[]):
+        self.value.find(x, i, index + [0])
+        if type(self) is x:
+            i += [index]
+        return i
+
+    def index(self, i):
+        if len(i) == 0:
+            return self
+        index = i[0]
+        rest = i[1:]
+        if not index == 0:
+            raise IndexError()
+        return self.value.index(rest)
+
     def get_value(self):
         return False
 
-    def get_first(self):
-        return self.value.get_first()
+    def get_first_value(self):
+        return self.value.get_first_value()
         # if not self.value.get_value():
         #     # value is an operator
-        #     return self.value.get_first()
+        #     return self.value.get_first_value()
         # else:
         #     # value is a value
         #     return self.value
 
-    def get_last(self):
-        return self.get_first()
+    def get_last_value(self):
+        return self.get_first_value()
 
     def is_matrix(self):
         return self.value.is_matrix()
+
+    def get_first_expression(self):
+        return self
+
+    def get_last_expression(self):
+        return self
 
     def __str__(self):
         return "MathUnaryOperator({},{})".format(self.value1, self.value2)
@@ -268,27 +342,48 @@ class MathOperator:
         self.value1 = value1
         self.value2 = value2
 
+    def find(self, x, i=[], index=[]):
+        self.value1.find(x, i, index + [0])
+        self.value2.find(x, i, index + [1])
+        if type(self) is x:
+            i += [index]
+        return i
+
+    def index(self, i):
+        if len(i) == 0:
+            return self
+        index = i[0]
+        rest = i[1:]
+        if not index in [0, 1]:
+            raise IndexError()
+        return self.value1.index(rest) if index == 0 else self.value2.index(rest)
+
     def get_value(self):
         return False
 
     def get_variables(self):
         return self.value1.get_variables() + self.value2.get_variables()
 
-    def get_first(self):
-        return self.value1.get_first()
+    def get_first_value(self):
+        return self.value1.get_first_value()
         # if not self.value1.get_value():
         #     # value1 is an operator
         # else:
         #     # value1 is a value
         #     return self.value1
 
-    def get_last(self):
-        return self.value2.get_last()
+    def get_last_value(self):
+        return self.value2.get_last_value()
         # if not self.value2.get_value():
-        #     # value2 is an operator
         # else:
         #     # value2 is a value
         #     return self.value2
+
+    def get_first_expression(self):
+        return self
+
+    def get_last_expression(self):
+        return self
 
     def __str__(self):
         return "MathOperator({},{})".format(self.value1, self.value2)
@@ -324,7 +419,7 @@ class MulOp(MathOperator):
         return self.value1.is_matrix() != self.value2.is_matrix()
 
     def is_dot(self):
-        return self.value1.get_last().is_matrix() and self.value2.get_first().is_matrix()
+        return self.value1.get_last_value().is_matrix() and self.value2.get_first_value().is_matrix()
 
     def __str__(self):
         return "MulOp({},{})".format(self.value1, self.value2)
@@ -402,10 +497,33 @@ class Integral:
             self.range = None
             self.is_definite = False
 
-    def get_first(self):
+    def find(self, x, i=[], index=[]):
+        self.value.find(x, i, index + [0])
+        if variable:
+            self.variable.find(x, i, index + [1])
+        if type(self) is x:
+            i += [index]
+        return i
+
+    def index(self, i):
+        if len(i) == 0:
+            return self
+        index = i[0]
+        rest = i[1:]
+        if not index in [0, 1] or index == 1 and variable is None:
+            raise IndexError()
+        return self.value.index(rest) if index == 0 else self.variable.index(rest)
+
+    def get_first_value(self):
         return self
 
-    def get_last(self):
+    def get_last_value(self):
+        return self
+
+    def get_first_expression(self):
+        return self
+
+    def get_last_expression(self):
         return self
 
     def is_matrix(self):
@@ -433,10 +551,32 @@ class Derivative:
         self.variable = variable
         self.nth = nth
 
-    def get_first(self):
+    def find(self, x, i=[], index=[]):
+        self.value.find(x, i, index + [0])
+        self.variable.find(x, i, index + [1])
+        if type(self) is x:
+            i += [index]
+        return i
+
+    def index(self, i):
+        if len(i) == 0:
+            return self
+        index = i[0]
+        rest = i[1:]
+        if not index in [0, 1]:
+            raise IndexError()
+        return self.value.index(rest) if index == 0 else self.variable.index(rest)
+
+    def get_first_value(self):
         return self
 
-    def get_last(self):
+    def get_last_value(self):
+        return self
+
+    def get_first_expression(self):
+        return self
+
+    def get_last_expression(self):
         return self
 
     def get_value(self):
@@ -456,6 +596,23 @@ class Sum:
     def is_matrix(self):
         return self.value.is_matrix()
 
+    def find(self, x, i=[], index=[]):
+        self.value.find(x, i, index + [0])
+        if variable:
+            self.variable.find(x, i, index + [1])
+        if type(self) is x:
+            i += [index]
+        return i
+
+    def index(self, i):
+        if len(i) == 0:
+            return self
+        index = i[0]
+        rest = i[1:]
+        if not index in [0, 1] or index == 1 and variable is None:
+            raise IndexError()
+        return self.value.index(rest) if index == 0 else self.variable.index(rest)
+
     def __init__(self, value, variable=None):
         self.value = value
         if type(variable) is Equality and type(variable.value2) is Range:
@@ -466,6 +623,18 @@ class Sum:
             self.variable = variable
             self.range = None
             self.has_limits = False
+
+    def get_first_value(self):
+        return self
+
+    def get_last_value(self):
+        return self
+
+    def get_first_expression(self):
+        return self
+
+    def get_last_expression(self):
+        return self
 
     def get_variables(self):
         return [x for x in self.value.get_variables() if x != self.variable]
@@ -481,11 +650,40 @@ class Sum:
 
 class Limit:
 
+    def find(self, x, i=[], index=[]):
+        self.value.find(x, i, index + [0])
+        if variable:
+            self.variable.find(x, i, index + [1])
+        if type(self) is x:
+            i += [index]
+        return i
+
+    def index(self, i):
+        if len(i) == 0:
+            return self
+        index = i[0]
+        rest = i[1:]
+        if not index in [0, 1] or index == 1 and variable is None:
+            raise IndexError()
+        return self.value.index(rest) if index == 0 else self.variable.index(rest)
+
     def is_matrix(self):
         return self.value.is_matrix()
 
     def get_variables(self):
         return [x for x in self.value.get_variables() if x != self.variable]
+
+    def get_first_value(self):
+        return self
+
+    def get_last_value(self):
+        return self
+
+    def get_first_expression(self):
+        return self
+
+    def get_last_expression(self):
+        return self
 
     def __init__(self, value, variable=None):
         self.value = value

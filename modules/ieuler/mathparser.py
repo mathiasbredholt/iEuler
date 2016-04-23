@@ -19,6 +19,14 @@ def get_variable_value(toks):
 #         return obj.value
 #     return obj
 
+# def insert_variable_value(obj):
+#     if type(obj) is ml.Variable:
+#         if obj.name() in user_variables:
+#             return user_variables[obj.name()]
+#     if type(obj) is ml.Ans:
+#         return obj.value
+#     return obj
+
 
 def get_decorator(toks):
     value, op = parsing.parse_unary_operator(toks)
@@ -74,7 +82,7 @@ def get_attr_op(toks):
 def assign_variable(variable, value):
     global user_variables
     if type(variable) is ml.Equality:
-        variable = variable.get_first()
+        variable = variable.get_first_value()
     if type(variable) is ml.Unit:
         variable = variable.convert_to_variable()
     if type(variable) is ml.Variable:

@@ -85,7 +85,7 @@ def add_to_workspace(workspace, index, command, latex):
 
 def save_workspace(workspace, path):
     f = open(path, 'w')
-    for key, value in workspace["user_input"].items():
+    for key, value in workspace["raw_input"].items():
         f.write(value + "\n")
     f.close()
     f = open(path + "c", 'wb')
@@ -97,8 +97,8 @@ def load_workspace(path, tab_index=0):
     f = open(path, 'rb')
     workspace = pickle.load(f)
     f.close
-    for key, value in workspace["user_input"].items():
-        # tab["user_input"][i] = {"command": line.strip()}
+    for key, value in workspace["raw_input"].items():
+        # tab["raw_input"][i] = {"command": line.strip()}
         transmit.send_math_string(tab_index, key, value)
     return workspace
 
@@ -156,8 +156,9 @@ def start():
             if tab_index >= len(workspace):
                 workspace.append({})
                 workspace[tab_index]["user_variables"] = {}
-                workspace[tab_index]["user_input"] = {}
-                workspace[tab_index]["user_output"] = {}
+                workspace[tab_index]["raw_input"] = {}
+                workspace[tab_index]["parsed_input"] = {}
+                workspace[tab_index]["latex_output"] = {}
                 workspace[tab_index]["default_calculator"] = settings[
                     "default_calculator"]
 
@@ -170,8 +171,9 @@ def start():
             # print(latex_string)
 
             # Add math object to workspace
-            workspace[tab_index]["user_input"][index] = math_string
-            workspace[tab_index]["user_output"][index] = latex_string
+            workspace[tab_index]["raw_input"][index] = math_string
+            workspace[tab_index]["parsed_input"][index] = math_obj
+            workspace[tab_index]["latex_output"][index] = latex_string
             workspace[tab_index]["index"] = index
 
             # Send index and latex string through UDP socket

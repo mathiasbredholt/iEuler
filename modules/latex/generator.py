@@ -181,7 +181,7 @@ def convert_mulop(self):
         output = "{} {}"
     num_after = type(self.value2) is ml.Number or type(self.value2) in [
         ml.MulOp, ml.Power
-    ] and type(self.value2.get_first()) is ml.Number
+    ] and type(self.value2.get_first_value()) is ml.Number
     if num_after:
         output = "{} \\cdot {}"
     if type(self.value1) in [ml.AddOp, ml.SubOp]:
