@@ -38,7 +38,8 @@ def init():
 
 def query(query, proc, queue, thread, convert=True):
     if convert:
-        query = generator.generate(query) + ";\n"
+        query = generator.generate(query)
+    query += ";\n"
     print("Maple query: {}".format(query))
     proc.stdin.write(query)
     return_string = procio.process_input(proc, queue, thread, 20)

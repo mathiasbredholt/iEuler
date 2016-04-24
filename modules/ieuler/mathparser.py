@@ -2,30 +2,48 @@ import mathlib as ml
 import parsing
 from modules.ieuler.lib import *
 import re
+import copy
 from pyparsing import *
 from importlib import import_module
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
 
-def get_variable_value(toks):
+def insert_variable_value(toks, all=False):
     var, op = parsing.parse_unary_operator(toks)
+    if all:
+        vars1 = []
+        vars2 = var.find(ml.Variable)
+        while vars2 != vars1:
+            var = insert_single_variable_value(var)
+            vars1 = vars2
+            vars2 = var.find(ml.Variable)
+        return var
+    else:
+        return insert_single_variable_value(var)
 
-# def insert_variable_value(obj):
-#     if type(obj) is ml.Variable:
-#         if obj.name() in user_variables:
-#             return user_variables[obj.name()]
-#     if type(obj) is ml.Ans:
-#         return obj.value
-#     return obj
 
-# def insert_variable_value(obj):
-#     if type(obj) is ml.Variable:
-#         if obj.name() in user_variables:
-#             return user_variables[obj.name()]
-#     if type(obj) is ml.Ans:
-#         return obj.value
-#     return obj
+def insert_single_variable_value(var):
+    #    print("var: {}".format(var))
+    vars = var.find(ml.Variable)
+#    print("vars: {}".format(vars))
+    if len(vars) == 0:
+        return var
+    if len(vars) > 1:
+        vars = [x for x in vars if len(x) == min(map(len, vars))]
+    for v in vars:
+        var = copy.deepcopy(var).replace(
+            v, get_variable_value(var.index(v)))
+    return var
+
+
+def get_variable_value(obj):
+    if type(obj) is ml.Variable:
+        if obj.name() in user_variables:
+            return user_variables[obj.name()]
+    if type(obj) is ml.Ans:
+        return obj.value
+    return obj
 
 
 def get_decorator(toks):
@@ -97,7 +115,9 @@ def evaluate_expression(expr, calculator="", convert=True):
         if not calculator:
             calculator = workspace["default_calculator"]
         return import_module("modules.{}.process".format(calculator)).evaluate(expr, convert)
-    return expr
+    if convert:
+        return expr
+    return ml.RawString(expr)
 
 
 ParserElement.setDefaultWhitespaceChars(' ')
@@ -142,7 +162,6 @@ number << (Combine(Word(nums) + Optional("." + NotAny(Literal('.')) + Optional(W
 
 eval_field = Suppress('#') + expression + Suppress('#')
 
-# escape_field = Suppress(oneOf('\' "')) +  + Suppress(oneOf('\' "'))
 escape_field = QuotedString("'") | QuotedString('"')
 
 eval_direct_field = QuotedString("$")
@@ -151,7 +170,7 @@ operand = (
     eval_field.setParseAction(lambda x: evaluate_expression(x[0]))
     | escape_field.setParseAction(lambda x: parsing.get_variable(x, variables))
     | eval_direct_field.setParseAction(
-        lambda x: evaluate_expression(x[0], False))
+        lambda x: evaluate_expression(x[0], convert=False))
     | function.setParseAction(lambda x: parsing.get_function(x, functions))
     | unit.setParseAction(lambda x: parsing.get_unit(x, units))
     | other_unit.setParseAction(lambda x: parsing.get_unit(x, units, unknown=True))
@@ -162,6 +181,7 @@ operand = (
     | number.setParseAction(parsing.get_value)
 )
 
+insert_all_value = parsing.word_start + Literal('_@') + parsing.no_white
 insert_value = parsing.word_start + Literal('@') + parsing.no_white
 attrop = Literal('++') + Word(parsing.chars) + Optional(Literal(':') +
                                                         (escape_field | Word(parsing.chars)))
@@ -183,7 +203,8 @@ equalop = Group(other_equals) | equals | Group(equality_kw_list)
 right = opAssoc.RIGHT
 left = opAssoc.LEFT
 expression << infixNotation(operand, [
-    (insert_value, 1, right, get_variable_value),
+    (insert_all_value, 1, right, lambda x: insert_variable_value(x, all=True)),
+    (insert_value, 1, right, lambda x: insert_variable_value(x, all=False)),
     (attrop, 1, left, get_attr_op),
     (factop, 1, left, parsing.get_factorial_op),
     (deco_kw_list, 1, right, get_decorator),

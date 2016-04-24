@@ -29,7 +29,9 @@ class Equality:
             self.value2) is Equality else [self.value2]
         return val1 + val2
 
-    def find(self, x, i=[], index=[]):
+    def find(self, x, i=None, index=[]):
+        if i is None:
+            i = []
         self.value1.find(x, i, index + [0])
         self.value2.find(x, i, index + [1])
         if type(self) is x:
@@ -44,6 +46,24 @@ class Equality:
         if not index in [0, 1]:
             raise IndexError()
         return self.value1.index(rest) if index == 0 else self.value2.index(rest)
+
+    def replace(self, i, val):
+        if len(i) == 0:
+            return val
+        index = i[0]
+        rest = i[1:]
+        if not index in [0, 1]:
+            raise IndexError()
+        if len(rest) == 0:
+            if index == 0:
+                self.value1 = val
+            else:
+                self.value2 = val
+        elif index == 0:
+            self.value1.replace(rest, val)
+        else:
+            self.value2.replace(rest, val)
+        return self
 
     # def has(self, type):
     # return type(self) is type or self.value1.has(type) or
@@ -76,7 +96,11 @@ class MathValue:
     def get_decorators(self):
         return self.decorators
 
-    def find(self, x, i=[], index=[]):
+    def find(self, x, i=None, index=[]):
+        if i is None:
+            i = []
+#        print("i: {}, index: {}, x: {}, type: {}, same: {}".format(
+#            i, index, x, type(self), type(self) is x))
         if type(self) is x:
             i += [index]
         return i
@@ -86,6 +110,12 @@ class MathValue:
             raise IndexError()
         else:
             return self
+
+    def replace(self, i, val):
+        if not len(i) == 0:
+            raise IndexError()
+        else:
+            return val
 
     def get_first_value(self):
         return self
@@ -120,6 +150,18 @@ class MathValue:
 
     def __str__(self):
         return "MathValue({})".format(self.value)
+
+    __repr__ = __str__
+
+
+class RawString(MathValue):
+
+    def __init__(self, value):
+        self.value = value
+        self.decorators = []
+
+    def __str__(self):
+        return "RawString(\"{}\")".format(self.value)
 
     __repr__ = __str__
 
@@ -275,7 +317,9 @@ class MathUnaryOperator:
     def get_variables(self):
         return self.value.get_variables()
 
-    def find(self, x, i=[], index=[]):
+    def find(self, x, i=None, index=[]):
+        if i is None:
+            i = []
         self.value.find(x, i, index + [0])
         if type(self) is x:
             i += [index]
@@ -289,6 +333,19 @@ class MathUnaryOperator:
         if not index == 0:
             raise IndexError()
         return self.value.index(rest)
+
+    def replace(self, i, val):
+        if len(i) == 0:
+            return val
+        index = i[0]
+        rest = i[1:]
+        if not index == 0:
+            raise IndexError()
+        if len(rest) == 0:
+            self.value = val
+        else:
+            self.value.replace(rest, val)
+        return self
 
     def get_value(self):
         return False
@@ -342,7 +399,9 @@ class MathOperator:
         self.value1 = value1
         self.value2 = value2
 
-    def find(self, x, i=[], index=[]):
+    def find(self, x, i=None, index=[]):
+        if i is None:
+            i = []
         self.value1.find(x, i, index + [0])
         self.value2.find(x, i, index + [1])
         if type(self) is x:
@@ -357,6 +416,24 @@ class MathOperator:
         if not index in [0, 1]:
             raise IndexError()
         return self.value1.index(rest) if index == 0 else self.value2.index(rest)
+
+    def replace(self, i, val):
+        if len(i) == 0:
+            return val
+        index = i[0]
+        rest = i[1:]
+        if not index in [0, 1]:
+            raise IndexError()
+        if len(rest) == 0:
+            if index == 0:
+                self.value1 = val
+            else:
+                self.value2 = val
+        elif index == 0:
+            self.value1.replace(rest, val)
+        else:
+            self.value2.replace(rest, val)
+        return self
 
     def get_value(self):
         return False
@@ -497,7 +574,9 @@ class Integral:
             self.range = None
             self.is_definite = False
 
-    def find(self, x, i=[], index=[]):
+    def find(self, x, i=None, index=[]):
+        if i is None:
+            i = []
         self.value.find(x, i, index + [0])
         if variable:
             self.variable.find(x, i, index + [1])
@@ -513,6 +592,24 @@ class Integral:
         if not index in [0, 1] or index == 1 and variable is None:
             raise IndexError()
         return self.value.index(rest) if index == 0 else self.variable.index(rest)
+
+    def replace(self, i, val):
+        if len(i) == 0:
+            return val
+        index = i[0]
+        rest = i[1:]
+        if not index in [0, 1] or index == 1 and variable is None:
+            raise IndexError()
+        if len(rest) == 0:
+            if index == 0:
+                self.value = val
+            else:
+                self.variable = val
+        elif index == 0:
+            self.value.replace(rest, val)
+        else:
+            self.variable.replace(rest, val)
+        return self
 
     def get_first_value(self):
         return self
@@ -551,7 +648,9 @@ class Derivative:
         self.variable = variable
         self.nth = nth
 
-    def find(self, x, i=[], index=[]):
+    def find(self, x, i=None, index=[]):
+        if i is None:
+            i = []
         self.value.find(x, i, index + [0])
         self.variable.find(x, i, index + [1])
         if type(self) is x:
@@ -566,6 +665,24 @@ class Derivative:
         if not index in [0, 1]:
             raise IndexError()
         return self.value.index(rest) if index == 0 else self.variable.index(rest)
+
+    def replace(self, i, val):
+        if len(i) == 0:
+            return val
+        index = i[0]
+        rest = i[1:]
+        if not index in [0, 1]:
+            raise IndexError()
+        if len(rest) == 0:
+            if index == 0:
+                self.value = val
+            else:
+                self.variable = val
+        elif index == 0:
+            self.value.replace(rest, val)
+        else:
+            self.variable.replace(rest, val)
+        return self
 
     def get_first_value(self):
         return self
@@ -596,7 +713,9 @@ class Sum:
     def is_matrix(self):
         return self.value.is_matrix()
 
-    def find(self, x, i=[], index=[]):
+    def find(self, x, i=None, index=[]):
+        if i is None:
+            i = []
         self.value.find(x, i, index + [0])
         if variable:
             self.variable.find(x, i, index + [1])
@@ -612,6 +731,24 @@ class Sum:
         if not index in [0, 1] or index == 1 and variable is None:
             raise IndexError()
         return self.value.index(rest) if index == 0 else self.variable.index(rest)
+
+    def replace(self, i, val):
+        if len(i) == 0:
+            return val
+        index = i[0]
+        rest = i[1:]
+        if not index in [0, 1] or index == 1 and variable is None:
+            raise IndexError()
+        if len(rest) == 0:
+            if index == 0:
+                self.value = val
+            else:
+                self.variable = val
+        elif index == 0:
+            self.value.replace(rest, val)
+        else:
+            self.variable.replace(rest, val)
+        return self
 
     def __init__(self, value, variable=None):
         self.value = value
@@ -650,7 +787,9 @@ class Sum:
 
 class Limit:
 
-    def find(self, x, i=[], index=[]):
+    def find(self, x, i=None, index=[]):
+        if i is None:
+            i = []
         self.value.find(x, i, index + [0])
         if variable:
             self.variable.find(x, i, index + [1])
@@ -666,6 +805,24 @@ class Limit:
         if not index in [0, 1] or index == 1 and variable is None:
             raise IndexError()
         return self.value.index(rest) if index == 0 else self.variable.index(rest)
+
+    def replace(self, i, val):
+        if len(i) == 0:
+            return val
+        index = i[0]
+        rest = i[1:]
+        if not index in [0, 1] or index == 1 and variable is None:
+            raise IndexError()
+        if len(rest) == 0:
+            if index == 0:
+                self.value = val
+            else:
+                self.variable = val
+        elif index == 0:
+            self.value.replace(rest, val)
+        else:
+            self.variable.replace(rest, val)
+        return self
 
     def is_matrix(self):
         return self.value.is_matrix()
