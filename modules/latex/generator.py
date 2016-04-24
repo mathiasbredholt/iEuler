@@ -278,6 +278,16 @@ def convert_range(self):
     return "\\left[ \\, {} \\, ; {} \\, \\right]".format(convert_expr(self.value1),
                                                          convert_expr(self.value2))
 
+
+def convert_raw_string(self):
+    print('\\mathrm{{\\${}\\$}}'.format(escape_string(self.value)))
+    return '\\mathrm{{\\${}\\$}}'.format(escape_string(self.value))
+
+
+def escape_string(str):
+    esc_chars = '&%$#_{}'
+    return ''.join(['\\' + c if c in esc_chars else c for c in str]).replace('\\', '\\backslash').replace('~', '\\sim').replace('^', '\\hat{}')
+
 # Extending mathlib classes with to_latex method for duck typing
 tl.Paragraph.to_latex = convert_paragraph
 tl.Text.to_latex = convert_text
@@ -299,3 +309,4 @@ ml.Derivative.to_latex = convert_derivative
 ml.Range.to_latex = convert_range
 ml.Sum.to_latex = convert_sum
 ml.Limit.to_latex = convert_limit
+ml.RawString.to_latex = convert_raw_string
