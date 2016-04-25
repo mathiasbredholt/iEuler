@@ -286,7 +286,8 @@ def convert_raw_string(self):
 
 def escape_string(str):
     esc_chars = '&%$#_{}'
-    return ''.join(['\\' + c if c in esc_chars else c for c in str]).replace('\\', '\\backslash').replace('~', '\\sim').replace('^', '\\hat{}')
+    str = str.replace('\\', '\\backslash')
+    return ''.join(['\\' + c if c in esc_chars else c for c in str]).replace('~', '\\sim').replace('^', '\\hat{}')
 
 # Extending mathlib classes with to_latex method for duck typing
 tl.Paragraph.to_latex = convert_paragraph
