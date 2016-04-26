@@ -21,7 +21,7 @@ def parentheses(input_expr, do=True):
 
 def convert_value(self):
     if type(self) is ml.Unit:
-        return (self.prefix if self.prefix != u'μ' else 'micro') + self.value
+        return (self.prefix if self.prefix != u'μ' else 'micro') + self.value if self.value != 'Ohm' else 'ohm'
     return self.value
 
 

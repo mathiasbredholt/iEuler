@@ -1,14 +1,15 @@
 <!DOCTYPE html>
-<link rel="stylesheet" href="katex/katex.min.css">
-<script src="katex/katex.min.js"></script>
-
 <div style="font-size: 13pt;" id="input"></div>
 
-<script src="qrc:///qtwebchannel/qwebchannel.js"></script>
 <script>
 var doRender, changeFontSize;
 var elem = document.getElementById("input");
+</script>
 
+<script src="katex/katex.min.js"></script>
+
+<script src="qrc:///qtwebchannel/qwebchannel.js"></script>
+<script>
 changeFontSize = function(size) {
     elem.style.fontSize = size;
 };
@@ -17,8 +18,16 @@ new QWebChannel(qt.webChannelTransport, function(channel) {
     var jshelper = channel.objects.jshelper;
 
     doRender = function (latexString) {
-        katex.render(latexString, elem);
+        try {
+            katex.render(latexString, elem);
+        }
+        catch(err) {
+            elem.innerHTML = err;
+        }
         setTimeout(function () { jshelper.onRenderComplete(elem.clientWidth, elem.clientHeight) }, 30);
     };
 });
 </script>
+
+<link rel="stylesheet" href="katex/katex.min.css">
+

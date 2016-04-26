@@ -52,7 +52,7 @@ bool MathEdit::eventFilter(QObject *object, QEvent *event)
             emit keyboardAction(EVAL_AND_CONTINUE);
             return true;
         }
-        else if (keyEvent->key() == Qt::Key_Backspace && keyEvent->modifiers() == Qt::ShiftModifier) {
+        else if (keyEvent->key() == Qt::Key_Backspace && keyEvent->modifiers() == Qt::ControlModifier) {
             emit keyboardAction(DELETE_LINE);
             return true;
         }

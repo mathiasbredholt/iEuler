@@ -85,10 +85,12 @@ void Paragraph::keyboardAction(int action)
     emit keyboardAction(action, this);
 }
 
-void Paragraph::lineNumberChanged(QLayout *mainLayout)
+void Paragraph::lineNumberChanged(int tabIndex, QLayout *mainLayout)
 {
-    qDebug() << mainLayout->indexOf(this) + 1;
-    lineNumberWidget->setNum(mainLayout->indexOf(this) + 1);
+    if (tabIndex == this->tabIndex) {
+        index = mainLayout->indexOf(this);
+        lineNumberWidget->setNum(mainLayout->indexOf(this) + 1);
+    }
 }
 
 void Paragraph::receivedLatexString(int tabIndex, int index, QString latexString)

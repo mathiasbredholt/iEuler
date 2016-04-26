@@ -8,7 +8,6 @@ Workspace::Workspace(QWidget *parent) : QTableWidget(parent)
     verticalHeader()->hide();
     horizontalHeader()->hide();
     horizontalHeader()->setStretchLastSection(true);
-    setFixedHeight(ptY(80));
 }
 
 void Workspace::receivedWorkspace(int tabIndex, int index, QVariantMap workspace)

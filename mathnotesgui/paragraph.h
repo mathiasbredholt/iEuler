@@ -57,7 +57,7 @@ private slots:
     void keyboardAction(int action);
 
 public slots:
-    void lineNumberChanged(QLayout *mainLayout);
+    void lineNumberChanged(int tabIndex, QLayout *mainLayout);
 
 };
 

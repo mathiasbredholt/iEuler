@@ -7,7 +7,6 @@ Renderer::Renderer(int windowWidth, int windowHeight, QWidget *parent) : QObject
 {
     this->windowWidth = windowWidth;
     QString html = readFile(":/katex.html");
-//    QString html = readFile(":/mathjax.html");
 
     QUrl baseUrl = QUrl::fromLocalFile(QDir::currentPath() + "/mathnotesgui/webkit/");
     webengine = new QWebEngineView();
@@ -23,9 +22,7 @@ Renderer::Renderer(int windowWidth, int windowHeight, QWidget *parent) : QObject
 
     webengine->setHtml(html, baseUrl);
 
-    // Setup zoom levels
     isRendering = false;
-//    hasLoaded = false;
     canRender = true;
     hasRenderedOnce = false;
 }
@@ -52,7 +49,7 @@ void Renderer::startRendering()
         MathWidget *target = queue.dequeue();
         currentlyRendering = target;
 
-        webengine->page()->runJavaScript("doRender(String.raw`" + target->latexString + "`);");
+        webengine->page()->runJavaScript("try { doRender(String.raw`" + target->latexString + "`); } catch(err) { console.log(err) }");
         isRendering = true;
     }
 }
@@ -68,7 +65,7 @@ void Renderer::setZoomFactor(int factor)
 {
 //    webengine->page()->runJavaScript("MathJax.Hub.Config({'SVG': { scale: " + factor + " } });");
     QString fontSize = QString::number((factor * 13) * dpi() / webengine_DPI / 100);
-    webengine->page()->runJavaScript("changeFontSize('" + fontSize + "pt');");
+    webengine->page()->runJavaScript("try { changeFontSize('" + fontSize + "pt'); } catch(err) { console.log(err) }");
 }
 
 void Renderer::render(MathWidget *target)
@@ -78,7 +75,12 @@ void Renderer::render(MathWidget *target)
 
 //    if (!isRendering && canRender && !queue.empty()) startRendering();
 //    webengine->page()->runJavaScript("doRender(String.raw`"+target->latexString+"`);");
-//    currentlyRendering = target;
+    //    currentlyRendering = target;
+}
+
+void Renderer::restart()
+{
+    //webengine->reload();
 }
 
 int Renderer::getScreenDPI()
@@ -89,7 +91,7 @@ int Renderer::getScreenDPI()
 void Renderer::onRenderComplete(int outputWidth, int outputHeight)
 {
     if (!hasRenderedOnce) {
-        webengine->page()->runJavaScript("doRender(String.raw`" + currentlyRendering->latexString + "\\;`);");
+        webengine->page()->runJavaScript("try { doRender(String.raw`" + currentlyRendering->latexString + "\\;`); } catch(err) { console.log(err) }");
         hasRenderedOnce = true;
     } else {
         hasRenderedOnce = false;

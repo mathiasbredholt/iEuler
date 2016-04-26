@@ -31,6 +31,7 @@ public:
     void setZoomFactor(int factor);
     void render(MathWidget *target);
     int windowWidth;
+    void restart();
 
 public slots:
     void loadFinished(bool);

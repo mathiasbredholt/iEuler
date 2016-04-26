@@ -14,19 +14,24 @@ MainWindow::MainWindow(QWidget *parent) :
     renderer = new Renderer(minimumWidth(), minimumHeight());
     renderer->windowWidth = minimumWidth();
 
-//     Create/ tabs
+    // Create splitter
+    QSplitter *splitter = new QSplitter;
+    splitter->setOrientation(Qt::Vertical);
+    container->layout()->addWidget(splitter);
+
+    // Create tabs
     tabs = new QTabWidget(this);
     tabs->setDocumentMode(true);
     tabs->setTabsClosable(true);
     tabs->setStyleSheet("QTabWidget { left: 5px; border: none; background: #FFF; /* move to the right by 5px */ } QTabBar::tab { font: Monaco; color: white; background: #666; } QTabBar::tab:selected { background: #444 }");
     tabs->setMovable(true);
-    container->layout()->addWidget(tabs);
+    splitter->addWidget(tabs);
 
     createNewTab();
 
     // Create workspace
     workspace = new Workspace(this);
-    container->layout()->addWidget(workspace);
+    splitter->addWidget(workspace);
     connect(euler, SIGNAL(receivedWorkspace(int, int, QVariantMap)), workspace, SLOT(receivedWorkspace(int, int, QVariantMap)));
 
 //     Create Command panel
@@ -35,7 +40,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     // Create console
     console = new Console(this);
-    container->layout()->addWidget(console);
+    splitter->addWidget(console);
     connect(euler, SIGNAL(receivedMsg(QString)), console, SLOT(receivedMsg(QString)));
     connect(euler, SIGNAL(receivedError(QString)), console, SLOT(receivedError(QString)));
 
@@ -49,6 +54,12 @@ MainWindow::~MainWindow()
 void MainWindow::createToolsMenu()
 {
     QMenu *toolsMenu = menuBar()->addMenu(tr("&Tools"));
+
+    // Restart core
+    QAction *coreAct = new QAction(tr("&Restart core"), this);
+    coreAct->setShortcut(QKeySequence(tr("Ctrl+R")));
+    connect(coreAct, SIGNAL(triggered(bool)), this, SLOT(on_actionRestart_core_triggered()));
+    toolsMenu->addAction(coreAct);
 
     // Zoom
     QAction *zoom100 = new QAction(tr("&Zoom 100%"), this);
@@ -125,12 +136,6 @@ void MainWindow::createFileMenu()
     closeAct->setShortcut(QKeySequence(tr("Ctrl+W")));
     connect(closeAct, SIGNAL(triggered(bool)), this, SLOT(on_actionClose_triggered()));
     fileMenu->addAction(closeAct);
-
-    // Restart core
-    QAction *coreAct = new QAction(tr("&Restart core"), this);
-    coreAct->setShortcut(QKeySequence(tr("Ctrl+R")));
-    connect(coreAct, SIGNAL(triggered(bool)), this, SLOT(on_actionRestart_core_triggered()));
-    fileMenu->addAction(coreAct);
 }
 
 void MainWindow::initRenderer() {
@@ -215,9 +220,9 @@ Paragraph * MainWindow::addNewParagraph(int lineNumber, QString mathString)
     }
 
     connect(paragraph, SIGNAL(keyboardAction(int, Paragraph*)), this, SLOT(keyboardAction(int, Paragraph*)));
-    connect(this, SIGNAL(lineNumberChanged(QLayout*)), paragraph, SLOT(lineNumberChanged(QLayout*)));
+    connect(this, SIGNAL(lineNumberChanged(int, QLayout*)), paragraph, SLOT(lineNumberChanged(int, QLayout*)));
 
-    emit lineNumberChanged(getTabContents()->layout());
+    emit lineNumberChanged(tabIndex, getTabContents()->layout());
 
     paragraphID++;
 
@@ -246,7 +251,7 @@ void MainWindow::keyboardAction(int action, Paragraph *target)
                 focusPreviousChild();
             }
             getTabContents()->layout()->removeWidget(target);
-            emit lineNumberChanged(getTabContents()->layout());
+            emit lineNumberChanged(tabs->currentIndex(), getTabContents()->layout());
             delete target;
         }
     } else if (action == MathEdit::MOVE_UP) {
@@ -402,4 +407,5 @@ void MainWindow::onTabChange(int index)
 void MainWindow::on_actionRestart_core_triggered()
 {
     euler->restartCore();
+    renderer->restart();
 }
