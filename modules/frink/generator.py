@@ -82,18 +82,23 @@ def convert_power(self):
 
 
 def convert_root(self):
-    if self.value2.get_value() == "2":
-        return "sqrt({}) ".format(convert_expr(self.value1))
-    else:
-        return "root({}, {}) ".format(
-            convert_expr(self.value1), convert_expr(self.value2))
+    return "{}^(1/{}) ".format(
+        convert_expr(self.value1), convert_expr(self.value2))
+
+
+def convert_function(self):
+    result = self.name + "["
+    if len(self.value) > 0:
+        result += convert_expr(self.value[0])
+        for arg in self.value[1:]:
+            result += ", " + convert_expr(arg)
+    return result + "]"
 
 
 def convert_ans(self):
     return convert_expr(self.value)
 
 
-# Extending mathlib classes with to_frink method for duck typing
 ml.MathValue.to_frink = convert_value
 ml.Minus.to_frink = convert_minus
 ml.Factorial.to_frink = convert_factorial
@@ -105,4 +110,4 @@ ml.Fraction.to_frink = convert_fraction
 ml.Power.to_frink = convert_power
 ml.Root.to_frink = convert_root
 ml.Ans.to_frink = convert_ans
-# ml.Function.to_frink = convert_function
+ml.Function.to_frink = convert_function

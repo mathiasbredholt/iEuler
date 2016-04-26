@@ -158,9 +158,11 @@ def convert_function(self):
     name = "\\mathrm{{{}}}".format(self.name) if len(
         self.name) > 1 else self.name
     name = convert_decorators(self, name)
-    result = name + "\\left( " + convert_expr(self.value[0])
-    for arg in self.value[1:]:
-        result += ", " + convert_expr(arg)
+    result = name + "\\left( "
+    if len(self.value) > 0:
+        result += convert_expr(self.value[0])
+        for arg in self.value[1:]:
+            result += ", " + convert_expr(arg)
     return result + " \\right)"
 
 
@@ -286,7 +288,8 @@ def convert_raw_string(self):
 
 def escape_string(str):
     esc_chars = '&%$#_{}'
-    return ''.join(['\\' + c if c in esc_chars else c for c in str]).replace('\\', '\\backslash').replace('~', '\\sim').replace('^', '\\hat{}')
+    str = str.replace('\\', '\\backslash')
+    return ''.join(['\\' + c if c in esc_chars else c for c in str]).replace('~', '\\sim').replace('^', '\\hat{}')
 
 # Extending mathlib classes with to_latex method for duck typing
 tl.Paragraph.to_latex = convert_paragraph
