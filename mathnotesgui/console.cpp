@@ -15,12 +15,14 @@ Console::Console(QWidget *parent) : QTextEdit(parent)
 
 void Console::receivedMsg(QString msg)
 {
-    append(msg.simplified());
+    append("<p style='color:black'>" + msg.simplified() + "</p>");
+    textCursor().setPosition(toPlainText().length());
     ensureCursorVisible();
 }
 
 void Console::receivedError(QString msg)
 {
     append("<p style='color:red'>" + msg.replace("\n","<br>") + "</p>");
+    textCursor().setPosition(toPlainText().length());
     ensureCursorVisible();
 }

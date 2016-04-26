@@ -131,8 +131,14 @@ void MainWindow::createFileMenu()
     connect(saveAct, SIGNAL(triggered(bool)), this, SLOT(on_actionSave_triggered()));
     fileMenu->addAction(saveAct);
 
+    // Export menu
+    QAction *exportAct = new QAction(tr("&Export"), this);
+    exportAct->setShortcut(QKeySequence(tr("Ctrl+E")));
+    connect(exportAct, SIGNAL(triggered(bool)), this, SLOT(on_actionExport_triggered()));
+    fileMenu->addAction(exportAct);
+
     // Close menu
-    QAction *closeAct = new QAction(tr("&Close"), this);
+    QAction *closeAct = new QAction(tr("Close file"), this);
     closeAct->setShortcut(QKeySequence(tr("Ctrl+W")));
     connect(closeAct, SIGNAL(triggered(bool)), this, SLOT(on_actionClose_triggered()));
     fileMenu->addAction(closeAct);

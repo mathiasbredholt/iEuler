@@ -192,3 +192,5 @@ def start():
             workspace.append(load_workspace(data["path"], tab_index + 1))
         elif cmd == transmit.SAVE:  # Save workspace
             save_workspace(workspace[tab_index], data["path"])
+        elif cmd == transmit.EXPORT:  # Export to LaTeX
+            modules.latex.process.export(workspace[tab_index])

@@ -65,7 +65,7 @@ def receive():
             "math_string": math_string
         }
         return (cmd, result)
-    elif cmd == OPEN or cmd == SAVE:
+    elif cmd == OPEN or cmd == SAVE or cmd == EXPORT:
         path = data[1:].decode('utf-8')
         result = {"path": path}
         return (cmd, result)
