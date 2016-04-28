@@ -9,18 +9,22 @@ from importlib import import_module
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 
 
-def insert_variable_value(toks, all=False):
+def get_variable_value_op(toks, all=False):
     var, op = parsing.parse_unary_operator(toks)
     if all:
-        vars1 = []
-        vars2 = var.find(ml.Variable)
-        while vars2 != vars1:
-            var = insert_single_variable_value(var)
-            vars1 = vars2
-            vars2 = var.find(ml.Variable)
-        return var
+        return insert_all_variable_values(var)
     else:
         return insert_single_variable_value(var)
+
+
+def insert_all_variable_values(var):
+    vars1 = []
+    vars2 = var.find(ml.Variable)
+    while vars2 != vars1:
+        var = insert_single_variable_value(var)
+        vars1 = vars2
+        vars2 = var.find(ml.Variable)
+    return var
 
 
 def insert_single_variable_value(var):
@@ -114,9 +118,9 @@ def evaluate_expression(expr, calculator="", convert=True):
     if evaluate:
         if not calculator:
             calculator = workspace["default_calculator"]
-        return import_module("modules.{}.process".format(calculator)).evaluate(expr, convert)
+        return import_module("modules.{}.process".format(calculator)).evaluate(insert_all_variable_values(expr), convert)
     if convert:
-        return expr
+        return insert_all_variable_values(expr)
     return ml.RawString(expr)
 
 
@@ -205,8 +209,8 @@ equalop = Group(other_equals) | equals | Group(equality_kw_list)
 right = opAssoc.RIGHT
 left = opAssoc.LEFT
 expression << infixNotation(operand, [
-    (insert_all_value, 1, right, lambda x: insert_variable_value(x, all=True)),
-    (insert_value, 1, right, lambda x: insert_variable_value(x, all=False)),
+    (insert_all_value, 1, right, lambda x: get_variable_value_op(x, all=True)),
+    (insert_value, 1, right, lambda x: get_variable_value_op(x, all=False)),
     (attrop, 1, left, get_attr_op),
     (factop, 1, left, parsing.get_factorial_op),
     (deco_kw_list, 1, right, get_decorator),
