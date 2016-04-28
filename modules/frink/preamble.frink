@@ -1,3 +1,4 @@
+force :-> "N"
 electric_potential :-> "V"
 power :-> "W"
 charge :-> "C"

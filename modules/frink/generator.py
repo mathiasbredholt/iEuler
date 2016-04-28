@@ -82,7 +82,7 @@ def convert_power(self):
 
 
 def convert_root(self):
-    return "{}^(1/{}) ".format(
+    return "({})^(1/{}) ".format(
         convert_expr(self.value1), convert_expr(self.value2))
 
 

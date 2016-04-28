@@ -61,6 +61,12 @@ void MainWindow::createToolsMenu()
     connect(coreAct, SIGNAL(triggered(bool)), this, SLOT(on_actionRestart_core_triggered()));
     toolsMenu->addAction(coreAct);
 
+    // Clear console
+    QAction *clearConsoleAct = new QAction(tr("&Clear console"), this);
+    clearConsoleAct->setShortcut(QKeySequence(tr("Ctrl+Shift+K")));
+    connect(clearConsoleAct, SIGNAL(triggered(bool)), this, SLOT(on_actionClear_console_triggered()));
+    toolsMenu->addAction(clearConsoleAct);
+
     // Zoom
     QAction *zoom100 = new QAction(tr("&Zoom 100%"), this);
     zoom100->setShortcut(QKeySequence(tr("Ctrl+1")));
@@ -414,4 +420,9 @@ void MainWindow::on_actionRestart_core_triggered()
 {
     euler->restartCore();
     renderer->restart();
+}
+
+void MainWindow::on_actionClear_console_triggered()
+{
+    console->clear();
 }

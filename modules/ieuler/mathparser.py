@@ -160,14 +160,16 @@ matrix = Suppress(oneOf(matrix_delimiters["start"]) + Optional(White())) + expre
 number << (Combine(Word(nums) + Optional("." + NotAny(Literal('.')) + Optional(Word(nums)))) +
            Optional(NotAny(White()) + (function | unit | variable)))
 
-eval_field = Suppress('#') + expression + Suppress('#')
+eval_field = Suppress('#') + expression + Suppress('#') + \
+    parsing.no_white + Optional(name)
 
 escape_field = QuotedString("'") | QuotedString('"')
 
 eval_direct_field = QuotedString("$")
 
 operand = (
-    eval_field.setParseAction(lambda x: evaluate_expression(x[0]))
+    eval_field.setParseAction(lambda x: evaluate_expression(
+        x[0], "" if len(x) < 2 else x[1]))
     | escape_field.setParseAction(lambda x: parsing.get_variable(x, variables))
     | eval_direct_field.setParseAction(
         lambda x: evaluate_expression(x[0], convert=False))
