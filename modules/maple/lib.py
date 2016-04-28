@@ -19,10 +19,35 @@ functions = {
 }
 
 variables = {
-    "pi": {
-        "object": lambda: ml.Number("pi")
-    },
     "__default__": {
         "object": ml.Variable
     }
+}
+
+special_symbols = {
+    'μ': "mu",
+    "pi": "Pi",
+}
+
+symbols = {
+    "__standard__":
+    ['alpha', 'beta', 'gamma', 'delta', 'epsilon', 'zeta', 'eta', 'theta',
+     'iota', 'kappa', 'lambda', 'mu', 'nu', 'xi', 'pi', 'rho', 'sigma', 'tau',
+     'upsilon', 'phi', 'chi', 'psi', 'omega', 'Alpha', 'Beta', 'Gamma',
+     'Delta', 'Epsilon', 'Zeta', 'Eta', 'Theta', 'Iota', 'Kappa', 'Lambda',
+     'Mu', 'Nu', 'Xi', 'Rho', 'Sigma', 'Tau', 'Upsilon', 'Phi', 'Chi',
+     'Psi', 'Omega', 'nabla', 'infinity', 'partial'],
+    "CC": "complexes",
+    "RR": "reals",
+    "QQ": "rationals",
+    "ZZ": "integers",
+    "NN": "naturals",
+    "AA": "forall",
+    "EE": "exists",
+    "oo": "infinity",
+    "inf": "infinity",
+    "grad": "nabla",
+    "µ": "mu",
+    "Pi": "pi",
+    "dd": "partial"
 }

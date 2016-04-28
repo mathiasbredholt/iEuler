@@ -130,7 +130,7 @@ def make_expression():
     operand = (
         matrix.setParseAction(get_matrix)
         | function.setParseAction(lambda x: parsing.get_function(x, functions))
-        | variable.setParseAction(lambda x: parsing.get_variable(x, variables))
+        | variable.setParseAction(lambda x: parsing.get_variable(x, variables, symbols))
         | number.setParseAction(parsing.get_value)
     )
 

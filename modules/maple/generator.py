@@ -44,6 +44,8 @@ def convert_value(self):
     if type(self) is ml.Unit:
         # TODO
         return ""
+    if self.value in special_symbols:
+        return special_symbols[self.value]
     return self.value
 
 
