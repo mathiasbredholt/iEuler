@@ -95,13 +95,13 @@ def get_matrix(toks, delimiters):
 
 
 def get_ans(toks, workspace):
-    print("workspace: {}".format(workspace))
+    # print("workspace: {}".format(workspace))
     i = 1
     if len(toks) == 1:
         if type(workspace["parsed_input"][workspace["index"]]) is ml.Equality:
             eqs = workspace["parsed_input"][workspace["index"]].flatten()
             for x in range(1, len(eqs)):
-                if eqs[x].find(ml.Ans):
+                if eqs[x].find([ml.Ans]):
                     return ml.Ans(eqs[x - 1])
     else:
         i = int(toks[1])

@@ -245,10 +245,10 @@ def convert_integral(self):
 
 def convert_derivative(self):
     if self.nth.get_value() == "1":
-        return "\\frac{{d}}{{d {}}}{} ".format(
+        return "\\dfrac{{d}}{{d {}}}{} ".format(
             convert_expr(self.variable), convert_expr(self.value))
     else:
-        return "\\frac{{d^{{{}}}}}{{d {}^{{{}}}}}{} ".format(
+        return "\\dfrac{{d^{{{}}}}}{{d {}^{{{}}}}}{} ".format(
             convert_expr(self.nth), convert_expr(self.variable),
             convert_expr(self.nth), convert_expr(self.value))
 

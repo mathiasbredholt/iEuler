@@ -22,6 +22,7 @@ void Console::receivedMsg(QString msg)
 
 void Console::receivedError(QString msg)
 {
+    qDebug() << "eerrrrr";
     append("<p style='color:red'>" + msg.replace("\n","<br>") + "</p>");
     textCursor().setPosition(toPlainText().length());
     ensureCursorVisible();

@@ -19,17 +19,17 @@ def get_variable_value_op(toks, all=False):
 
 def insert_all_variable_values(var):
     vars1 = []
-    vars2 = var.find(ml.Variable)
+    vars2 = var.find([ml.Variable, ml.Ans])
     while vars2 != vars1:
         var = insert_single_variable_value(var)
         vars1 = vars2
-        vars2 = var.find(ml.Variable)
+        vars2 = var.find([ml.Variable, ml.Ans])
     return var
 
 
 def insert_single_variable_value(var):
     #    print("var: {}".format(var))
-    vars = var.find(ml.Variable)
+    vars = var.find([ml.Variable, ml.Ans])
 #    print("vars: {}".format(vars))
     if len(vars) == 0:
         return var

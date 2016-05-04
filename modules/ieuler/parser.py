@@ -3,6 +3,7 @@ import modules.ieuler.mathparser as math
 import modules.ieuler.textparser as text
 import json
 from pyparsing import ParseException
+from traceback import print_exc
 
 
 def parse(string, workspace, eval=True):
@@ -13,5 +14,6 @@ def parse(string, workspace, eval=True):
             return text.parse(string[1:])
         else:
             return math.parse(string, eval, workspace)
-    except ParseException:
+    except:
+        print_exc()
         return ml.Variable("ParseException")

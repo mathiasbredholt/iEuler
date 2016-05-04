@@ -9,6 +9,7 @@ Euler::Euler(QObject *parent) : QObject(parent)
     proc = new QProcess(this);
     connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
     connect(proc, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
+    connect(proc, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(gotCrash(int,QProcess::ExitStatus)));
     proc->start("python3 -u start.py");
 
     // Init socket
@@ -179,8 +180,11 @@ void Euler::readStandardError()
         qDebug() << errorList.at(i);
 
     emit receivedError(error);
+}
 
-    if (!hasCrashed) {
+void Euler::gotCrash(int, QProcess::ExitStatus status)
+{
+    if (!hasCrashed && status == QProcess::CrashExit) {
         hasCrashed = true;
         QMessageBox msgBox;
         msgBox.setText("The iEuler core has crashed.");
@@ -191,5 +195,4 @@ void Euler::readStandardError()
         int ret = msgBox.exec();
         if (ret == QMessageBox::Reset) restartCore();
     }
-
 }

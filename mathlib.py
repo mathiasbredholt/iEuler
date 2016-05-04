@@ -34,7 +34,7 @@ class Equality:
             i = []
         self.value1.find(x, i, index + [0])
         self.value2.find(x, i, index + [1])
-        if type(self) is x:
+        if type(self) in x:
             i += [index]
         return i
 
@@ -99,9 +99,9 @@ class MathValue:
     def find(self, x, i=None, index=[]):
         if i is None:
             i = []
-#        print("i: {}, index: {}, x: {}, type: {}, same: {}".format(
-#            i, index, x, type(self), type(self) is x))
-        if type(self) is x:
+        print("i: {}, index: {}, x: {}, type: {}, same: {}".format(
+            i, index, x, type(self), type(self) in x))
+        if type(self) in x:
             i += [index]
         return i
 
@@ -321,7 +321,7 @@ class MathUnaryOperator:
         if i is None:
             i = []
         self.value.find(x, i, index + [0])
-        if type(self) is x:
+        if type(self) in x:
             i += [index]
         return i
 
@@ -404,7 +404,7 @@ class MathOperator:
             i = []
         self.value1.find(x, i, index + [0])
         self.value2.find(x, i, index + [1])
-        if type(self) is x:
+        if type(self) in x:
             i += [index]
         return i
 
@@ -580,7 +580,7 @@ class Integral:
         self.value.find(x, i, index + [0])
         if variable:
             self.variable.find(x, i, index + [1])
-        if type(self) is x:
+        if type(self) in x:
             i += [index]
         return i
 
@@ -653,7 +653,7 @@ class Derivative:
             i = []
         self.value.find(x, i, index + [0])
         self.variable.find(x, i, index + [1])
-        if type(self) is x:
+        if type(self) in x:
             i += [index]
         return i
 
@@ -719,7 +719,7 @@ class Sum:
         self.value.find(x, i, index + [0])
         if variable:
             self.variable.find(x, i, index + [1])
-        if type(self) is x:
+        if type(self) in x:
             i += [index]
         return i
 
@@ -793,7 +793,7 @@ class Limit:
         self.value.find(x, i, index + [0])
         if variable:
             self.variable.find(x, i, index + [1])
-        if type(self) is x:
+        if type(self) in x:
             i += [index]
         return i
 

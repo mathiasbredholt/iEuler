@@ -104,6 +104,7 @@ private slots:
     void writeDatagram(QByteArray datagram);
     void readStandardOutput();
     void readStandardError();
+    void gotCrash(int, QProcess::ExitStatus status);
 };
 
 #endif // EULER_H
