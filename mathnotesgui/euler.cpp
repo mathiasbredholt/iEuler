@@ -5,12 +5,7 @@
 
 Euler::Euler(QObject *parent) : QObject(parent)
 {
-//     Start iEuler
-    proc = new QProcess(this);
-    connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
-    connect(proc, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
-    connect(proc, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(gotCrash(int,QProcess::ExitStatus)));
-    proc->start("python3 -u start.py");
+    startCore();
 
     // Init socket
     socket = new QUdpSocket(this);
@@ -19,13 +14,25 @@ Euler::Euler(QObject *parent) : QObject(parent)
     connect(socket, SIGNAL(readyRead()), this, SLOT(readPendingDatagrams()));
 }
 
-void Euler::restartCore()
+void Euler::startCore()
 {
-    terminate();
+    // Start iEuler
     proc = new QProcess(this);
     connect(proc, SIGNAL(readyReadStandardOutput()), this, SLOT(readStandardOutput()));
     connect(proc, SIGNAL(readyReadStandardError()), this, SLOT(readStandardError()));
+    connect(proc, SIGNAL(finished(int,QProcess::ExitStatus)), this, SLOT(gotCrash(int,QProcess::ExitStatus)));
+
+#ifdef QT_DEBUG
     proc->start("python3 -u start.py");
+#else
+    proc->start("bin/pypy -u start.py");
+#endif
+}
+
+void Euler::restartCore()
+{
+    terminate();
+    startCore();
     hasCrashed = false;
 }
 

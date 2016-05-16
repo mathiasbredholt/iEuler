@@ -1,4 +1,4 @@
-import json
+import toml
 import pickle
 import modules.ieuler.parser as parser
 import modules.ieuler.generator as generator
@@ -29,8 +29,8 @@ def conf(os):
             "pdflatex": "/usr/local/texlive/2015/bin/x86_64-darwin/pdftex",
             "default_calculator": "maple"
         }
-    with open('settings.conf', 'w') as f:
-        json.dump(__settings__, f)
+    with open('settings.toml', 'w') as f:
+        f.write(toml.dumps(__settings__))
 
 
 def run(argv=None):
@@ -117,8 +117,8 @@ def parse_math(math_string, workspace, evaluate):
 
 def read_settings():
     global settings
-    with open('settings.conf', 'r') as f:
-        settings = json.load(f)
+    with open('settings.toml', 'r') as f:
+        settings = toml.loads(f.read())
     modules.maple.process.set_path(settings["maple"])
     modules.frink.process.set_path(settings["frink"])
     modules.latex.process.set_path(settings["pdflatex"])

@@ -13,3 +13,9 @@ mathnotesgui/mathnotesgui.pro.user
 *.euler
 *.eulerc
 bin
+pypy*
+iEuler.app
+lib-pypy/
+lib-python/
+include
+site-packages
