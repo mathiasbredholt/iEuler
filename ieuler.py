@@ -162,19 +162,31 @@ def start():
                 workspace[tab_index]["default_calculator"] = settings[
                     "default_calculator"]
 
+            workspace[tab_index]["index"] = index
+            workspace[tab_index]["raw_input"][index] = math_string
+
+            if index in workspace[tab_index]["parsed_input"].keys():
+                del workspace[tab_index]["parsed_input"][index]
+
+            # Flag to check if parser needs to be run twice, used for ans.
+            workspace[tab_index]["needs_refresh"] = False
             # Parse math string in iEuler syntax to a python representation
             math_obj = parse_math(math_string, workspace[tab_index], evaluate)
+            # Add math object to workspace
+            workspace[tab_index]["parsed_input"][index] = math_obj
+            if workspace[tab_index]["needs_refresh"]:
+                # Do it again
+                math_obj = parse_math(math_string, workspace[
+                                      tab_index], evaluate)
+                workspace[tab_index]["parsed_input"][index] = math_obj
             print(math_obj)
 
             # Convert to LaTeX
             latex_string = modules.latex.generator.generate(math_obj)
             # print(latex_string)
 
-            # Add math object to workspace
-            workspace[tab_index]["raw_input"][index] = math_string
-            workspace[tab_index]["parsed_input"][index] = math_obj
+            # Add latex string to workspace
             workspace[tab_index]["latex_output"][index] = latex_string
-            workspace[tab_index]["index"] = index
 
             # Send index and latex string through UDP socket
             transmit.send_latex(tab_index, index, latex_string)

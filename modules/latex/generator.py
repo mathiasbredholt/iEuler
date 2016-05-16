@@ -92,7 +92,7 @@ def convert_value(self):
         return "\\mathrm{{{} {}}}".format(prefix, unit)
     elif type(self) is ml.Ans:
         result = "ans{}".format(
-            "_{" + convert_expr(self.index) + "}" if int(self.index.value) > 1 else "")
+            "_{" + convert_expr(self.idx) + "}" if int(self.idx.value) > 0 else "")
         return result
     elif type(self) is ml.Variable:
         if not "latex" in self.attributes:
@@ -142,6 +142,10 @@ def convert_decorators(self, string):
                 string = "\\vec{{{}}}".format(string)
 
     return string
+
+
+def convert_abs(self):
+    return "\\lvert {} \\rvert".format(convert_expr(self.value))
 
 
 def convert_minus(self):
@@ -298,6 +302,7 @@ ml.MathValue.to_latex = convert_value
 ml.Matrix.to_latex = convert_matrix
 ml.Equality.to_latex = convert_equality
 ml.Function.to_latex = convert_function
+ml.Abs.to_latex = convert_abs
 ml.Minus.to_latex = convert_minus
 ml.Factorial.to_latex = convert_factorial
 ml.AddOp.to_latex = convert_addop

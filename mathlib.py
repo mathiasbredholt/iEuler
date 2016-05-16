@@ -2,17 +2,6 @@
 # contains all datatypes
 
 
-class Empty:
-
-    def __init__(self):
-        pass
-
-    def __str__(self):
-        return "Empty"
-
-    __repr__ = __str__
-
-
 class Equality:
 
     def __init__(self, type, value1, value2, assignment=False, hidden=False):
@@ -34,7 +23,7 @@ class Equality:
             i = []
         self.value1.find(x, i, index + [0])
         self.value2.find(x, i, index + [1])
-        if type(self) in x:
+        if x(self):
             i += [index]
         return i
 
@@ -99,9 +88,9 @@ class MathValue:
     def find(self, x, i=None, index=[]):
         if i is None:
             i = []
-        print("i: {}, index: {}, x: {}, type: {}, same: {}".format(
-            i, index, x, type(self), type(self) in x))
-        if type(self) in x:
+        print("MathValue.find>> i: {}, index: {}, type: {}, match: {}".format(
+            i, index, type(self), x(self)))
+        if x(self):
             i += [index]
         return i
 
@@ -150,6 +139,18 @@ class MathValue:
 
     def __str__(self):
         return "MathValue({})".format(self.value)
+
+    __repr__ = __str__
+
+
+class Empty(MathValue):
+
+    def __init__(self):
+        self.value = None
+        self.decorators = []
+
+    def __str__(self):
+        return "Empty"
 
     __repr__ = __str__
 
@@ -247,16 +248,28 @@ class Variable(MathValue):
 
 class Ans(MathValue):
 
-    def __init__(self, value, index=Number('1')):
+    def __init__(self, value, idx=Number('0')):
         self.value = value
-        self.index = index
+        self.idx = idx
+        self.decorators = []
 
     def get_variables(self):
         return self.value.get_variables()
 
     def __str__(self):
-        return "Ans(index: {}, value: {})".format(
-            self.index, self.value)
+        return "Ans(idx: {}, value: {})".format(
+            self.idx, self.value)
+
+    __repr__ = __str__
+
+
+class AnsPlaceholder(MathValue):
+
+    def __init__(self):
+        pass
+
+    def __str__(self):
+        return "AnsPlaceholder"
 
     __repr__ = __str__
 
@@ -321,7 +334,7 @@ class MathUnaryOperator:
         if i is None:
             i = []
         self.value.find(x, i, index + [0])
-        if type(self) in x:
+        if x(self):
             i += [index]
         return i
 
@@ -377,6 +390,14 @@ class MathUnaryOperator:
     __repr__ = __str__
 
 
+class Abs(MathUnaryOperator):
+
+    def __str__(self):
+        return "Abs({})".format(self.value)
+
+    __repr__ = __str__
+
+
 class Minus(MathUnaryOperator):
 
     def __str__(self):
@@ -404,7 +425,7 @@ class MathOperator:
             i = []
         self.value1.find(x, i, index + [0])
         self.value2.find(x, i, index + [1])
-        if type(self) in x:
+        if x(self):
             i += [index]
         return i
 
@@ -580,7 +601,7 @@ class Integral:
         self.value.find(x, i, index + [0])
         if variable:
             self.variable.find(x, i, index + [1])
-        if type(self) in x:
+        if x(self):
             i += [index]
         return i
 
@@ -653,7 +674,7 @@ class Derivative:
             i = []
         self.value.find(x, i, index + [0])
         self.variable.find(x, i, index + [1])
-        if type(self) in x:
+        if x(self):
             i += [index]
         return i
 
@@ -719,7 +740,7 @@ class Sum:
         self.value.find(x, i, index + [0])
         if variable:
             self.variable.find(x, i, index + [1])
-        if type(self) in x:
+        if x(self):
             i += [index]
         return i
 
@@ -793,7 +814,7 @@ class Limit:
         self.value.find(x, i, index + [0])
         if variable:
             self.variable.find(x, i, index + [1])
-        if type(self) in x:
+        if x(self):
             i += [index]
         return i
 

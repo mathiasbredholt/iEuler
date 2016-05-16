@@ -25,6 +25,10 @@ def convert_value(self):
     return self.value
 
 
+def convert_abs(self):
+    return "abs[{}]".format(convert_expr(self.value))
+
+
 def convert_minus(self):
     return "-{}".format(parentheses(self.value, not type(self.value) in
                                     [ml.Number, ml.Variable]))
@@ -100,6 +104,7 @@ def convert_ans(self):
 
 
 ml.MathValue.to_frink = convert_value
+ml.Abs.to_frink = convert_abs
 ml.Minus.to_frink = convert_minus
 ml.Factorial.to_frink = convert_factorial
 ml.Equality.to_frink = convert_equality

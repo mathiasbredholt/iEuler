@@ -19,23 +19,32 @@ def get_variable_value_op(toks, all=False):
 
 def insert_all_variable_values(var):
     vars1 = []
-    vars2 = var.find([ml.Variable, ml.Ans])
+    vars2 = var.find(lambda x: type(x) in [ml.Variable, ml.Ans])
     while vars2 != vars1:
         var = insert_single_variable_value(var)
         vars1 = vars2
-        vars2 = var.find([ml.Variable, ml.Ans])
+        vars2 = var.find(lambda x: type(x) in [ml.Variable, ml.Ans])
     return var
 
 
 def insert_single_variable_value(var):
     #    print("var: {}".format(var))
-    vars = var.find([ml.Variable, ml.Ans])
-#    print("vars: {}".format(vars))
+    vars = var.find(lambda x: type(x) is ml.Ans or type(
+        x) is ml.Variable and x.name() in user_variables)
+    print("insert_single_variable_value>> vars: {}".format(vars))
     if len(vars) == 0:
+        print("insert_single_variable_value>> len(vars)==0")
         return var
     if len(vars) > 1:
+        print("insert_single_variable_value>> len(vars)>1")
         vars = [x for x in vars if len(x) == min(map(len, vars))]
+        print("insert_single_variable_value>> vars: {}".format(vars))
+    print("insert_single_variable_value>> loop")
     for v in vars:
+        print("insert_single_variable_value>> var: {}, v: {}".format(var, v))
+        print("insert_single_variable_value>> var.index(v): {}".format(var.index(v)))
+        print("insert_single_variable_value>> get_variable_value(var.index(v)): {}".format(
+            get_variable_value(var.index(v))))
         var = copy.deepcopy(var).replace(
             v, get_variable_value(var.index(v)))
     return var
@@ -45,7 +54,7 @@ def get_variable_value(obj):
     if type(obj) is ml.Variable:
         if obj.name() in user_variables:
             return user_variables[obj.name()]
-    if type(obj) is ml.Ans:
+    if type(obj) is ml.Ans and not type(obj.value) is ml.Empty:
         return obj.value
     return obj
 
@@ -118,6 +127,8 @@ def evaluate_expression(expr, calculator="", convert=True):
     if evaluate:
         if not calculator:
             calculator = workspace["default_calculator"]
+        if expr.find(lambda x: type(x) is ml.AnsPlaceholder):
+            return expr
         return import_module("modules.{}.process".format(calculator)).evaluate(insert_all_variable_values(expr), convert)
     if convert:
         return insert_all_variable_values(expr)
@@ -171,12 +182,15 @@ escape_field = QuotedString("'") | QuotedString('"')
 
 eval_direct_field = QuotedString("$")
 
+abs_field = Suppress('|') + expression + Suppress('|')
+
 operand = (
     eval_field.setParseAction(lambda x: evaluate_expression(
         x[0], "" if len(x) < 2 else x[1]))
     | escape_field.setParseAction(lambda x: parsing.get_variable(x, variables))
     | eval_direct_field.setParseAction(
         lambda x: evaluate_expression(x[0], convert=False))
+    | abs_field.setParseAction(parsing.get_abs_op)
     | function.setParseAction(lambda x: parsing.get_function(x, functions))
     | unit.setParseAction(lambda x: parsing.get_unit(x, units))
     | other_unit.setParseAction(lambda x: parsing.get_unit(x, units, unknown=True))

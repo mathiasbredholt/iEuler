@@ -21,10 +21,13 @@ def get_scientific(toks):
 def get_mul_op(toks):
     res = parsing.get_mul_op(toks)
     if type(res.value2) is ml.Unit and type(res.value1) is ml.MulOp and type(res.value1.value2) is ml.Power and type(res.value1.value2.value1) is ml.Number and res.value1.value2.value1.value == '10':
+        # Expression matches format val*10^x*unit
         exponent = 0 if res.value2.prefix == '' else units[
             'prefixes'][res.value2.prefix]
         if type(res.value1.value2.value2) is ml.Number and res.value1.value2.value2.value.isdigit():
+            # x is a positive integer
             exponent += int(res.value1.value2.value2.value)
+            # x is a negative integer
         elif type(res.value1.value2.value2) is ml.Minus and res.value1.value2.value2.value.value.isdigit():
             exponent -= int(res.value1.value2.value2.value.value)
         if exponent in units['prefixes'].values():

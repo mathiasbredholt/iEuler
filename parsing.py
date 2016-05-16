@@ -95,18 +95,26 @@ def get_matrix(toks, delimiters):
 
 
 def get_ans(toks, workspace):
-    # print("workspace: {}".format(workspace))
-    i = 1
+    print("get_ans>> workspace: {}".format(workspace))
+    i = 0
     if len(toks) == 1:
-        if type(workspace["parsed_input"][workspace["index"]]) is ml.Equality:
-            eqs = workspace["parsed_input"][workspace["index"]].flatten()
-            for x in range(1, len(eqs)):
-                if eqs[x].find([ml.Ans]):
-                    return ml.Ans(eqs[x - 1])
+        if workspace["index"] in workspace["parsed_input"].keys():
+            if type(workspace["parsed_input"][workspace["index"]]) is ml.Equality:
+                eqs = workspace["parsed_input"][workspace["index"]].flatten()
+                for x in range(1, len(eqs)):
+                    if eqs[x].find(lambda x: type(x) is ml.AnsPlaceholder):
+                        return ml.Ans(eqs[x - 1])
+            return ml.Ans(ml.Empty())
+        else:
+            workspace["needs_refresh"] = True
+            return ml.AnsPlaceholder()
     else:
         i = int(toks[1])
-    value = workspace["parsed_input"][workspace["index"] - i] if workspace[
-        "index"] - i in workspace["parsed_input"].keys() else ml.Empty()
+    if workspace["index"] - i in workspace["parsed_input"].keys():
+        value = workspace["parsed_input"][workspace["index"] - i]
+    else:
+        value = ml.Empty()
+    print("get_ans>> value: {}, index: {}".format(value, i))
     return ml.Ans(value, ml.Number(str(i)))
     # return ml.Empty()
 
@@ -165,6 +173,10 @@ def get_range_op(toks):
 def get_factorial_op(toks):
     value, op = parse_unary_operator(toks, right=False)
     return ml.Factorial(value)
+
+
+def get_abs_op(toks):
+    return ml.Abs(toks[0])
 
 
 def get_minus_op(toks):
