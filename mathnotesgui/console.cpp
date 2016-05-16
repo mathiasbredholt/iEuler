@@ -18,14 +18,12 @@ Console::Console(QWidget *parent) : QTextEdit(parent)
 void Console::receivedMsg(QString msg)
 {
     append("<p style='color:black'>" + msg.simplified() + "</p>");
-    textCursor().setPosition(toPlainText().length());
-    ensureCursorVisible();
+    verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }
 
 void Console::receivedError(QString msg)
 {
     qDebug() << "eerrrrr";
     append("<p style='color:red'>" + msg.replace("\n","<br>") + "</p>");
-    textCursor().setPosition(toPlainText().length());
-    ensureCursorVisible();
+    verticalScrollBar()->setValue(verticalScrollBar()->maximum());
 }

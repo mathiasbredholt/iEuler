@@ -6,6 +6,7 @@
 #include <QTextEdit>
 #include <QScrollArea>
 #include <QDir>
+#include <QScrollBar>
 
 #include "util.h"
 
