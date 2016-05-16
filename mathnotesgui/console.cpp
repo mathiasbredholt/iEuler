@@ -11,6 +11,8 @@ Console::Console(QWidget *parent) : QTextEdit(parent)
     setFocusPolicy(Qt::ClickFocus);
     setReadOnly(true);
     setFont(QFont("Monaco", 10));
+
+    append("<p style='color:black'>" + QDir::currentPath() + "</p>");
 }
 
 void Console::receivedMsg(QString msg)

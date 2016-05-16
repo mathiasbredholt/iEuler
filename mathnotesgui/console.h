@@ -5,6 +5,7 @@
 #include <QVBoxLayout>
 #include <QTextEdit>
 #include <QScrollArea>
+#include <QDir>
 
 #include "util.h"
 

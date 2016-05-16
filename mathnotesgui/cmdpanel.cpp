@@ -37,40 +37,42 @@ CmdPanel::CmdPanel(QWidget *parent) : QWidget(parent)
 
 bool CmdPanel::eventFilter(QObject *object, QEvent *event)
 {
-    if (event->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+    if (object == this) {
+        if (event->type() == QEvent::KeyPress) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
-        if (keyEvent->key() == Qt::Key_Return) {
-            QList<CmdPanelItem *> items = this->parent()->findChildren<CmdPanelItem *>();
-            qDebug() << items.at(focusIndex)->text();
-            return true;
-        } else if (keyEvent->key() == Qt::Key_Up) {
-            if (focusIndex > 0) {
-                focusIndex--;
-
+            if (keyEvent->key() == Qt::Key_Return) {
                 QList<CmdPanelItem *> items = this->parent()->findChildren<CmdPanelItem *>();
+                qDebug() << items.at(focusIndex)->text();
+                return true;
+            } else if (keyEvent->key() == Qt::Key_Up) {
+                if (focusIndex > 0) {
+                    focusIndex--;
 
-                QListIterator<CmdPanelItem *> i(items);
-                while (i.hasNext()) {
-                    CmdPanelItem *item = i.next();
-                    item->setHover(focusIndex == item->index);
+                    QList<CmdPanelItem *> items = this->parent()->findChildren<CmdPanelItem *>();
+
+                    QListIterator<CmdPanelItem *> i(items);
+                    while (i.hasNext()) {
+                        CmdPanelItem *item = i.next();
+                        item->setHover(focusIndex == item->index);
+                    }
+
                 }
+                return true;
+            } else if (keyEvent->key() == Qt::Key_Down) {
+                if (focusIndex < itemCount - 1) {
+                    focusIndex++;
 
-            }
-            return true;
-        } else if (keyEvent->key() == Qt::Key_Down) {
-            if (focusIndex < itemCount - 1) {
-                focusIndex++;
+                    QList<CmdPanelItem *> items = this->findChildren<CmdPanelItem *>();
 
-                QList<CmdPanelItem *> items = this->findChildren<CmdPanelItem *>();
-
-                QListIterator<CmdPanelItem *> i(items);
-                while (i.hasNext()) {
-                    CmdPanelItem *item = i.next();
-                    item->setHover(focusIndex == item->index);
+                    QListIterator<CmdPanelItem *> i(items);
+                    while (i.hasNext()) {
+                        CmdPanelItem *item = i.next();
+                        item->setHover(focusIndex == item->index);
+                    }
                 }
+                return true;
             }
-            return true;
         }
     }
 

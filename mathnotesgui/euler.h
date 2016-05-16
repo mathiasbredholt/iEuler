@@ -58,6 +58,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QVariantMap>
+#include <QApplication>
 
 class Euler : public QObject
 {
@@ -66,6 +67,7 @@ public:
     explicit Euler(QObject *parent = 0);
     void restartCore();
     void terminate();
+    void startCore();
     void sendMathString(int tabIndex, int index, QString mathString, bool evaluate);
     void sendOpenFileRequest(QString path);
     void sendSaveFileRequest(QString path);
