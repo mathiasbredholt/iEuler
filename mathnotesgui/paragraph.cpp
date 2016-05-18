@@ -11,6 +11,7 @@ Paragraph::Paragraph(QWidget *parent,
     this->renderer = renderer;
     this->tabIndex = tabIndex;
     this->index = index;
+    this->mathString = mathString;
 
     setFocusPolicy(Qt::NoFocus);
     setPalette(parent->palette());
@@ -59,7 +60,7 @@ void Paragraph::initMathEdit()
 
 void Paragraph::preview()
 {
-    QString mathString = mathEdit->toPlainText();
+    mathString = mathEdit->toPlainText();
 
     mathEdit->updateHeight();
 
@@ -74,8 +75,9 @@ void Paragraph::preview()
 
 void Paragraph::evaluate(int action)
 {
+    mathString = mathEdit->toPlainText();
+
     if ((action == MathEdit::EVAL_AND_CONTINUE || action == MathEdit::EVAL_IN_PLACE) && !isEmpty()) {
-        QString mathString = mathEdit->toPlainText();
         euler->sendMathString(tabIndex, index, mathString, true);
     }
 }
