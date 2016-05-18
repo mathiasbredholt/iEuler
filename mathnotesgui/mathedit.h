@@ -23,6 +23,7 @@ public:
     static const int INSERT_ABOVE = 4;
     static const int INSERT_BELOW = 5;
     static const int DELETE_LINE = 6;
+    static const int DUPLICATE_LINE = 7;
 
     void updateHeight();
 

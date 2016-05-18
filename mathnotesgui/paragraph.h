@@ -26,6 +26,7 @@ public:
     int tabIndex;
     int index;
     void focus();
+    QString mathString;
 
     MathEdit *mathEdit;
 

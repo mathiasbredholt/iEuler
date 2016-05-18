@@ -64,6 +64,10 @@ bool MathEdit::eventFilter(QObject *object, QEvent *event)
             emit keyboardAction(INSERT_BELOW);
             return true;
         }
+        else if (keyEvent->key() == Qt::Key_D && keyEvent->modifiers() & Qt::ControlModifier && keyEvent->modifiers() & Qt::ShiftModifier) {
+            emit keyboardAction(DUPLICATE_LINE);
+            return true;
+        }
         else if (keyEvent->key() == Qt::Key_Up) {
             if (textCursor().blockNumber() == 0) {
                 emit keyboardAction(MOVE_UP);

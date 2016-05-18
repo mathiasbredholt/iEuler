@@ -299,6 +299,17 @@ void MainWindow::keyboardAction(int action, Paragraph *target)
             Paragraph *after = (Paragraph *) getTabContents()->layout()->itemAt(index + 1)->widget();
             setTabOrder(paragraph->mathEdit, after->mathEdit);
         }
+    } else if (action == MathEdit::DUPLICATE_LINE) {
+        Paragraph *paragraph = addNewParagraph(lineNumber + 1, target->mathString);
+
+        int index = getTabContents()->layout()->indexOf(paragraph);
+
+        setTabOrder(target->mathEdit, paragraph->mathEdit);
+
+        if (index < count - 1) {
+            Paragraph *after = (Paragraph *) getTabContents()->layout()->itemAt(index + 1)->widget();
+            setTabOrder(paragraph->mathEdit, after->mathEdit);
+        }
     }
 }
 
