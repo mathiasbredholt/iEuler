@@ -8,7 +8,7 @@ decorator_keywords = ['hat', 'bar', 'ul', 'vec', 'dot', 'ddot', 'tdot',
 equality_keywords = ['in', '!in', 'sub', 'sup', 'sube', 'supe']
 
 units = {
-    'units': ['V', 'A', 'J', 'm', 's', 'K', 'W', 'H', 'F', 'T', 'g', 'Hz', 'N', 'Pa', 'C', 'Ohm', 'ohm', 'Omega', 'S', 'Wb', 'lm', 'lx', 'Bq', 'Gy', 'Sv', 'cd', 'mol'],
+    'units': ['V', 'A', 'J', 'm', 's', 'K', 'W', 'H', 'F', 'T', 'g', 'Hz', 'N', 'Pa', 'C', 'Ohm', 'ohm', 'Omega', 'S', 'Wb', 'lm', 'lx', 'Bq', 'Gy', 'Sv', 'cd', 'mol', 'deg', 'rad'],
     'aliases': {
         'volt': 'V',
         'ampere': 'A',
@@ -36,7 +36,9 @@ units = {
         'gray': 'Gy',
         'sievert': 'Sv',
         'candela': 'cd',
-        'mole': 'mol'
+        'mole': 'mol',
+        'degree': 'deg',
+        'radian': 'rad'
     },
     'plural': 's',
     'prefixes': ['y', 'z', 'a', 'f', 'p', 'n', u'μ', 'm', 'c', 'd', 'da', 'h', 'k', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'],

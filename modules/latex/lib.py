@@ -36,5 +36,6 @@ equalities = {
 }
 
 special_units = {
-    'Ohm': '\\Omega'
+    'Ohm': '\\Omega',
+    'deg': '{}^{\\circ}'
 }
