@@ -22,6 +22,7 @@
 #include "console.h"
 #include "workspace.h"
 #include "mathedit.h"
+#include "lasemrender.h"
 
 class MainWindow : public QMainWindow
 {
@@ -38,7 +39,8 @@ private:
     QTabWidget *tabs;
     CmdPanel *cmdpanel;
     Euler *euler;
-    Renderer *renderer;
+//    Renderer *renderer;
+    LASEMRender *lsm_render;
     QPalette pal;
     Console *console;
     Workspace *workspace;

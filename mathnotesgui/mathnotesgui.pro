@@ -6,8 +6,8 @@
 
 QT       += core gui
 QT       += network
-QT       += webchannel
-QT       += webenginewidgets
+#QT       += webchannel
+#QT       += webenginewidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -28,7 +28,8 @@ SOURCES += \
     cmdpanelitem.cpp \
     util.cpp \
     console.cpp \
-    workspace.cpp
+    workspace.cpp \
+    lasemrender.cpp
 
 HEADERS  += \
     mainwindow.h \
@@ -42,7 +43,8 @@ HEADERS  += \
     cmdpanelitem.h \
     util.h \
     console.h \
-    workspace.h
+    workspace.h \
+    lasemrender.h
 
 FORMS    +=
 

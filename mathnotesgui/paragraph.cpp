@@ -2,13 +2,13 @@
 
 Paragraph::Paragraph(QWidget *parent,
                      Euler *euler,
-                     Renderer *renderer,
+//                     Renderer *renderer,
                      int tabIndex,
                      int index,
                      QString mathString) :QWidget(parent)
 {
     this->euler = euler;
-    this->renderer = renderer;
+//    this->renderer = renderer;
     this->tabIndex = tabIndex;
     this->index = index;
     this->mathString = mathString;
@@ -36,7 +36,11 @@ Paragraph::Paragraph(QWidget *parent,
     initMathEdit();
     gridLayout->addWidget(mathEdit, 0, 1);
 
-    mathWidget = new MathWidget(this);
+//    mathWidget = new MathWidget(this);
+//    gridLayout->addWidget(mathWidget, 1, 1);
+//    svgWidget = new QSvgWidget(this);
+//    gridLayout->addWidget(svgWidget, 1, 1);
+    mathWidget = new QLabel(this);
     gridLayout->addWidget(mathWidget, 1, 1);
 
     mathEdit->setPlainText(mathString);
@@ -97,16 +101,17 @@ void Paragraph::lineNumberChanged(int tabIndex, QLayout *mainLayout)
 
 void Paragraph::receivedLatexString(int tabIndex, int index, QString latexString)
 {
-    if (tabIndex == this->tabIndex && index == this->index && mathWidget->latexString != latexString) {
-        mathWidget->latexString = latexString;
-        renderer->render(mathWidget);
+    if (tabIndex == this->tabIndex && index == this->index && this->latexString != latexString) {
+        this->latexString = latexString;
+//        renderer->render(this);
+        emit doRender(this);
     }
 }
 
 void Paragraph::receivedPlot(int tabIndex, int index, QString path)
 {
     if (tabIndex == this->tabIndex && index == this->index) {
-        mathWidget->loadPlot(path);
+//        mathWidget->loadPlot(path);
     }
 }
 
@@ -114,3 +119,4 @@ bool Paragraph::isEmpty()
 {
     return mathEdit->toPlainText().length() == 0;
 }
+

@@ -6,6 +6,7 @@
 #include <QDebug>
 #include <QLabel>
 #include <QFontMetrics>
+#include <QProcess>
 
 #include "mathedit.h"
 #include "mathwidget.h"
@@ -19,7 +20,7 @@ class Paragraph : public QWidget
 public:
     explicit Paragraph(QWidget *parent = 0,
                        Euler *euler = 0,
-                       Renderer *renderer = 0,
+//                       Renderer *renderer = 0,
                        int tabIndex = 0,
                        int index = 0,
                        QString mathString = "");
@@ -27,8 +28,10 @@ public:
     int index;
     void focus();
     QString mathString;
+    QString latexString;
 
     MathEdit *mathEdit;
+    QLabel *mathWidget;
 
     bool isEmpty();
 
@@ -39,14 +42,16 @@ signals:
 //    void deleteLine_triggered(Paragraph *target);
 //    void changeFocus_triggered(Paragraph *paragraph, bool goUp);
     void keyboardAction(int action, Paragraph *);
+    void doRender(Paragraph *);
 
 private:
     Euler *euler;
-    Renderer *renderer;
-    MathWidget *mathWidget;
+//    Renderer *renderer;
+//    MathWidget *mathWidget;
     QLabel *lineNumberWidget;
 
     void initMathEdit();
+    void render();
 
 private slots:
     void preview();

@@ -1,56 +1,56 @@
-#ifndef RENDERER_H
-#define RENDERER_H
+//#ifndef RENDERER_H
+//#define RENDERER_H
 
-#include <QApplication>
-#include <QDesktopWidget>
+//#include <QApplication>
+//#include <QDesktopWidget>
 
-#include <QWidget>
-#include <QtWebEngineWidgets>
-#include <QWebEngineView>
-#include <QWebChannel>
+//#include <QWidget>
+//#include <QtWebEngineWidgets>
+//#include <QWebEngineView>
+//#include <QWebChannel>
 
-#include <QQueue>
-#include <QPixmap>
-#include <QDir>
-#include <QDebug>
+//#include <QQueue>
+//#include <QPixmap>
+//#include <QDir>
+//#include <QDebug>
 
-#include "mathwidget.h"
-#include "util.h"
+//#include "mathwidget.h"
+//#include "util.h"
 
-class Renderer : public QObject
-{
-    Q_OBJECT
-public:
-    explicit Renderer(int windowWidth, int windowHeight, QWidget *parent = 0);
-    void close();
-    void move(const QPoint p);
-    QWebEngineView *webengine;
+//class Renderer : public QObject
+//{
+//    Q_OBJECT
+//public:
+//    explicit Renderer(int windowWidth, int windowHeight, QWidget *parent = 0);
+//    void close();
+//    void move(const QPoint p);
+//    QWebEngineView *webengine;
 
-    qreal zoomFactor;
+//    qreal zoomFactor;
 
-    void setZoomFactor(int factor);
-    void render(MathWidget *target);
-    int windowWidth;
-    void restart();
+//    void setZoomFactor(int factor);
+//    void render(MathWidget *target);
+//    int windowWidth;
+//    void restart();
 
-public slots:
-    void loadFinished(bool);
-    void toggleRendering(bool disable);
-    void onRenderComplete(int outputWidth, int outputHeight);
+//public slots:
+//    void loadFinished(bool);
+//    void toggleRendering(bool disable);
+//    void onRenderComplete(int outputWidth, int outputHeight);
 
 
-private:
-    qreal baseScaling;
-    bool isRendering;
-    bool canRender;
-    bool hasRenderedOnce;
-    int getScreenDPI();
-    void startRendering();
-    QSize getSize();
-    QQueue<MathWidget*> queue;
-    QPixmap createPixmap(int width, int height);
-    MathWidget *currentlyRendering;
-    QWebChannel *channel;
-};
+//private:
+//    qreal baseScaling;
+//    bool isRendering;
+//    bool canRender;
+//    bool hasRenderedOnce;
+//    int getScreenDPI();
+//    void startRendering();
+//    QSize getSize();
+//    QQueue<MathWidget*> queue;
+//    QPixmap createPixmap(int width, int height);
+//    MathWidget *currentlyRendering;
+//    QWebChannel *channel;
+//};
 
-#endif // RENDERER_H
+//#endif // RENDERER_H

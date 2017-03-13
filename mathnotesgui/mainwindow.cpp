@@ -11,8 +11,10 @@ MainWindow::MainWindow(QWidget *parent) :
     euler = new Euler();
     connect(euler, SIGNAL(receivedMathString(int, int, QString)), this, SLOT(receivedMathString(int, int, QString)));
 
-    renderer = new Renderer(minimumWidth(), minimumHeight());
-    renderer->windowWidth = minimumWidth();
+//    renderer = new Renderer(minimumWidth(), minimumHeight());
+//    renderer->windowWidth = minimumWidth();
+
+    lsm_render = new LASEMRender();
 
     // Create splitter
     QSplitter *splitter = new QSplitter;
@@ -34,7 +36,7 @@ MainWindow::MainWindow(QWidget *parent) :
     splitter->addWidget(workspace);
     connect(euler, SIGNAL(receivedWorkspace(int, int, QVariantMap)), workspace, SLOT(receivedWorkspace(int, int, QVariantMap)));
 
-//     Create Command panel
+    // Create Command panel
     cmdpanel = new CmdPanel(this);
     container->layout()->addWidget(cmdpanel);
 
@@ -151,7 +153,7 @@ void MainWindow::createFileMenu()
 }
 
 void MainWindow::initRenderer() {
-    renderer->move(this->pos());
+//    renderer->move(this->pos());
 }
 
 void MainWindow::closeEvent(QCloseEvent *e) {
@@ -169,14 +171,14 @@ void MainWindow::closeEvent(QCloseEvent *e) {
         }
     } else {
         euler->terminate();
-        renderer->close();
+//        renderer->close();
         qDebug() << "Terminate python.";
     }
 }
 
 void MainWindow::moveEvent(QMoveEvent *)
 {
-    renderer->move(pos());
+//    renderer->move(pos());
 }
 
 void MainWindow::scrollTo(Paragraph *paragraph)
@@ -220,10 +222,12 @@ Paragraph * MainWindow::addNewParagraph(int lineNumber, QString mathString)
     int index = paragraphID;
     Paragraph *paragraph = new Paragraph(this,
                                          euler,
-                                         renderer,
+//                                         renderer,
                                          tabIndex,
                                          index,
                                          mathString);
+
+
 
     if (lineNumber < 0) {
         getTabContents()->layout()->addWidget(paragraph);
@@ -233,6 +237,7 @@ Paragraph * MainWindow::addNewParagraph(int lineNumber, QString mathString)
 
     connect(paragraph, SIGNAL(keyboardAction(int, Paragraph*)), this, SLOT(keyboardAction(int, Paragraph*)));
     connect(this, SIGNAL(lineNumberChanged(int, QLayout*)), paragraph, SLOT(lineNumberChanged(int, QLayout*)));
+    connect(paragraph, SIGNAL(doRender(Paragraph*)), lsm_render, SLOT(render(Paragraph*)));
 
     emit lineNumberChanged(tabIndex, getTabContents()->layout());
 
@@ -377,17 +382,17 @@ void MainWindow::receivedMathString(int, int, QString mathString)
 
 void MainWindow::on_action100_triggered()
 {
-    renderer->setZoomFactor(100);
+//    renderer->setZoomFactor(100);
 }
 
 void MainWindow::on_action150_triggered()
 {
-    renderer->setZoomFactor(150);
+//    renderer->setZoomFactor(150);
 }
 
 void MainWindow::on_action200_triggered()
 {
-    renderer->setZoomFactor(200);
+//    renderer->setZoomFactor(200);
 }
 
 void MainWindow::on_actionNew_triggered()
@@ -430,7 +435,7 @@ void MainWindow::onTabChange(int index)
 void MainWindow::on_actionRestart_core_triggered()
 {
     euler->restartCore();
-    renderer->restart();
+//    renderer->restart();
 }
 
 void MainWindow::on_actionClear_console_triggered()
