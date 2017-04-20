@@ -2,7 +2,7 @@
 # import matplotlib
 # matplotlib.use('AGG')
 # import matplotlib.pyplot as plt
-# import iEuler.mathlib as ml
+# import iEuler.modules.mathlib as ml
 # import modules.numpy.generator as generator
 # import modules.latex.generator
 # import modules.tools.transmit as transmit

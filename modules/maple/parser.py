@@ -1,10 +1,10 @@
 # maple parser for iEuler
-import iEuler.mathlib as ml
-import parsing as parsing
+import iEuler.modules.mathlib as ml
+import iEuler.modules.parsing as parsing
 from modules.maple.lib import *
 import re
 from iEuler.modules.pyparsing.pyparsing import *
-import parsing
+import iEuler.modules.parsing
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 

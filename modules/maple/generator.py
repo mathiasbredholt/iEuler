@@ -1,5 +1,5 @@
 # maple parser for iEuler
-import iEuler.mathlib as ml
+import iEuler.modules.mathlib as ml
 from modules.maple.lib import *
 
 

@@ -1,5 +1,5 @@
-import iEuler.mathlib as ml
-import iEuler.textlib as tl
+import iEuler.modules.mathlib as ml
+import iEuler.modules.textlib as tl
 import iEuler.parsing as parsing
 from iEuler.modules.ieuler.lib import *
 import re

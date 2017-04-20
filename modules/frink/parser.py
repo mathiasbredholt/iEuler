@@ -1,10 +1,10 @@
 # Frink parser for iEuler
-import iEuler.mathlib as ml
-import parsing as parsing
+import iEuler.modules.mathlib as ml
+import iEuler.modules.parsing as parsing
 from modules.frink.lib import *
 import re
 from pyparsing import *
-import parsing
+import iEuler.modules.parsing
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 

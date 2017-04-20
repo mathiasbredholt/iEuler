@@ -1,4 +1,4 @@
-import iEuler.mathlib as ml
+import iEuler.modules.mathlib as ml
 import iEuler.parsing as parsing
 from iEuler.modules.ieuler.lib import *
 import re

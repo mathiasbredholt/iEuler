@@ -4,6 +4,7 @@ import queue
 # import iEuler.modules.pexpect.pexpect as pexpect
 
 import iEuler.modules.ieuler.parser as parser
+import iEuler.modules.ieuler.generator as euler_generator
 import iEuler.modules.latex.generator as latex_generator
 
 path = sublime.packages_path() + "/iEuler"
@@ -32,7 +33,6 @@ class EulerEventListener(sublime_plugin.ViewEventListener):
         math_string = self.view.substr(self.view.line(region))
 
         math_obj = parser.parse(math_string, workspace, True)
-        # print(math_obj)
         latex_string = latex_generator.generate(math_obj)
 
         print("Latex: ", latex_string)
