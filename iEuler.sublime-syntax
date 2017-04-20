@@ -1,0 +1,10 @@
+%YAML 1.2
+---
+# See http://www.sublimetext.com/docs/3/syntax.html
+name: iEuler
+file_extensions: [euler]
+scope: euler
+contexts:
+  main:
+    - match: \b(if|else|for|while)\b
+      scope: keyword.control.euler

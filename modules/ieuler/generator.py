@@ -1,6 +1,5 @@
-
-import mathlib as ml
-from modules.ieuler.lib import *
+import iEuler.mathlib as ml
+from iEuler.modules.ieuler.lib import *
 
 
 def generate(input_expr):

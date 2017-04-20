@@ -1,12 +1,11 @@
-
-import mathlib as ml
-import textlib as tl
-import parsing
-from modules.ieuler.lib import *
+import iEuler.mathlib as ml
+import iEuler.textlib as tl
+import iEuler.parsing as parsing
+from iEuler.modules.ieuler.lib import *
 import re
-from pyparsing import *
-import modules.ieuler.mathparser as math
-import modules.tools.plot2d as plot2d
+from iEuler.modules.pyparsing.pyparsing import *
+import iEuler.modules.ieuler.mathparser as math
+import iEuler.modules.tools.plot2d as plot2d
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
 

@@ -1,9 +1,10 @@
-from modules.ieuler.lib import *
-import modules.ieuler.mathparser as math
-import modules.ieuler.textparser as text
 import json
-from pyparsing import ParseException
+from iEuler.modules.pyparsing.pyparsing import ParseException
 from traceback import print_exc
+
+from iEuler.modules.ieuler.lib import *
+import iEuler.modules.ieuler.mathparser as math
+import iEuler.modules.ieuler.textparser as text
 
 
 def parse(string, workspace, eval=True):

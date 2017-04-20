@@ -1,5 +1,5 @@
 # Command line interface for iEuler
-import mathlib as ml
+import iEuler.mathlib as ml
 import math
 
 __plot_vars__ = {}

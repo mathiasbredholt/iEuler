@@ -1,4 +1,4 @@
-import mathlib as ml
+import iEuler.mathlib as ml
 
 functions = {
     "sqrt": {
@@ -30,14 +30,11 @@ variables = {
 units = {
     'units': ['V', 'A', 'J', 'm', 's', 'K', 'W', 'H', 'F', 'T', 'g', 'Hz', 'N', 'Pa', 'C', 'Ohm', 'ohm', 'Omega', 'S', 'Wb', 'lm', 'lx', 'Bq', 'Gy', 'Sv', 'cd', 'mol'],
     'aliases': {
-        'Ohm': 'ohm',
-        'rad': 'radian'
+        'ohm': 'Ohm'
     },
     'plural': 's',
     'prefixes': {'y': -24, 'z': -21, 'a': -18, 'f': -15, 'p': -12, 'n': -9, u'μ': -6, 'm': -3, 'c': -2, 'd': -1, 'da': 1, 'h': 2, 'k': 3, 'M': 6, 'G': 9, 'T': 12, 'P': 15, 'E': 18, 'Z': 21, 'Y': 24},
-    'prefix_aliases': {
-        u'μ': 'micro'
-    },
+    'prefix_aliases': {},
     'escape_character': ''
 }
 

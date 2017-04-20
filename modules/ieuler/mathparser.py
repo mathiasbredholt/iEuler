@@ -1,9 +1,9 @@
-import mathlib as ml
-import parsing
-from modules.ieuler.lib import *
+import iEuler.mathlib as ml
+import iEuler.parsing as parsing
+from iEuler.modules.ieuler.lib import *
 import re
 import copy
-from pyparsing import *
+from iEuler.modules.pyparsing.pyparsing import *
 from importlib import import_module
 
 ParserElement.enablePackrat()  # Vastly improves pyparsing performance
@@ -105,8 +105,6 @@ def get_attr_op(toks):
         else:
             decorator = t[2]
             user_variables[variable.name()].add_decorator(decorator)
-
-    print(user_variables)
     return variable
 
 
@@ -242,7 +240,6 @@ expression.parseWithTabs()
 
 
 def parse(text, eval, worksp):
-    # print(workspace)
     global workspace
     global user_variables
     global evaluate

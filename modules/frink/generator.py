@@ -1,5 +1,5 @@
 # Frink generator for iEuler
-import mathlib as ml
+import iEuler.mathlib as ml
 from modules.frink.lib import *
 
 
@@ -21,7 +21,7 @@ def parentheses(input_expr, do=True):
 
 def convert_value(self):
     if type(self) is ml.Unit:
-        return (self.prefix if not self.prefix in units['prefix_aliases'] else units['prefix_aliases'][self.prefix]) + (self.value if not self.value in units['aliases'] else units['aliases'][self.value])
+        return (self.prefix if self.prefix != u'μ' else 'micro') + (self.value if self.value != 'Ohm' else 'ohm')
     return self.value
 
 

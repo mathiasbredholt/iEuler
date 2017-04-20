@@ -1,6 +1,6 @@
-import mathlib as ml
-import textlib as tl
-from modules.latex.lib import *
+import iEuler.mathlib as ml
+import iEuler.textlib as tl
+from iEuler.modules.latex.lib import *
 
 
 def display_math(input_expr):
@@ -17,8 +17,6 @@ def generate(input_expr, display=True, delimiters=True):
         return result  # Change display math system
     else:
         return result  # Change display math system
-
-    result = input_expr.to_latex()
 
 
 def convert_expr(input_expr, display=True):

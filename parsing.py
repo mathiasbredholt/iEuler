@@ -1,7 +1,7 @@
 import re
-import mathlib as ml
+import iEuler.mathlib as ml
 from functools import reduce
-from pyparsing import Keyword, White, NotAny, alphas, alphas8bit, nums, Word
+from iEuler.modules.pyparsing.pyparsing import Keyword, White, NotAny, alphas, alphas8bit, nums, Word
 
 
 letters = alphas + alphas8bit
@@ -63,7 +63,7 @@ def get_variable(toks, variables, symbols={"__standard__": []}, user_variables={
         subscript = None
         name = value
 
-    print(value)
+    # print(value)
 
     # print("Variable: {}".format(name))
     if name in variables:

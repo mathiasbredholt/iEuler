@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>katex.html</file>
-    </qresource>
-</RCC>

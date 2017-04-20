@@ -1,4 +1,3 @@
-
 class Paragraph:
 
     def __init__(self, blocks):
