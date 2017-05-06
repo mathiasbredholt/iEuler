@@ -1,4 +1,0 @@
-frink = "/Applications/Frink/frink.jar"
-maple = "/Library/Frameworks/Maple.framework/Versions/2015/bin/maple"
-default_calculator = "maple"
-pdflatex = "/usr/local/texlive/2015/bin/x86_64-darwin/pdftex"
