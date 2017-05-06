@@ -13,9 +13,8 @@ def run(cmd, catch=True):
                  stdin=PIPE,
                  stderr=STDOUT,
                  universal_newlines=True,
-                 shell=True,
-                 bufsize=1,
-                 close_fds=ON_POSIX)
+                 bufsize=1)
+    # close_fds=ON_POSIX)
 
     queue = Queue()
     thread = Thread(target=enqueue_output, args=(proc.stdout, queue))

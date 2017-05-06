@@ -1,6 +1,6 @@
 import iEuler.modules.mathlib as ml
 import iEuler.modules.textlib as tl
-import iEuler.parsing as parsing
+import iEuler.modules.parsing as parsing
 from iEuler.modules.ieuler.lib import *
 import re
 from iEuler.modules.pyparsing.pyparsing import *

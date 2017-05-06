@@ -1,8 +1,10 @@
 import sublime
 import sublime_plugin
 import queue
+import os
 # import iEuler.modules.pexpect.pexpect as pexpect
 
+import iEuler.modules.tools.procio as procio
 import iEuler.modules.ieuler.parser as parser
 import iEuler.modules.ieuler.generator as euler_generator
 import iEuler.modules.latex.generator as latex_generator
@@ -15,7 +17,6 @@ workspace["raw_input"] = {}
 workspace["parsed_input"] = {}
 workspace["latex_output"] = {}
 workspace["default_calculator"] = "maple"
-
 
 mathematical = None
 
@@ -35,7 +36,7 @@ class EulerEventListener(sublime_plugin.ViewEventListener):
         math_obj = parser.parse(math_string, workspace, True)
         latex_string = latex_generator.generate(math_obj)
 
-        print("Latex: ", latex_string)
+        # print("Latex: ", latex_string)
 
         # if mathematical is None:
         #     cmd = "'" + path + "/modules/mathematical/render.rb'"
@@ -55,15 +56,22 @@ class EulerEventListener(sublime_plugin.ViewEventListener):
 
         # print(data)
 
+        # (proc, queue, thread) = procio.run(
+        #     os.getcwd() + '/modules/mathematical/render.rb', False)
+        # proc.kill()
+
+        html = "<div style='background-color:white; padding: 1em; color: black'>{}</div>".format(
+            latex_string)
+
         # html = "<div style='background-color:white; padding: 1em;'><img src=\"{}\"></div>".format(
         #     "data:image/png;base64," + data)
 
-        # (row, col) = self.view.rowcol(region.begin())
+        (row, col) = self.view.rowcol(region.begin())
 
-        # self.view.erase_phantoms("eq" + str(row))
+        self.view.erase_phantoms("eq" + str(row))
 
-        # self.view.add_phantom("eq" + str(row), region,
-        #                       html, sublime.LAYOUT_BLOCK)
+        self.view.add_phantom("eq" + str(row), region,
+                              html, sublime.LAYOUT_BLOCK)
 
     @classmethod
     def is_applicable(cls, settings):
