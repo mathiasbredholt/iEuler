@@ -6,6 +6,6 @@ require 'socket'
 
 math = Mathematical.new({:format => :png, :ppi => 120.0})
 
-File.open('out.png', 'wb') { |file|
-    file.write(math.render("$$" + ARGV[0] + "$$")[:data])
+File.open(ARGV[0], 'wb') { |file|
+    file.write(math.render("$$" + ARGV[1] + "$$")[:data])
 }

@@ -17,7 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     lsm_render = new LASEMRender();
 
     // Create splitter
-    QSplitter *splitter = new QSplitter;
+    QSplitter *splitter = new QSplitter();
     splitter->setOrientation(Qt::Vertical);
     container->layout()->addWidget(splitter);
 

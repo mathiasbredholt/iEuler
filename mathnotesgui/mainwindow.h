@@ -2,7 +2,6 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-//#include "ui_mainwindow.h"
 #include <QDebug>
 #include <QTabWidget>
 #include <QScrollArea>
@@ -10,8 +9,10 @@
 #include <QFileInfo>
 #include <QStandardPaths>
 #include <QMessageBox>
-#include <QtWebEngineWidgets>
-#include <QWebEngineView>
+#include <QSplitter>
+#include <QMenuBar>
+//#include <QtWebEngineWidgets>
+//#include <QWebEngineView>
 #include <QMoveEvent>
 #include <QThread>
 
